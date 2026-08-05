@@ -1,0 +1,24 @@
+{
+  "projectId": "6931782476800309476",
+  "title": "Pastel Teacher Planner",
+  "deviceType": "MOBILE",
+  "lastSyncTime": "2026-07-20T13:40:00.000Z",
+  "screens": {
+    "00d5e33c6ee943aa863688062fd051fd": { "id": "00d5e33c6ee943aa863688062fd051fd" },
+    "1dd86120c08b433ca2a54b288c16dcc1": { "id": "1dd86120c08b433ca2a54b288c16dcc1" },
+    "30d1921cce604aa3af4da9ef9d306983": { "id": "30d1921cce604aa3af4da9ef9d306983" },
+    "3d5f21e9ec8e4b7f888e22e7d07b4fa5": { "id": "3d5f21e9ec8e4b7f888e22e7d07b4fa5" },
+    "4374ef74677349a9845c37db1638e4ea": { "id": "4374ef74677349a9845c37db1638e4ea" },
+    "48836566555c47058f220d4bcb9b9136": { "id": "48836566555c47058f220d4bcb9b9136" },
+    "65760adca0104cb7905607d60cba614a": { "id": "65760adca0104cb7905607d60cba614a" },
+    "69391810f36c406abf3a199c7027f4dd": { "id": "69391810f36c406abf3a199c7027f4dd" },
+    "7596721ab4104a61b99e5484a19258a4": { "id": "7596721ab4104a61b99e5484a19258a4" },
+    "761f15931a7f4fba89646bf7d10956d7": { "id": "761f15931a7f4fba89646bf7d10956d7" },
+    "875a44dbb5e446e1bb31ee2a1930a148": { "id": "875a44dbb5e446e1bb31ee2a1930a148" },
+    "8ed6501113bb454fb14de10fcdf6435b": { "id": "8ed6501113bb454fb14de10fcdf6435b" },
+    "9d4dc4a759e44b07ae82bfd1df682330": { "id": "9d4dc4a759e44b07ae82bfd1df682330" },
+    "ad38b81e1d394addbd252945380fd1c9": { "id": "ad38b81e1d394addbd252945380fd1c9" },
+    "ea51b70e545944b9a16669f137a559fc": { "id": "ea51b70e545944b9a16669f137a559fc" },
+    "f973e7c5dd3b4978b536bd178c6c181b": { "id": "f973e7c5dd3b4978b536bd178c6c181b" }
+  }
+}

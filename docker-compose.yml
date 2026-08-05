@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      target: development
+    container_name: cuteteachy_web
+    ports:
+      - "3000:3000"
+    volumes:
+      # Mount toàn bộ code từ máy vào Container để Hot-Reload hoạt động
+      - .:/app
+      # Đảm bảo node_modules của máy tính và Container không "đánh nhau"
+      - /app/node_modules
+      - /app/apps/web/node_modules
+      - /app/packages/api/node_modules
+      - /app/packages/database/node_modules
+      - /app/packages/types/node_modules
+    environment:
+      - NODE_ENV=development
+      # Khai báo cổng mặc định
+      - PORT=3000
+
+# Tương lai: Khi nào bạn sẵn sàng tích hợp BE (NestJS) hoặc Database,
+# chúng ta sẽ thêm service postgresql và nestjs vào ngay dưới file này.
