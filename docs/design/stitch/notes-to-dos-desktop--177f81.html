@@ -1,0 +1,324 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>GentleTeach - Notes</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-container": "#4f6877",
+                        "surface-container": "#f7ebeb",
+                        "on-primary-fixed-variant": "#5f3c4d",
+                        "on-primary-fixed": "#2e1221",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed": "#021e2b",
+                        "surface-container-high": "#f1e5e5",
+                        "on-tertiary-fixed": "#1b1d0e",
+                        "on-secondary-fixed-variant": "#314a59",
+                        "tertiary-container": "#d7d7bf",
+                        "surface-container-low": "#fdf1f1",
+                        "primary-fixed": "#ffd8e7",
+                        "outline-variant": "#d2c3c7",
+                        "on-surface-variant": "#4f4448",
+                        "on-primary-container": "#765162",
+                        "on-error-container": "#93000a",
+                        "error-container": "#ffdad6",
+                        "inverse-surface": "#352f2f",
+                        "surface-bright": "#fff8f7",
+                        "surface": "#fff8f7",
+                        "primary-fixed-dim": "#e9bacd",
+                        "on-tertiary-fixed-variant": "#474836",
+                        "inverse-primary": "#e9bacd",
+                        "tertiary-fixed-dim": "#c8c8b0",
+                        "inverse-on-surface": "#faeeee",
+                        "secondary": "#496271",
+                        "surface-dim": "#e3d7d7",
+                        "secondary-fixed": "#cce6f9",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed-dim": "#b0cadc",
+                        "on-surface": "#201a1a",
+                        "on-error": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "primary-container": "#f8c8dc",
+                        "surface-variant": "#ebe0e0",
+                        "primary": "#795465",
+                        "surface-tint": "#795465",
+                        "tertiary-fixed": "#e4e4cc",
+                        "on-background": "#201a1a",
+                        "on-tertiary-container": "#5c5d4a",
+                        "error": "#ba1a1a",
+                        "surface-container-highest": "#ebe0e0",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#cce6f9",
+                        "background": "#fff8f7",
+                        "tertiary": "#5e604d",
+                        "outline": "#817478"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-padding": "20px",
+                        "gutter": "16px",
+                        "base": "4px",
+                        "unit-4": "16px",
+                        "unit-6": "24px",
+                        "unit-2": "8px",
+                        "unit-8": "32px",
+                        "unit-1": "4px"
+                    },
+                    "fontFamily": {
+                        "title-lg": ["Quicksand"],
+                        "headline-md": ["Quicksand"],
+                        "body-lg": ["Quicksand"],
+                        "body-sm": ["Quicksand"],
+                        "display-lg-mobile": ["Quicksand"],
+                        "label-md": ["Quicksand"],
+                        "display-lg": ["Quicksand"]
+                    },
+                    "fontSize": {
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "500" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "display-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700" }],
+                        "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: theme('colors.background'); }
+        .ambient-shadow { box-shadow: 0 4px 20px rgba(121, 84, 101, 0.08); }
+        .glass-blur { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        /* Masonry fallback */
+        .masonry-grid { column-count: 1; column-gap: 1.5rem; }
+        @media (min-width: 768px) { .masonry-grid { column-count: 2; } }
+        @media (min-width: 1024px) { .masonry-grid { column-count: 3; } }
+        @media (min-width: 1280px) { .masonry-grid { column-count: 4; } }
+        .masonry-item { break-inside: avoid; margin-bottom: 1.5rem; }
+    </style>
+</head>
+<body class="text-on-background font-body-lg min-h-screen flex selection:bg-primary-container selection:text-on-primary-container">
+<!-- SideNavBar (Hidden on Mobile) -->
+<nav class="hidden md:flex h-screen w-64 fixed left-0 top-0 bg-surface-container-low dark:bg-surface-container-lowest shadow-sm flex-col py-unit-6 px-unit-4 z-40">
+<!-- Header -->
+<div class="flex items-center gap-unit-4 mb-unit-8 px-unit-4">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-primary-container flex-shrink-0">
+<img alt="Teacher Profile Picture" class="w-full h-full object-cover" data-alt="A gentle, soft-focus portrait of an educator in a bright, modern classroom setting. Warm beige and soft pink tones. The teacher is smiling gently, conveying a sense of calm and organized productivity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCREidOiqQbaS4xodQ4tWF-9UPW3lMGT4vJTwGnuk5by7TH1ok8ONvVatoAn0dl-uJh0mnrJlvego0AgWAMqVvz4l3EhO1kRgJusKdcFn2w4i9aPxeHbYXX7S5Y5XSGd8gA_zniWU0NArRWRoVXDfn-zBIo6-f8v3Zem7T_EOi2D5mfXbIvlIZMdY3pIUjxGi0giH5aksJHofNfkY7Q-_OHdIhMISP5XTW0ftnGi_fjqUpUziHKoZhs5UbHl_aZF52LYdk1jjwapzo">
+</div>
+<div>
+<h1 class="font-display-lg text-display-lg text-primary dark:text-primary-fixed-dim leading-none tracking-tight">GentleTeach</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Educator Portal</p>
+</div>
+</div>
+<!-- Navigation Tabs -->
+<div class="flex flex-col gap-unit-2 flex-grow">
+<!-- Home: Inactive -->
+<a class="flex items-center gap-unit-4 px-unit-4 py-3 rounded-lg text-on-secondary-container dark:text-on-secondary-fixed-variant hover:bg-secondary-container/50 dark:hover:bg-secondary-fixed/20 transition-colors Active: scale-95 transition-transform group" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:text-primary transition-colors" data-icon="home">home</span>
+<span class="font-body-lg text-body-lg">Home</span>
+</a>
+<!-- Calendar: Inactive -->
+<a class="flex items-center gap-unit-4 px-unit-4 py-3 rounded-lg text-on-secondary-container dark:text-on-secondary-fixed-variant hover:bg-secondary-container/50 dark:hover:bg-secondary-fixed/20 transition-colors Active: scale-95 transition-transform group" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:text-primary transition-colors" data-icon="calendar_today">calendar_today</span>
+<span class="font-body-lg text-body-lg">Calendar</span>
+</a>
+<!-- Notes: ACTIVE STATE -->
+<a class="flex items-center gap-unit-4 px-unit-4 py-3 rounded-lg text-primary dark:text-primary-fixed-dim font-bold border-r-4 border-primary bg-primary-container/10 Active: scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined text-2xl" data-icon="description" data-weight="fill" style="font-variation-settings: 'FILL' 1;">description</span>
+<span class="font-body-lg text-body-lg">Notes</span>
+</a>
+<!-- Profile: Inactive -->
+<a class="flex items-center gap-unit-4 px-unit-4 py-3 rounded-lg text-on-secondary-container dark:text-on-secondary-fixed-variant hover:bg-secondary-container/50 dark:hover:bg-secondary-fixed/20 transition-colors Active: scale-95 transition-transform group" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:text-primary transition-colors" data-icon="person">person</span>
+<span class="font-body-lg text-body-lg">Profile</span>
+</a>
+</div>
+<!-- Footer Tab -->
+<div class="mt-auto pt-unit-4 border-t border-surface-variant/50">
+<a class="flex items-center gap-unit-4 px-unit-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-variant/50 transition-colors Active: scale-95 transition-transform group" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:text-error transition-colors" data-icon="logout">logout</span>
+<span class="font-body-lg text-body-lg">Logout</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<div class="flex-1 flex flex-col min-h-screen md:ml-64 w-full">
+<!-- TopNavBar (Hidden on Mobile) -->
+<header class="hidden md:flex sticky top-0 w-full bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md justify-between items-center h-20 px-unit-8 z-30">
+<!-- Product Name / Context -->
+<div class="flex items-center gap-unit-4">
+<h2 class="font-headline-md text-headline-md text-on-surface dark:text-on-surface-variant">Hello, Teacher</h2>
+</div>
+<!-- Search & Actions -->
+<div class="flex items-center gap-unit-6">
+<!-- Search Bar -->
+<div class="relative flex items-center group">
+<span class="material-symbols-outlined absolute left-3 text-on-surface-variant z-10" data-icon="search">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container-high/50 rounded-full border-none focus:ring-2 focus:ring-secondary focus-within:ring-2 focus-within:ring-secondary text-body-sm font-body-sm text-on-surface placeholder:text-on-surface-variant/70 w-64 transition-all glass-blur" placeholder="Search notes gently..." type="text">
+</div>
+<!-- Trailing Icons -->
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high/50 dark:hover:bg-surface-container-highest/30 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-secondary">
+<span class="material-symbols-outlined text-2xl" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high/50 dark:hover:bg-surface-container-highest/30 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-secondary">
+<span class="material-symbols-outlined text-2xl" data-icon="settings">settings</span>
+</button>
+</div>
+</header>
+<!-- Page Content Canvas -->
+<main class="flex-1 p-container-padding md:p-unit-8 w-full max-w-[1600px] mx-auto">
+<!-- Page Header / Actions -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-unit-4 mb-unit-8">
+<div>
+<h1 class="font-display-lg text-display-lg text-on-surface mb-1">Your Notes &amp; Thoughts</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Capture fleeting ideas and structured plans.</p>
+</div>
+<!-- Filter Pills -->
+<div class="flex flex-wrap gap-unit-2">
+<button class="px-4 py-1.5 rounded-full bg-primary text-on-primary font-label-md text-label-md transition-colors shadow-sm">All</button>
+<button class="px-4 py-1.5 rounded-full bg-surface-container-high text-on-surface-variant hover:bg-secondary-container hover:text-on-secondary-container font-label-md text-label-md transition-colors">Prep</button>
+<button class="px-4 py-1.5 rounded-full bg-surface-container-high text-on-surface-variant hover:bg-secondary-container hover:text-on-secondary-container font-label-md text-label-md transition-colors">Meetings</button>
+<button class="px-4 py-1.5 rounded-full bg-surface-container-high text-on-surface-variant hover:bg-secondary-container hover:text-on-secondary-container font-label-md text-label-md transition-colors">Ideas</button>
+</div>
+</div>
+<!-- Masonry Grid for Notes -->
+<div class="masonry-grid">
+<!-- Note Card 1: Urgent/Primary -->
+<div class="masonry-item bg-surface-container-lowest rounded-xl p-unit-6 ambient-shadow group hover:shadow-md transition-shadow relative overflow-hidden border border-surface-container-high">
+<div class="absolute top-0 left-0 w-full h-1 bg-primary"></div>
+<div class="flex justify-between items-start mb-unit-4">
+<h3 class="font-title-lg text-title-lg text-on-surface pr-8">Prepare Science Materials</h3>
+<div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity absolute right-4 top-4">
+<button class="p-1 text-on-surface-variant hover:text-primary rounded-full hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="edit">edit</span>
+</button>
+<button class="p-1 text-on-surface-variant hover:text-error rounded-full hover:bg-error-container/50 transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="delete">delete</span>
+</button>
+</div>
+</div>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-unit-4 line-clamp-4">
+                        Need to gather the microscopes from storage room B. Check if we have enough slides for 30 students. Also, print out the observation worksheets for the 'Cells &amp; Structures' lab on Thursday. Remember to request distilled water.
+                    </p>
+<div class="flex flex-wrap gap-2 mt-auto">
+<span class="px-3 py-1 bg-primary-container/50 text-on-primary-container rounded-full font-label-md text-label-md">Science</span>
+<span class="px-3 py-1 bg-secondary-container/50 text-on-secondary-container rounded-full font-label-md text-label-md">Prep</span>
+<span class="px-3 py-1 bg-error-container/30 text-on-error-container rounded-full font-label-md text-label-md flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="schedule">schedule</span> Tomorrow
+                        </span>
+</div>
+</div>
+<!-- Note Card 2: List -->
+<div class="masonry-item bg-surface-container-lowest rounded-xl p-unit-6 ambient-shadow group hover:shadow-md transition-shadow relative border border-surface-container-high">
+<div class="flex justify-between items-start mb-unit-4">
+<h3 class="font-title-lg text-title-lg text-on-surface pr-8">Review Math Homework</h3>
+<div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity absolute right-4 top-4">
+<button class="p-1 text-on-surface-variant hover:text-primary rounded-full hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="edit">edit</span>
+</button>
+<button class="p-1 text-on-surface-variant hover:text-error rounded-full hover:bg-error-container/50 transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="delete">delete</span>
+</button>
+</div>
+</div>
+<div class="flex flex-col gap-2 mb-unit-4 font-body-lg text-body-lg text-on-surface-variant">
+<label class="flex items-center gap-3 group/chk cursor-pointer">
+<input checked="" class="form-checkbox h-5 w-5 text-secondary border-outline-variant rounded focus:ring-secondary/50 focus:ring-offset-0 bg-transparent transition-colors" type="checkbox">
+<span class="line-through opacity-60 transition-all">Grade Section A fractions</span>
+</label>
+<label class="flex items-center gap-3 group/chk cursor-pointer">
+<input class="form-checkbox h-5 w-5 text-secondary border-outline-variant rounded focus:ring-secondary/50 focus:ring-offset-0 bg-transparent transition-colors" type="checkbox">
+<span class="group-hover/chk:text-on-surface transition-colors">Grade Section B word problems</span>
+</label>
+<label class="flex items-center gap-3 group/chk cursor-pointer">
+<input class="form-checkbox h-5 w-5 text-secondary border-outline-variant rounded focus:ring-secondary/50 focus:ring-offset-0 bg-transparent transition-colors" type="checkbox">
+<span class="group-hover/chk:text-on-surface transition-colors">Enter grades into portal</span>
+</label>
+<label class="flex items-center gap-3 group/chk cursor-pointer">
+<input class="form-checkbox h-5 w-5 text-secondary border-outline-variant rounded focus:ring-secondary/50 focus:ring-offset-0 bg-transparent transition-colors" type="checkbox">
+<span class="group-hover/chk:text-on-surface transition-colors">Flag students needing extra help</span>
+</label>
+</div>
+<div class="flex flex-wrap gap-2 mt-auto pt-2 border-t border-surface-variant/30">
+<span class="px-3 py-1 bg-secondary-container/50 text-on-secondary-container rounded-full font-label-md text-label-md">Math</span>
+<span class="px-3 py-1 bg-surface-variant text-on-surface-variant rounded-full font-label-md text-label-md">Grading</span>
+</div>
+</div>
+<!-- Note Card 3: Image / Media -->
+<div class="masonry-item bg-surface-container-lowest rounded-xl p-0 ambient-shadow group hover:shadow-md transition-shadow relative overflow-hidden border border-surface-container-high">
+<div class="h-32 w-full bg-tertiary-container relative">
+<img alt="Art project inspiration" class="w-full h-full object-cover opacity-80 mix-blend-multiply" data-alt="A softly lit close up of watercolor paints and brushes on a wooden desk. Gentle pastel colors, calm and inspiring educational mood." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAcc8Xh1wgOtjBAN7SA1DnCkwtm9_oXt7ly93Yv9Yf2kMze_8zDrte2QOcu2TWv6LAKUKN-9rl4E7SbveQLdTo1bldmGH3Zw4UlkcvIwApYIXWeX53fLeQXZ4bsyNLp2EWZ_RftNaAj0sou0NSAd6HrpjRWatopBc6EaFwy3ngxo-J6xndOs1Q9sE7g9CjCei32cg0GVl6Tyo5a8a9OMz9QXpNiWIsyb29nmEsgS3lRC7jmq_0rZfxkoBqm3GC94Mz1wTn2gRDqOMU">
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest to-transparent"></div>
+</div>
+<div class="p-unit-6 pt-2">
+<div class="flex justify-between items-start mb-unit-2">
+<h3 class="font-title-lg text-title-lg text-on-surface pr-8">Spring Art Project Ideas</h3>
+<div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity absolute right-4 top-4 bg-surface-container-lowest/80 backdrop-blur-sm rounded-full p-1">
+<button class="p-1 text-on-surface-variant hover:text-primary rounded-full hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="edit">edit</span>
+</button>
+<button class="p-1 text-on-surface-variant hover:text-error rounded-full hover:bg-error-container/50 transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="delete">delete</span>
+</button>
+</div>
+</div>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-unit-4">
+                            Look into using recycled materials for the upcoming Earth Day project. Maybe bottle cap murals or papier-mâché globes? Ask parents for donations of clean recyclables next newsletter.
+                        </p>
+<div class="flex flex-wrap gap-2 mt-auto">
+<span class="px-3 py-1 bg-tertiary-container/40 text-on-tertiary-container rounded-full font-label-md text-label-md">Art</span>
+<span class="px-3 py-1 bg-surface-variant text-on-surface-variant rounded-full font-label-md text-label-md">Ideas</span>
+</div>
+</div>
+</div>
+<!-- Note Card 4: Short text -->
+<div class="masonry-item bg-surface-container-lowest rounded-xl p-unit-6 ambient-shadow group hover:shadow-md transition-shadow relative border border-surface-container-high">
+<div class="flex justify-between items-start mb-unit-2">
+<h3 class="font-title-lg text-title-lg text-on-surface pr-8">Parent Meeting Notes - Sarah P.</h3>
+<div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity absolute right-4 top-4">
+<button class="p-1 text-on-surface-variant hover:text-primary rounded-full hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="edit">edit</span>
+</button>
+</div>
+</div>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-unit-4 italic text-on-surface-variant/80 border-l-2 border-secondary pl-3 ml-1">
+                        "Sarah has been reading more at home but struggles with comprehension questions."
+                    </p>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-unit-4">
+                        Action item: Provide graphic organizers for reading homework to help her map out story elements. Check in next Tuesday.
+                    </p>
+<div class="flex flex-wrap gap-2 mt-auto">
+<span class="px-3 py-1 bg-surface-variant text-on-surface-variant rounded-full font-label-md text-label-md">Meetings</span>
+<span class="px-3 py-1 bg-surface-variant text-on-surface-variant rounded-full font-label-md text-label-md">Reading</span>
+</div>
+</div>
+<!-- Note Card 5: Empty/New State look -->
+<div class="masonry-item bg-surface-container border-2 border-dashed border-outline-variant/50 rounded-xl p-unit-6 flex flex-col items-center justify-center text-center min-h-[200px] cursor-pointer hover:bg-surface-container-high/50 hover:border-outline transition-all group">
+<div class="w-12 h-12 rounded-full bg-primary-container/50 text-primary flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-3xl" data-icon="add">add</span>
+</div>
+<h3 class="font-title-lg text-title-lg text-on-surface">Capture a thought</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Jot down something gently</p>
+</div>
+</div>
+</main>
+</div>
+<!-- Floating Action Button (FAB) -->
+<button class="fixed bottom-8 right-8 z-50 flex items-center justify-center gap-2 bg-primary hover:bg-on-primary-container text-on-primary rounded-2xl p-4 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+<span class="material-symbols-outlined text-[28px]" data-icon="edit_square">edit_square</span>
+<span class="font-title-lg text-[16px] pr-2 max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300 ease-in-out whitespace-nowrap opacity-0 group-hover:opacity-100">Quick Task</span>
+</button>
+</body></html>

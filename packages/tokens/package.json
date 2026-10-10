@@ -1,0 +1,24 @@
+{
+  "name": "@cute-teachy/tokens",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./theme.css": {
+      "style": "./css/theme.css",
+      "default": "./css/theme.css"
+    }
+  },
+  "scripts": {
+    "generate": "node scripts/generate-css.ts",
+    "check-types": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^22.15.3",
+    "typescript": "5.9.2"
+  }
+}

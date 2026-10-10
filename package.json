@@ -7,6 +7,8 @@
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
+    "test": "turbo run test",
+    "web": "pnpm --filter web dev",
     "mobile": "pnpm --filter mobile start"
   },
   "devDependencies": {
@@ -14,13 +16,14 @@
     "turbo": "^2.10.5",
     "typescript": "5.9.2"
   },
+  "packageManager": "pnpm@11.28.2",
   "engines": {
-    "node": ">=18"
+    "node": ">=22.13"
   },
   "devEngines": {
     "packageManager": {
       "name": "pnpm",
-      "version": "9.1.0"
+      "version": "11.28.2"
     }
   }
 }

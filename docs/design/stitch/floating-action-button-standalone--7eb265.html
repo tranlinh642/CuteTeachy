@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Floating Action Button</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-background": "#201a1a",
+                        "secondary": "#496271",
+                        "primary-container": "#f8c8dc",
+                        "on-secondary-fixed": "#021e2b",
+                        "surface-variant": "#ebe0e0",
+                        "tertiary": "#5e604d",
+                        "on-secondary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "inverse-primary": "#e9bacd",
+                        "background": "#fff8f7",
+                        "primary-fixed-dim": "#e9bacd",
+                        "on-surface": "#201a1a",
+                        "primary": "#795465",
+                        "primary-fixed": "#ffd8e7",
+                        "surface-container-high": "#f1e5e5",
+                        "on-tertiary-fixed": "#1b1d0e",
+                        "error-container": "#ffdad6",
+                        "on-secondary-container": "#4f6877",
+                        "tertiary-fixed": "#e4e4cc",
+                        "surface-bright": "#fff8f7",
+                        "tertiary-fixed-dim": "#c8c8b0",
+                        "surface-container-highest": "#ebe0e0",
+                        "on-error-container": "#93000a",
+                        "on-surface-variant": "#4f4448",
+                        "on-primary-fixed": "#2e1221",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-container": "#765162",
+                        "secondary-fixed-dim": "#b0cadc",
+                        "secondary-fixed": "#cce6f9",
+                        "surface-container-low": "#fdf1f1",
+                        "inverse-on-surface": "#faeeee",
+                        "on-secondary-fixed-variant": "#314a59",
+                        "on-tertiary-fixed-variant": "#474836",
+                        "inverse-surface": "#352f2f",
+                        "outline-variant": "#d2c3c7",
+                        "outline": "#817478",
+                        "tertiary-container": "#d7d7bf",
+                        "on-primary": "#ffffff",
+                        "surface-container": "#f7ebeb",
+                        "secondary-container": "#cce6f9",
+                        "on-primary-fixed-variant": "#5f3c4d",
+                        "on-tertiary-container": "#5c5d4a",
+                        "on-error": "#ffffff",
+                        "surface-dim": "#e3d7d7",
+                        "surface-tint": "#795465",
+                        "surface-container-lowest": "#ffffff",
+                        "surface": "#fff8f7"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit-8": "32px",
+                        "unit-1": "4px",
+                        "unit-6": "24px",
+                        "unit-2": "8px",
+                        "unit-4": "16px",
+                        "container-padding": "20px",
+                        "gutter": "16px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Quicksand"],
+                        "body-sm": ["Quicksand"],
+                        "display-lg-mobile": ["Quicksand"],
+                        "display-lg": ["Quicksand"],
+                        "title-lg": ["Quicksand"],
+                        "label-md": ["Quicksand"],
+                        "body-lg": ["Quicksand"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "display-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-transparent flex items-center justify-center min-h-screen p-4">
+<!-- Container strictly hugging content -->
+<div class="w-fit h-fit">
+<button aria-label="Add new item" class="group flex items-center justify-center w-14 h-14 bg-primary text-on-primary rounded-2xl shadow-sm hover:shadow-md hover:bg-surface-tint hover:opacity-90 active:scale-95 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-fixed focus:ring-offset-2 focus:ring-offset-background" type="button">
+<span class="material-symbols-outlined text-3xl font-bold transition-transform duration-200 group-hover:rotate-90">add</span>
+</button>
+</div>
+</body></html>

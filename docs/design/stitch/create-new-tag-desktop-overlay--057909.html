@@ -1,0 +1,192 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Bloom &amp; Plan - Create New Tag</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed-dim": "#b0cadc",
+                        "primary": "#795465",
+                        "surface-container": "#f7ebeb",
+                        "on-surface-variant": "#4f4448",
+                        "outline-variant": "#d2c3c7",
+                        "on-secondary-fixed-variant": "#314a59",
+                        "on-primary-fixed-variant": "#5f3c4d",
+                        "inverse-on-surface": "#faeeee",
+                        "surface": "#fff8f7",
+                        "on-tertiary-fixed": "#1b1d0e",
+                        "on-tertiary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "primary-fixed-dim": "#e9bacd",
+                        "surface-variant": "#ebe0e0",
+                        "on-primary-container": "#765162",
+                        "tertiary": "#5e604d",
+                        "on-tertiary-container": "#5c5d4a",
+                        "on-secondary": "#ffffff",
+                        "outline": "#817478",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface": "#201a1a",
+                        "primary-container": "#f8c8dc",
+                        "tertiary-fixed-dim": "#c8c8b0",
+                        "on-secondary-fixed": "#021e2b",
+                        "tertiary-fixed": "#e4e4cc",
+                        "on-background": "#201a1a",
+                        "secondary-container": "#cce6f9",
+                        "on-secondary-container": "#4f6877",
+                        "on-primary-fixed": "#2e1221",
+                        "secondary-fixed": "#cce6f9",
+                        "inverse-surface": "#352f2f",
+                        "surface-container-low": "#fdf1f1",
+                        "surface-dim": "#e3d7d7",
+                        "inverse-primary": "#e9bacd",
+                        "primary-fixed": "#ffd8e7",
+                        "error": "#ba1a1a",
+                        "surface-bright": "#fff8f7",
+                        "on-error-container": "#93000a",
+                        "surface-container-highest": "#ebe0e0",
+                        "surface-tint": "#795465",
+                        "background": "#fff8f7",
+                        "secondary": "#496271",
+                        "on-tertiary-fixed-variant": "#474836",
+                        "on-primary": "#ffffff",
+                        "tertiary-container": "#d7d7bf",
+                        "surface-container-high": "#f1e5e5",
+                        "on-error": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit-6": "24px",
+                        "unit-2": "8px",
+                        "unit-1": "4px",
+                        "unit-4": "16px",
+                        "gutter": "16px",
+                        "container-padding": "20px",
+                        "base": "4px",
+                        "unit-8": "32px"
+                    },
+                    "fontFamily": {
+                        "title-lg": ["Quicksand"],
+                        "display-lg-mobile": ["Quicksand"],
+                        "body-lg": ["Quicksand"],
+                        "label-md": ["Quicksand"],
+                        "body-sm": ["Quicksand"],
+                        "display-lg": ["Quicksand"],
+                        "headline-md": ["Quicksand"]
+                    },
+                    "fontSize": {
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "display-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "500" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Quicksand', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface h-screen w-full overflow-hidden relative font-body-lg">
+<!-- Blurred Background Context (Desktop Main Dashboard Mockup) -->
+<div class="absolute inset-0 w-full h-full filter blur-md opacity-60 z-0 select-none">
+<!-- TopNavBar Mockup -->
+<header class="w-full h-16 bg-surface flex justify-between items-center px-unit-8 max-w-7xl mx-auto border-b-0">
+<div class="font-display-lg text-display-lg text-primary">Bloom &amp; Plan</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer" data-icon="help">help</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer" data-icon="settings">settings</span>
+</div>
+</header>
+<!-- Main Content Area Mockup -->
+<main class="max-w-7xl mx-auto px-unit-8 py-10 grid grid-cols-12 gap-8 h-[calc(100vh-64px)]">
+<!-- Side Nav Area Mockup -->
+<aside class="col-span-3 bg-surface-container rounded-2xl p-6 h-full flex flex-col gap-4">
+<div class="h-8 bg-surface-variant rounded w-3/4 mb-4"></div>
+<div class="h-6 bg-surface-variant rounded w-full"></div>
+<div class="h-6 bg-surface-variant rounded w-full"></div>
+<div class="h-6 bg-surface-variant rounded w-4/5"></div>
+</aside>
+<!-- Canvas Area Mockup -->
+<div class="col-span-9 flex flex-col gap-8">
+<div class="h-32 bg-surface-container rounded-2xl w-full"></div>
+<div class="grid grid-cols-3 gap-6">
+<div class="h-48 bg-surface-container rounded-2xl"></div>
+<div class="h-48 bg-surface-container rounded-2xl"></div>
+<div class="h-48 bg-surface-container rounded-2xl"></div>
+</div>
+</div>
+</main>
+</div>
+<!-- Overlay Backdrop -->
+<div class="absolute inset-0 z-40 bg-on-surface/20 backdrop-blur-sm flex items-center justify-center">
+<!-- Create New Tag Modal -->
+<div aria-labelledby="modal-title" aria-modal="true" class="bg-surface-container-lowest rounded-2xl shadow-md w-full max-w-md mx-unit-4 overflow-hidden relative z-50 transform transition-all" role="dialog">
+<div class="px-unit-6 py-unit-6">
+<!-- Header -->
+<div class="flex justify-between items-center mb-unit-6">
+<h2 class="font-headline-md text-headline-md text-on-surface" id="modal-title">Create New Tag</h2>
+<button aria-label="Close modal" class="text-on-surface-variant hover:text-primary transition-colors focus:outline-none rounded-full p-1">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+</div>
+<!-- Input Field -->
+<div class="mb-unit-6 relative">
+<label class="font-label-md text-label-md text-on-surface-variant block mb-unit-2" for="tag-name">Tag Name</label>
+<input class="w-full bg-surface text-on-surface font-body-lg text-body-lg rounded-lg border border-outline-variant px-unit-4 py-unit-2 focus:outline-none focus:border-secondary-fixed focus:ring-1 focus:ring-secondary-fixed transition-colors placeholder-on-surface-variant/50" id="tag-name" placeholder="e.g. Grading, Urgent" type="text">
+</div>
+<!-- Color Selection -->
+<div class="mb-unit-8">
+<label class="font-label-md text-label-md text-on-surface-variant block mb-unit-4">Color Label</label>
+<div class="flex justify-start gap-unit-4 flex-wrap">
+<!-- Color Options (Using system palette colors closely matching pastel intent) -->
+<button aria-label="Select soft pink" aria-pressed="true" class="w-10 h-10 rounded-full bg-primary-container border-2 border-primary ring-2 ring-transparent ring-offset-2 hover:opacity-90 focus:outline-none transition-all flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-primary text-sm" data-icon="check" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check</span>
+</button>
+<button aria-label="Select pastel blue" aria-pressed="false" class="w-10 h-10 rounded-full bg-secondary-container border-2 border-transparent hover:border-secondary-fixed-dim hover:scale-105 focus:outline-none transition-all shadow-sm"></button>
+<button aria-label="Select warm beige" aria-pressed="false" class="w-10 h-10 rounded-full bg-tertiary-container border-2 border-transparent hover:border-tertiary-fixed-dim hover:scale-105 focus:outline-none transition-all shadow-sm"></button>
+<button aria-label="Select pastel red" aria-pressed="false" class="w-10 h-10 rounded-full bg-error-container border-2 border-transparent hover:border-error hover:scale-105 focus:outline-none transition-all shadow-sm"></button>
+<button aria-label="Select neutral gray" aria-pressed="false" class="w-10 h-10 rounded-full bg-surface-variant border-2 border-transparent hover:border-outline-variant hover:scale-105 focus:outline-none transition-all shadow-sm"></button>
+</div>
+</div>
+<!-- Actions -->
+<div class="flex justify-end items-center gap-unit-4 mt-unit-2">
+<button class="px-unit-4 py-unit-2 font-body-lg text-body-lg text-on-surface-variant hover:text-primary transition-colors focus:outline-none font-bold">
+                        Cancel
+                    </button>
+<button class="bg-primary-container text-on-primary-container font-body-lg text-body-lg font-bold px-unit-6 py-unit-2 rounded-lg hover:bg-primary-fixed hover:shadow-md transition-all focus:outline-none">
+                        Create Tag
+                    </button>
+</div>
+</div>
+<!-- Optional subtle bottom accent line -->
+<div class="h-1 w-full bg-primary-container absolute bottom-0 left-0"></div>
+</div>
+</div>
+<!-- Script to handle custom tag generation (as per instructions) -->
+<script>
+        document.querySelectorAll('[data-icon]').forEach(el => {
+            const iconName = el.getAttribute('data-icon');
+            el.textContent = iconName;
+            el.classList.add('material-symbols-outlined');
+            if(el.getAttribute('data-weight') === 'fill') {
+                el.style.fontVariationSettings = "'FILL' 1";
+            }
+        });
+    </script>
+</body></html>

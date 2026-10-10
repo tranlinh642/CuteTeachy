@@ -1,0 +1,30 @@
+export const common = {
+  appName: 'CuteTeachy',
+  tagline: 'Trợ lý dịu dàng cho thầy cô',
+  actions: {
+    save: 'Lưu',
+    cancel: 'Hủy',
+    create: 'Tạo',
+    delete: 'Xóa',
+    edit: 'Chỉnh sửa',
+    close: 'Đóng',
+    add: 'Thêm',
+    back: 'Quay lại',
+    confirm: 'Xác nhận',
+    retry: 'Thử lại',
+    search: 'Tìm kiếm',
+    seeAll: 'Xem tất cả',
+    more: 'Thêm tùy chọn',
+  },
+  states: {
+    loading: 'Đang tải…',
+    empty: 'Chưa có gì ở đây',
+    error: 'Đã có lỗi xảy ra',
+  },
+  a11y: {
+    avatar: 'Ảnh đại diện của {{name}}',
+    openMenu: 'Mở menu',
+    notifications: 'Thông báo',
+    settings: 'Cài đặt',
+  },
+};

@@ -16,12 +16,16 @@ services:
       - /app/node_modules
       - /app/apps/web/node_modules
       - /app/packages/api/node_modules
-      - /app/packages/database/node_modules
+      - /app/packages/core/node_modules
+      - /app/packages/i18n/node_modules
+      - /app/packages/tokens/node_modules
       - /app/packages/types/node_modules
     environment:
       - NODE_ENV=development
       # Khai báo cổng mặc định
       - PORT=3000
+      # URL của BE NestJS (chạy cổng 4000)
+      - NEXT_PUBLIC_API_URL=http://localhost:4000
 
 # Tương lai: Khi nào bạn sẵn sàng tích hợp BE (NestJS) hoặc Database,
 # chúng ta sẽ thêm service postgresql và nestjs vào ngay dưới file này.

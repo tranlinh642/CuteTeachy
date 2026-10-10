@@ -1,0 +1,22 @@
+import type { weekly as Schema } from '../vi/weekly';
+
+export const weekly: typeof Schema = {
+  title: "Today's Focus",
+  hello: 'Hello, {{name}}',
+  thisWeek: 'This Week',
+  weekRange: '{{start}} – {{end}}',
+  previousWeek: 'Previous week',
+  nextWeek: 'Next week',
+  todaysClasses: "Today's Classes",
+  teachingClasses: 'Teaching Classes',
+  personalTodos: 'Personal To-Dos',
+  topic: 'Topic',
+  prepNeeded: 'Prep needed',
+  addPersonalTask: 'Add personal task',
+  noClasses: 'No classes today. Take a breath!',
+  noTodos: "You're all caught up 🎉",
+  dueAt: 'Due by {{time}}',
+  mindfulMoment: 'Mindful Moment',
+  mindfulMomentHint: 'Take a 5-minute breather before your next class.',
+  dayTodos: 'To-dos for the day',
+};

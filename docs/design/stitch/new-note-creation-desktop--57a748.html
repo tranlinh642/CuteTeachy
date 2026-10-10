@@ -1,0 +1,186 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Bloom &amp; Plan - New Note</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed-dim": "#b0cadc",
+                        "primary": "#795465",
+                        "surface-container": "#f7ebeb",
+                        "on-surface-variant": "#4f4448",
+                        "outline-variant": "#d2c3c7",
+                        "on-secondary-fixed-variant": "#314a59",
+                        "on-primary-fixed-variant": "#5f3c4d",
+                        "inverse-on-surface": "#faeeee",
+                        "surface": "#fff8f7",
+                        "on-tertiary-fixed": "#1b1d0e",
+                        "on-tertiary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "primary-fixed-dim": "#e9bacd",
+                        "surface-variant": "#ebe0e0",
+                        "on-primary-container": "#765162",
+                        "tertiary": "#5e604d",
+                        "on-tertiary-container": "#5c5d4a",
+                        "on-secondary": "#ffffff",
+                        "outline": "#817478",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface": "#201a1a",
+                        "primary-container": "#f8c8dc",
+                        "tertiary-fixed-dim": "#c8c8b0",
+                        "on-secondary-fixed": "#021e2b",
+                        "tertiary-fixed": "#e4e4cc",
+                        "on-background": "#201a1a",
+                        "secondary-container": "#cce6f9",
+                        "on-secondary-container": "#4f6877",
+                        "on-primary-fixed": "#2e1221",
+                        "secondary-fixed": "#cce6f9",
+                        "inverse-surface": "#352f2f",
+                        "surface-container-low": "#fdf1f1",
+                        "surface-dim": "#e3d7d7",
+                        "inverse-primary": "#e9bacd",
+                        "primary-fixed": "#ffd8e7",
+                        "error": "#ba1a1a",
+                        "surface-bright": "#fff8f7",
+                        "on-error-container": "#93000a",
+                        "surface-container-highest": "#ebe0e0",
+                        "surface-tint": "#795465",
+                        "background": "#fff8f7",
+                        "secondary": "#496271",
+                        "on-tertiary-fixed-variant": "#474836",
+                        "on-primary": "#ffffff",
+                        "tertiary-container": "#d7d7bf",
+                        "surface-container-high": "#f1e5e5",
+                        "on-error": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit-6": "24px",
+                        "unit-2": "8px",
+                        "unit-1": "4px",
+                        "unit-4": "16px",
+                        "gutter": "16px",
+                        "container-padding": "20px",
+                        "base": "4px",
+                        "unit-8": "32px"
+                    },
+                    "fontFamily": {
+                        "title-lg": ["Quicksand"],
+                        "display-lg-mobile": ["Quicksand"],
+                        "body-lg": ["Quicksand"],
+                        "label-md": ["Quicksand"],
+                        "body-sm": ["Quicksand"],
+                        "display-lg": ["Quicksand"],
+                        "headline-md": ["Quicksand"]
+                    },
+                    "fontSize": {
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "display-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "500" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-surface-container-low min-h-screen flex flex-col font-body-lg text-on-surface">
+<!-- Top Navigation Bar -->
+<header class="bg-surface dark:bg-surface-dim w-full h-16 flex justify-between items-center px-unit-8 max-w-7xl mx-auto z-50">
+<div class="flex items-center gap-unit-4">
+<span class="font-display-lg text-display-lg text-primary dark:text-primary-fixed-dim">Bloom &amp; Plan</span>
+</div>
+<nav class="hidden md:flex items-center gap-unit-6">
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed transition-colors duration-200 cursor-pointer" href="#">Dashboard</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed transition-colors duration-200 cursor-pointer" href="#">Classes</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed transition-colors duration-200 cursor-pointer" href="#">Students</a>
+<a class="text-primary dark:text-primary-fixed-dim border-b-2 border-primary pb-1" href="#">Notes</a>
+</nav>
+<div class="flex items-center gap-unit-4">
+<button aria-label="Help" class="text-on-surface-variant hover:text-primary transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-[24px]">help</span>
+</button>
+<button aria-label="Settings" class="text-on-surface-variant hover:text-primary transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-[24px]">settings</span>
+</button>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-grow flex justify-center items-start pt-unit-8 px-container-padding pb-unit-8">
+<!-- Wide Card Layout for Note Creation -->
+<div class="bg-surface-container-lowest w-full max-w-4xl rounded-xl p-unit-8 shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col gap-unit-6">
+<!-- Header Section -->
+<div class="flex items-center justify-between border-b border-surface-variant pb-unit-4">
+<div class="flex items-center gap-unit-2 text-on-surface-variant cursor-pointer hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">arrow_back</span>
+<span class="font-body-lg">Back to Notes</span>
+</div>
+<div class="flex gap-unit-2">
+<button aria-label="Tag Note" class="p-unit-2 rounded-full hover:bg-surface-container transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">sell</span>
+</button>
+<button aria-label="Attach File" class="p-unit-2 rounded-full hover:bg-surface-container transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">attach_file</span>
+</button>
+</div>
+</div>
+<!-- Title Input -->
+<div>
+<input class="w-full bg-transparent border-none text-headline-md font-headline-md text-on-surface placeholder-outline-variant focus:ring-0 px-0 pt-unit-2 pb-unit-2 focus:outline-none transition-all duration-200" placeholder="Note Title..." type="text">
+</div>
+<!-- Tags Area (Optional, minimal) -->
+<div class="flex gap-unit-2 flex-wrap">
+<span class="inline-flex items-center gap-unit-1 px-unit-4 py-unit-1 rounded-full bg-secondary-container text-on-secondary-container font-label-md text-label-md">
+                    Lesson Plan
+                    <span class="material-symbols-outlined text-[14px] cursor-pointer hover:text-error">close</span>
+</span>
+<button class="inline-flex items-center gap-unit-1 px-unit-4 py-unit-1 rounded-full border border-outline-variant text-on-surface-variant font-label-md text-label-md hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[14px]">add</span> Add Tag
+                </button>
+</div>
+<!-- Main Text Area -->
+<div class="flex-grow min-h-[400px]">
+<textarea class="w-full h-full min-h-[400px] bg-transparent border-none text-body-lg font-body-lg text-on-surface placeholder-outline-variant focus:ring-0 px-0 resize-none focus:outline-none leading-relaxed" placeholder="Jot down your thoughts..."></textarea>
+</div>
+<!-- Action Area -->
+<div class="flex justify-end pt-unit-4 border-t border-surface-variant">
+<button class="bg-primary-container text-on-primary-container px-unit-6 py-unit-4 rounded-xl font-title-lg text-title-lg hover:bg-primary-fixed transition-colors duration-200 shadow-sm flex items-center gap-unit-2">
+<span class="material-symbols-outlined text-[20px]">save</span>
+                    Save Note
+                </button>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-transparent w-full py-unit-6 flex flex-col items-center justify-center space-y-unit-2 mt-auto">
+<div class="font-title-lg text-title-lg text-primary">Bloom &amp; Plan</div>
+<div class="flex gap-unit-4 font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant">
+<a class="hover:underline hover:text-primary dark:hover:text-primary-fixed transition-all duration-200" href="#">Privacy Policy</a>
+<a class="hover:underline hover:text-primary dark:hover:text-primary-fixed transition-all duration-200" href="#">Terms of Service</a>
+<a class="hover:underline hover:text-primary dark:hover:text-primary-fixed transition-all duration-200" href="#">Contact Support</a>
+</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant">
+            © 2024 Bloom &amp; Plan. Designed for Educators.
+        </div>
+</footer>
+</body></html>

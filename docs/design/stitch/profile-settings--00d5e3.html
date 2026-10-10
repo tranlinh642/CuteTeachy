@@ -1,0 +1,233 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Bloom Planner - Profile</title>
+<!-- Google Fonts: Quicksand -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Design System Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-container": "#765162",
+                    "surface-container-highest": "#ebe0e0",
+                    "tertiary-fixed": "#e4e4cc",
+                    "error": "#ba1a1a",
+                    "error-container": "#ffdad6",
+                    "primary-fixed-dim": "#e9bacd",
+                    "on-primary-fixed": "#2e1221",
+                    "on-secondary-container": "#4f6877",
+                    "background": "#fff8f7",
+                    "secondary-container": "#cce6f9",
+                    "primary-fixed": "#ffd8e7",
+                    "on-primary-fixed-variant": "#5f3c4d",
+                    "tertiary": "#5e604d",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "surface": "#fff8f7",
+                    "inverse-surface": "#352f2f",
+                    "on-secondary-fixed-variant": "#314a59",
+                    "on-secondary-fixed": "#021e2b",
+                    "outline": "#817478",
+                    "surface-container": "#f7ebeb",
+                    "primary-container": "#f8c8dc",
+                    "on-error-container": "#93000a",
+                    "on-tertiary-fixed": "#1b1d0e",
+                    "inverse-primary": "#e9bacd",
+                    "on-tertiary-fixed-variant": "#474836",
+                    "outline-variant": "#d2c3c7",
+                    "secondary-fixed-dim": "#b0cadc",
+                    "on-tertiary-container": "#5c5d4a",
+                    "surface-container-low": "#fdf1f1",
+                    "surface-bright": "#fff8f7",
+                    "secondary-fixed": "#cce6f9",
+                    "primary": "#795465",
+                    "inverse-on-surface": "#faeeee",
+                    "tertiary-container": "#d7d7bf",
+                    "secondary": "#496271",
+                    "on-tertiary": "#ffffff",
+                    "tertiary-fixed-dim": "#c8c8b0",
+                    "surface-variant": "#ebe0e0",
+                    "on-surface": "#201a1a",
+                    "on-secondary": "#ffffff",
+                    "on-background": "#201a1a",
+                    "surface-dim": "#e3d7d7",
+                    "on-surface-variant": "#4f4448",
+                    "on-error": "#ffffff",
+                    "surface-tint": "#795465",
+                    "surface-container-high": "#f1e5e5"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "unit-8": "32px",
+                    "unit-6": "24px",
+                    "gutter": "16px",
+                    "container-padding": "20px",
+                    "unit-4": "16px",
+                    "unit-1": "4px",
+                    "base": "4px",
+                    "unit-2": "8px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Quicksand"],
+                    "display-lg-mobile": ["Quicksand"],
+                    "body-lg": ["Quicksand"],
+                    "label-md": ["Quicksand"],
+                    "headline-md": ["Quicksand"],
+                    "title-lg": ["Quicksand"],
+                    "body-sm": ["Quicksand"]
+            },
+            "fontSize": {
+                    "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "display-lg-mobile": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "500"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "title-lg": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "500"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        /* Custom styles for the toggle switch interaction */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #f8c8dc; /* primary-container */
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #f8c8dc; /* primary-container */
+        }
+        .toggle-checkbox:checked + .toggle-label:after {
+            transform: translateX(100%);
+            border-color: white;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-lg min-h-screen flex flex-col antialiased">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full bg-background/80 dark:bg-background/80 backdrop-blur-md z-50 transition-opacity duration-200 flat no shadows flex items-center justify-between px-container-padding h-16">
+<div class="flex items-center hover:opacity-80 cursor-pointer">
+<span class="material-symbols-outlined text-primary font-headline-md text-headline-md mr-unit-2" data-icon="spa">spa</span>
+</div>
+<h1 class="font-display-lg-mobile text-display-lg-mobile text-primary tracking-tight">Bloom Planner</h1>
+<div class="w-8"></div> <!-- Spacer to center headline -->
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-24 pb-32 px-container-padding w-full max-w-md mx-auto flex flex-col space-y-unit-8">
+<!-- Profile Header Area -->
+<section class="flex flex-col items-center justify-center space-y-unit-4 animate-fade-in-up">
+<div class="relative">
+<div class="w-24 h-24 rounded-full p-1 bg-gradient-to-tr from-primary-container to-secondary-container shadow-sm">
+<img alt="Sarah Bloom Avatar" class="w-full h-full rounded-full object-cover border-4 border-surface-container-lowest" data-alt="A gentle, soft-focus portrait of a young female educator with a warm, encouraging smile. She is framed tightly in a circular composition against a highly blurred, minimalist classroom background bathed in soft natural daylight. The overall lighting is high-key and serene, emphasizing a light pastel color palette of warm beige and subtle pinks. The aesthetic embodies calm confidence and modern educational professionalism." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDisygUlrZ6t-B7LreMXTE1EMX7QXMfrKaEnQtp33VH51Uybaot1qzK3Pr5fxqr7n0-DxxgrMMRNKeM9nu49fLKUkoDJf7jzdAZ00sihNllWwBpe4l__wR7Vg4kMoW3zFvA9zfS2o2ZUcuXIuBq5OfohS5pFe_V9xlUuAvXzs7jNoEJ8IBii0i5D9HntGvafrIeZytMES2o7eZaKy6xm2rw5JVCv8KpuLElIij-Tf5Rlp57Hl9Yu8_c7oLDZMuTXmx5FF-thIXv4Q">
+</div>
+</div>
+<div class="text-center">
+<h2 class="font-headline-md text-headline-md text-on-surface">Sarah Bloom</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">sarah.bloom@school.edu</p>
+</div>
+</section>
+<!-- Settings Grouped List -->
+<section class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden flex flex-col">
+<!-- Push Notifications (Toggle) -->
+<div class="flex items-center justify-between p-unit-4 hover:bg-surface-container-low transition-colors duration-200">
+<div class="flex items-center space-x-unit-4 text-on-surface">
+<div class="w-10 h-10 rounded-full bg-secondary-container/30 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined" data-weight="fill">notifications</span>
+</div>
+<span class="font-body-lg text-body-lg">Push Notifications</span>
+</div>
+<!-- Custom Toggle Switch -->
+<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 transition-transform duration-200 ease-in-out border-primary-container" id="toggle1" name="toggle" type="checkbox">
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-primary-container cursor-pointer" for="toggle1"></label>
+</div>
+</div>
+<div class="h-px bg-surface-variant w-full"></div>
+<!-- Theme Preferences -->
+<button class="w-full flex items-center justify-between p-unit-4 hover:bg-surface-container-low transition-colors duration-200 text-left">
+<div class="flex items-center space-x-unit-4 text-on-surface">
+<div class="w-10 h-10 rounded-full bg-primary-container/30 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-weight="fill">palette</span>
+</div>
+<span class="font-body-lg text-body-lg">Theme Preferences</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+</button>
+<div class="h-px bg-surface-variant w-full"></div>
+<!-- Account Details -->
+<button class="w-full flex items-center justify-between p-unit-4 hover:bg-surface-container-low transition-colors duration-200 text-left">
+<div class="flex items-center space-x-unit-4 text-on-surface">
+<div class="w-10 h-10 rounded-full bg-tertiary-container/30 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined" data-weight="fill">person</span>
+</div>
+<span class="font-body-lg text-body-lg">Account Details</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+</button>
+</section>
+<!-- Log Out Button -->
+<section class="pt-unit-4">
+<button class="w-full py-4 bg-primary-container text-on-primary-container font-label-md text-label-md rounded-xl shadow-sm hover:opacity-80 transition-opacity duration-200 flex items-center justify-center space-x-2">
+<span class="material-symbols-outlined text-[18px]">logout</span>
+<span>Log Out</span>
+</button>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-unit-4 py-unit-2 bg-surface-container-low dark:bg-surface-container-low rounded-t-xl shadow-sm md:hidden">
+<!-- Home (Inactive) -->
+<button class="flex flex-col items-center justify-center text-on-secondary-fixed-variant px-4 py-1 hover:bg-surface-container-highest scale-95 active:scale-90 transition-transform duration-200 rounded-xl">
+<span class="material-symbols-outlined mb-1" data-icon="home">home</span>
+<span class="font-label-md text-label-md">Home</span>
+</button>
+<!-- Calendar (Inactive) -->
+<button class="flex flex-col items-center justify-center text-on-secondary-fixed-variant px-4 py-1 hover:bg-surface-container-highest scale-95 active:scale-90 transition-transform duration-200 rounded-xl">
+<span class="material-symbols-outlined mb-1" data-icon="calendar_today">calendar_today</span>
+<span class="font-label-md text-label-md">Calendar</span>
+</button>
+<!-- Notes (Inactive) -->
+<button class="flex flex-col items-center justify-center text-on-secondary-fixed-variant px-4 py-1 hover:bg-surface-container-highest scale-95 active:scale-90 transition-transform duration-200 rounded-xl">
+<span class="material-symbols-outlined mb-1" data-icon="description">description</span>
+<span class="font-label-md text-label-md">Notes</span>
+</button>
+<!-- Profile (Active) -->
+<button class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-4 py-1 hover:bg-surface-container-highest scale-95 active:scale-90 transition-transform duration-200">
+<span class="material-symbols-outlined mb-1" data-icon="person" data-weight="fill">person</span>
+<span class="font-label-md text-label-md text-primary">Profile</span>
+</button>
+</nav>
+<!-- Simple script for entrance animation of the toggle to ensure it displays correctly styled on load -->
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggle = document.getElementById('toggle1');
+            toggle.addEventListener('change', function() {
+                if(this.checked) {
+                    this.style.borderColor = '#f8c8dc';
+                } else {
+                    this.style.borderColor = '#d2c3c7'; // outline-variant
+                }
+            });
+        });
+    </script>
+</body></html>

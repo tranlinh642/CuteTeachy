@@ -1,0 +1,200 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>New Task Modal</title>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed-variant": "#474836",
+                        "inverse-surface": "#352f2f",
+                        "on-primary-container": "#765162",
+                        "secondary-fixed": "#cce6f9",
+                        "on-primary-fixed": "#2e1221",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed-dim": "#c8c8b0",
+                        "tertiary": "#5e604d",
+                        "primary-fixed": "#ffd8e7",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-high": "#f1e5e5",
+                        "secondary-fixed-dim": "#b0cadc",
+                        "on-background": "#201a1a",
+                        "on-secondary": "#ffffff",
+                        "inverse-on-surface": "#faeeee",
+                        "background": "#fff8f7",
+                        "outline": "#817478",
+                        "outline-variant": "#d2c3c7",
+                        "on-surface": "#201a1a",
+                        "on-secondary-fixed": "#021e2b",
+                        "surface": "#fff8f7",
+                        "surface-variant": "#ebe0e0",
+                        "surface-tint": "#795465",
+                        "secondary": "#496271",
+                        "tertiary-container": "#d7d7bf",
+                        "surface-container-highest": "#ebe0e0",
+                        "inverse-primary": "#e9bacd",
+                        "on-tertiary-container": "#5c5d4a",
+                        "on-secondary-fixed-variant": "#314a59",
+                        "on-secondary-container": "#4f6877",
+                        "surface-dim": "#e3d7d7",
+                        "primary-fixed-dim": "#e9bacd",
+                        "tertiary-fixed": "#e4e4cc",
+                        "surface-container": "#f7ebeb",
+                        "secondary-container": "#cce6f9",
+                        "primary": "#795465",
+                        "on-surface-variant": "#4f4448",
+                        "on-error": "#ffffff",
+                        "primary-container": "#f8c8dc",
+                        "surface-container-low": "#fdf1f1",
+                        "on-tertiary-fixed": "#1b1d0e",
+                        "surface-bright": "#fff8f7",
+                        "on-primary-fixed-variant": "#5f3c4d",
+                        "error-container": "#ffdad6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit-8": "32px",
+                        "container-padding": "20px",
+                        "base": "4px",
+                        "unit-2": "8px",
+                        "unit-6": "24px",
+                        "unit-4": "16px",
+                        "unit-1": "4px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "title-lg": ["Quicksand"],
+                        "body-lg": ["Quicksand"],
+                        "display-lg-mobile": ["Quicksand"],
+                        "label-md": ["Quicksand"],
+                        "display-lg": ["Quicksand"],
+                        "headline-md": ["Quicksand"],
+                        "body-sm": ["Quicksand"]
+                    },
+                    "fontSize": {
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "500" }],
+                        "display-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700" }],
+                        "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-surface-dim h-screen w-screen overflow-hidden flex flex-col justify-end antialiased font-body-lg text-on-surface">
+<!-- Modal Backdrop -->
+<div class="absolute inset-0 bg-on-background/10 backdrop-blur-sm z-40 transition-opacity"></div>
+<!-- Bottom Sheet Modal Container -->
+<div class="relative z-50 w-full max-w-md mx-auto bg-surface flex flex-col shadow-2xl max-h-[90vh] rounded-t-2xl">
+<!-- Header -->
+<div class="flex items-center justify-between p-container-padding pb-unit-4 border-b border-surface-variant/50 shrink-0">
+<h2 class="font-headline-md text-headline-md text-on-surface">New Task</h2>
+<button class="p-2 rounded-full hover:bg-surface-container transition-colors focus:outline-none focus:ring-2 focus:ring-secondary-fixed">
+<span class="material-symbols-outlined text-on-surface-variant">close</span>
+</button>
+</div>
+<!-- Scrollable Form Content -->
+<div class="overflow-y-auto p-container-padding flex flex-col gap-unit-6">
+<!-- Task Name Input -->
+<div class="flex flex-col gap-unit-2">
+<label class="font-label-md text-label-md text-on-surface-variant px-1">Task Name</label>
+<div class="flex items-center gap-unit-2 bg-surface-container-lowest p-unit-4 shadow-sm border border-transparent focus-within:border-secondary-fixed/50 focus-within:ring-2 focus-within:ring-secondary-fixed/20 transition-all h-14 rounded-2xl">
+<span class="material-symbols-outlined text-on-surface-variant">edit_square</span>
+<input class="flex-1 bg-transparent border-none p-0 focus:ring-0 font-body-lg text-on-surface placeholder:text-on-surface-variant/60 outline-none" placeholder="What needs to be done?" type="text">
+</div>
+</div>
+<!-- Date & Time Row -->
+<div class="flex gap-unit-4">
+<!-- Date Input -->
+<div class="flex flex-col gap-unit-2 flex-1">
+<label class="font-label-md text-label-md text-on-surface-variant px-1">Date</label>
+<div class="flex items-center gap-unit-2 bg-surface-container-lowest p-unit-4 shadow-sm border border-transparent focus-within:border-secondary-fixed/50 focus-within:ring-2 focus-within:ring-secondary-fixed/20 transition-all relative h-14 rounded-2xl">
+<span class="material-symbols-outlined text-on-surface-variant absolute left-unit-4 pointer-events-none">calendar_today</span>
+<input class="w-full bg-transparent border-none p-0 pl-10 focus:ring-0 font-body-lg text-on-surface outline-none appearance-none" placeholder="mm/dd/yyyy" type="date">
+</div>
+</div>
+<!-- Time Input -->
+<div class="flex flex-col gap-unit-2 flex-1">
+<label class="font-label-md text-label-md text-on-surface-variant px-1">Time</label>
+<div class="flex items-center gap-unit-2 bg-surface-container-lowest p-unit-4 shadow-sm border border-transparent focus-within:border-secondary-fixed/50 focus-within:ring-2 focus-within:ring-secondary-fixed/20 transition-all relative h-14 rounded-2xl">
+<span class="material-symbols-outlined text-on-surface-variant absolute left-unit-4 pointer-events-none">schedule</span>
+<input class="w-full bg-transparent border-none p-0 pl-10 focus:ring-0 font-body-lg text-on-surface outline-none appearance-none" type="time">
+</div>
+</div>
+</div>
+<!-- Category Toggles -->
+<div class="flex flex-col gap-unit-2">
+<label class="font-label-md text-label-md text-on-surface-variant px-1">Category</label>
+<div class="flex gap-unit-4">
+<button class="flex-1 flex items-center justify-center gap-2 py-3 px-4 border border-outline-variant bg-surface hover:bg-surface-container-low focus:ring-2 focus:ring-secondary-fixed transition-colors font-body-lg text-body-lg text-on-surface-variant active-category-btn h-14 rounded-2xl" type="button">
+<span class="material-symbols-outlined text-[20px]">school</span> School
+                    </button>
+<button class="flex-1 flex items-center justify-center gap-2 py-3 px-4 border border-outline-variant bg-surface hover:bg-surface-container-low focus:ring-2 focus:ring-secondary-fixed transition-colors font-body-lg text-body-lg text-on-surface-variant h-14 rounded-2xl" type="button">
+<span class="material-symbols-outlined text-[20px]">person</span> Personal
+                    </button>
+</div>
+</div>
+<!-- Notes Textarea -->
+<div class="flex flex-col gap-unit-2">
+<label class="font-label-md text-label-md text-on-surface-variant px-1">Notes (Optional)</label>
+<div class="bg-surface-container-lowest shadow-sm border border-transparent focus-within:border-secondary-fixed/50 focus-within:ring-2 focus-within:ring-secondary-fixed/20 transition-all rounded-2xl">
+<textarea class="w-full bg-transparent border-none p-unit-4 focus:ring-0 font-body-lg text-on-surface placeholder:text-on-surface-variant/60 outline-none resize-none" placeholder="Add extra details here..." rows="4"></textarea>
+</div>
+</div>
+<!-- Spacer to push footer down if content is short -->
+
+</div>
+<!-- Sticky Footer Actions -->
+<div class="p-container-padding bg-surface border-t border-surface-variant/30 flex gap-unit-4 shrink-0 rounded-t-3xl shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+<button class="flex-1 py-4 font-label-md text-label-md text-on-surface hover:bg-surface-container rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-secondary-fixed h-14">
+                Cancel
+            </button>
+<button class="flex-1 py-4 font-label-md text-label-md bg-primary-container text-on-primary-container rounded-full hover:opacity-90 active:scale-95 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-surface h-14">
+                Save Task
+            </button>
+</div>
+</div>
+<script>
+        // Simple interaction script for category buttons
+        const categoryBtns = document.querySelectorAll('.flex.gap-unit-4 > button');
+        categoryBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Reset all
+                categoryBtns.forEach(b => {
+                    b.classList.remove('bg-secondary-container', 'border-secondary-container', 'text-on-secondary-container');
+                    b.classList.add('bg-surface', 'border-outline-variant', 'text-on-surface-variant');
+                });
+                // Set active
+                btn.classList.remove('bg-surface', 'border-outline-variant', 'text-on-surface-variant');
+                btn.classList.add('bg-secondary-container', 'border-secondary-container', 'text-on-secondary-container');
+            });
+        });
+    </script>
+
+
+</body></html>

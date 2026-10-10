@@ -1,0 +1,131 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Date Picker</title>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#F4D0DB",
+                        "background-light": "#FCF7F7",
+                        "background-dark": "#1E1E1E",
+                        "surface-light": "#FFFAFA",
+                        "surface-dark": "#2C2C2C",
+                        "text-main-light": "#4A3A42",
+                        "text-main-dark": "#E5D8DF",
+                        "text-muted-light": "#8A7D84",
+                        "text-muted-dark": "#A69DA2",
+                        "input-bg-light": "#F2EAEC",
+                        "input-bg-dark": "#3D3A3B",
+                        "close-btn-bg": "#EFE6E8",
+                        "close-btn-icon": "#6B5A63"
+                    },
+                    fontFamily: {
+                        display: ["Quicksand", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "1rem",
+                        'lg': "1.5rem",
+                        'xl': "2rem"
+                    },
+                    boxShadow: {
+                        'soft': '0 10px 40px -10px rgba(0,0,0,0.05)',
+                        'floating': '0 20px 40px -10px rgba(0,0,0,0.08)'
+                    }
+                },
+            },
+        };
+    </script>
+<style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen flex items-center justify-center p-4">
+<div class="bg-surface-light dark:bg-surface-dark rounded-[2rem] shadow-soft p-6 relative w-fit h-fit">
+<button class="absolute top-4 right-4 w-10 h-10 rounded-full bg-close-btn-bg dark:bg-gray-700 flex items-center justify-center shadow-sm hover:opacity-80 transition-opacity">
+<span class="material-icons text-close-btn-icon dark:text-gray-300">close</span>
+</button>
+<div class="mt-8">
+<div class="flex items-center gap-2 mb-3 text-text-main-light dark:text-text-main-dark font-medium">
+<span class="material-icons text-[1.25rem]">eco</span>
+<span class="">Planting Date</span>
+</div>
+<div class="relative mb-6">
+<input class="w-full bg-input-bg-light dark:bg-input-bg-dark border-none rounded-DEFAULT py-4 px-5 text-lg text-text-main-light dark:text-text-main-dark focus:ring-2 focus:ring-primary outline-none" readonly="" type="text" value="Oct 14, 2023">
+<span class="material-icons absolute right-4 top-1/2 -translate-y-1/2 text-text-main-light dark:text-text-main-dark">calendar_today</span>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark rounded-xl p-5 pb-8 relative -mt-10 mx-auto w-[105%] z-10 border border-gray-100 dark:border-gray-800 shadow-sm">
+<div class="flex items-center justify-between mb-6 px-2">
+<button class="text-text-main-light dark:text-text-main-dark hover:opacity-70"><span class="material-icons">chevron_left</span></button>
+<h3 class="text-xl font-semibold text-text-main-light dark:text-text-main-dark">October</h3>
+<button class="text-text-main-light dark:text-text-main-dark hover:opacity-70"><span class="material-icons">chevron_right</span></button>
+</div>
+<div class="grid grid-cols-7 text-center mb-4">
+<div class="text-sm font-medium text-text-muted-light dark:text-text-muted-dark">M</div>
+<div class="text-sm font-medium text-text-muted-light dark:text-text-muted-dark">T</div>
+<div class="text-sm font-medium text-text-muted-light dark:text-text-muted-dark">W</div>
+<div class="text-sm font-medium text-text-muted-light dark:text-text-muted-dark">T</div>
+<div class="text-sm font-medium text-text-muted-light dark:text-text-muted-dark">F</div>
+<div class="text-sm font-medium text-text-muted-light dark:text-text-muted-dark">S</div>
+<div class="text-sm font-medium text-text-muted-light dark:text-text-muted-dark">S</div>
+</div>
+<div class="grid grid-cols-7 gap-y-4 text-center">
+<div class="text-gray-200 dark:text-gray-600">25</div>
+<div class="text-gray-200 dark:text-gray-600">26</div>
+<div class="text-gray-200 dark:text-gray-600">27</div>
+<div class="text-gray-200 dark:text-gray-600">28</div>
+<div class="text-gray-200 dark:text-gray-600">29</div>
+<div class="text-gray-200 dark:text-gray-600">30</div>
+<div class="text-text-main-light dark:text-text-main-dark hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">1</div>
+<div class="text-text-main-light dark:text-text-main-dark hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">2</div>
+<div class="text-text-main-light dark:text-text-main-dark hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">3</div>
+<div class="text-text-main-light dark:text-text-main-dark hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">4</div>
+<div class="text-text-main-light dark:text-text-main-dark hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">5</div>
+<div class="text-text-main-light dark:text-text-main-dark hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">6</div>
+<div class="text-text-main-light dark:text-text-main-dark hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">7</div>
+<div class="text-text-main-light dark:text-text-main-dark hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">8</div>
+<div class="text-text-main-light dark:text-text-main-dark hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">9</div>
+<div class="text-text-main-light dark:text-text-main-dark hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">10</div>
+<div class="text-text-main-light dark:text-text-main-dark hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">11</div>
+<div class="text-text-main-light dark:text-text-main-dark hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">12</div>
+<div class="text-text-main-light dark:text-text-main-dark hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">13</div>
+<div class="bg-primary text-text-main-light rounded-full w-10 h-10 flex items-center justify-center mx-auto cursor-pointer -m-1 font-medium shadow-sm">14</div>
+<div class="text-text-main-light dark:text-text-main-dark hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">15</div>
+<div class="text-text-main-light dark:text-text-main-dark hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">16</div>
+<div class="text-text-main-light dark:text-text-main-dark hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">17</div>
+<div class="text-text-main-light dark:text-text-main-dark hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">18</div>
+<div class="text-text-main-light dark:text-text-main-dark hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">19</div>
+<div class="text-text-main-light dark:text-text-main-dark hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">20</div>
+<div class="text-text-main-light dark:text-text-main-dark hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">21</div>
+<div class="text-text-main-light dark:text-text-main-dark hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">22</div>
+<div class="text-text-main-light dark:text-text-main-dark hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">23</div>
+<div class="text-text-main-light dark:text-text-main-dark hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">24</div>
+<div class="text-text-main-light dark:text-text-main-dark hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">25</div>
+<div class="text-text-main-light dark:text-text-main-dark hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">26</div>
+<div class="text-text-main-light dark:text-text-main-dark hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">27</div>
+<div class="text-text-main-light dark:text-text-main-dark hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">28</div>
+<div class="text-text-main-light dark:text-text-main-dark hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">29</div>
+<div class="text-text-main-light dark:text-text-main-dark hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">30</div>
+<div class="text-text-main-light dark:text-text-main-dark hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">31</div>
+<div class="text-gray-200 dark:text-gray-600">1</div>
+<div class="text-gray-200 dark:text-gray-600">2</div>
+</div>
+</div>
+</div>
+</div>
+
+
+
+</body></html>

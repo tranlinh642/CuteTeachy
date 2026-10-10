@@ -1,0 +1,81 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Time Picker Overlay</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Quicksand', 'sans-serif'],
+          },
+          colors: {
+            overlay: '#B8B3B5',
+            modal: '#FFF8F6',
+            highlight: '#F3E8E6',
+            text: '#1C1C1E',
+            textSecondary: '#8E8E93',
+            brand: '#5D4037',
+            blueHighlight: '#CDE5F7',
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-styles">
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    /* Hide scrollbar for IE, Edge and Firefox */
+    .no-scrollbar {
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;  /* Firefox */
+    }
+  </style>
+</head>
+<body class="bg-overlay h-screen w-screen flex items-center justify-center font-sans antialiased">
+<!-- BEGIN: Time Picker Modal -->
+<main class="bg-modal w-[360px] rounded-2xl shadow-lg p-8 relative flex flex-col" data-purpose="time-picker-modal">
+<!-- Modal Header -->
+<header class="text-center mb-8" data-purpose="modal-header">
+<h2 class="text-[22px] font-medium text-text">Select Time</h2>
+</header>
+<!-- Time Selection Area -->
+<div class="relative flex items-center justify-center mb-10 h-[140px]" data-purpose="time-wheels">
+<!-- Selection Highlight Background -->
+<div class="absolute w-[280px] h-[72px] bg-highlight rounded-xl top-1/2 -translate-y-1/2 -translate-x-4 z-0"></div>
+<!-- Hours Wheel -->
+<div class="flex flex-col items-center h-full overflow-y-auto snap-y snap-mandatory no-scrollbar w-16 z-10 relative" data-purpose="hours-wheel">
+<div class="snap-center text-[28px] font-medium text-text/40 h-12 flex items-center justify-center">10</div>
+<div class="snap-center text-6xl font-semibold text-text h-16 flex items-center justify-center">11</div>
+<div class="snap-center text-[28px] font-medium text-text/40 h-12 flex items-center justify-center">12</div>
+</div>
+<!-- Colon Separator -->
+<div class="text-[34px] font-medium text-text mx-4 z-10 pb-4">:</div>
+<!-- Minutes Wheel -->
+<div class="flex flex-col items-center h-full overflow-y-auto snap-y snap-mandatory no-scrollbar w-16 z-10 relative" data-purpose="minutes-wheel">
+<div class="snap-center text-[28px] font-medium text-text/40 h-12 flex items-center justify-center">25</div>
+<div class="snap-center text-6xl font-semibold text-text h-16 flex items-center justify-center">30</div>
+<div class="snap-center text-[28px] font-medium text-text/40 h-12 flex items-center justify-center">35</div>
+</div>
+<!-- AM/PM Toggle -->
+<div class="flex flex-col ml-8 space-y-4 z-10 relative" data-purpose="ampm-toggle">
+<button class="bg-blueHighlight text-text text-sm font-medium w-[44px] h-[32px] rounded-full flex items-center justify-center transition-colors">AM</button>
+<button class="bg-transparent text-text text-sm font-medium w-[44px] h-[32px] rounded-full flex items-center justify-center transition-colors">PM</button>
+</div>
+</div>
+<!-- Modal Actions -->
+<footer class="flex justify-between items-center mt-4 px-4" data-purpose="modal-actions">
+<button class="text-[17px] font-medium text-textSecondary active:opacity-70 transition-opacity">Cancel</button>
+<button class="text-[17px] font-semibold text-brand active:opacity-70 transition-opacity">Done</button>
+</footer>
+</main>
+<!-- END: Time Picker Modal -->
+
+
+</body></html>

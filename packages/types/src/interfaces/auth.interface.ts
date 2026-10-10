@@ -1,0 +1,14 @@
+import type { ISODateTime } from './common.interface';
+import type { User } from './user.interface';
+
+export interface LoginCredentials {
+  readonly email: string;
+  readonly password: string;
+  readonly remember?: boolean;
+}
+
+export interface AuthSession {
+  readonly user: User;
+  readonly accessToken: string;
+  readonly expiresAt: ISODateTime;
+}

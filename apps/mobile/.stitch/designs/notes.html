@@ -1,0 +1,312 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Notes</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed": "#1b1d0e",
+                        "on-tertiary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "secondary-fixed": "#cce6f9",
+                        "tertiary-fixed-dim": "#c8c8b0",
+                        "primary": "#795465",
+                        "surface-dim": "#e3d7d7",
+                        "outline": "#817478",
+                        "on-surface": "#201a1a",
+                        "background": "#fff8f7",
+                        "surface-container-lowest": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "inverse-primary": "#e9bacd",
+                        "surface-tint": "#795465",
+                        "surface": "#fff8f7",
+                        "outline-variant": "#d2c3c7",
+                        "tertiary-container": "#d7d7bf",
+                        "on-surface-variant": "#4f4448",
+                        "primary-fixed-dim": "#e9bacd",
+                        "tertiary": "#5e604d",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-container": "#4f6877",
+                        "secondary": "#496271",
+                        "on-primary-fixed": "#2e1221",
+                        "surface-container-low": "#fdf1f1",
+                        "on-error": "#ffffff",
+                        "on-primary-fixed-variant": "#5f3c4d",
+                        "primary-container": "#f8c8dc",
+                        "on-tertiary-fixed-variant": "#474836",
+                        "surface-container": "#f7ebeb",
+                        "surface-container-highest": "#ebe0e0",
+                        "tertiary-fixed": "#e4e4cc",
+                        "secondary-container": "#cce6f9",
+                        "on-primary": "#ffffff",
+                        "surface-container-high": "#f1e5e5",
+                        "on-primary-container": "#765162",
+                        "surface-variant": "#ebe0e0",
+                        "on-secondary-fixed": "#021e2b",
+                        "on-background": "#201a1a",
+                        "inverse-on-surface": "#faeeee",
+                        "primary-fixed": "#ffd8e7",
+                        "surface-bright": "#fff8f7",
+                        "on-tertiary-container": "#5c5d4a",
+                        "on-secondary-fixed-variant": "#314a59",
+                        "secondary-fixed-dim": "#b0cadc",
+                        "inverse-surface": "#352f2f",
+                        "on-error-container": "#93000a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit-8": "32px",
+                        "gutter": "16px",
+                        "base": "4px",
+                        "unit-4": "16px",
+                        "unit-2": "8px",
+                        "container-padding": "20px",
+                        "unit-6": "24px",
+                        "unit-1": "4px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Quicksand"],
+                        "display-lg-mobile": ["Quicksand"],
+                        "headline-md": ["Quicksand"],
+                        "body-sm": ["Quicksand"],
+                        "display-lg": ["Quicksand"],
+                        "body-lg": ["Quicksand"],
+                        "title-lg": ["Quicksand"]
+                    },
+                    "fontSize": {
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700" }],
+                        "display-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "500" }],
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+        /* Custom Checkbox Styling */
+        .cute-checkbox {
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid theme('colors.primary');
+            outline: none;
+            cursor: pointer;
+            position: relative;
+            background-color: theme('colors.surface');
+            transition: all 0.2s ease-in-out;
+            flex-shrink: 0;
+        }
+        .cute-checkbox:checked {
+            background-color: theme('colors.primary');
+            border-color: theme('colors.primary');
+        }
+        .cute-checkbox:checked::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 10px;
+            height: 10px;
+            background-color: theme('colors.on-primary');
+            border-radius: 50%;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-lg antialiased min-h-screen flex flex-col pt-16 pb-24">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-md bg-surface flex items-center justify-between px-container-padding h-16 transition-all duration-300">
+<button aria-label="Menu" class="text-primary hover:bg-surface-container-high transition-colors active:scale-95 transition-transform p-2 rounded-full">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary font-bold">Today's Focus</h1>
+<button aria-label="Profile" class="hover:bg-surface-container-high transition-colors active:scale-95 transition-transform rounded-full overflow-hidden w-8 h-8 focus:outline-none focus:ring-2 focus:ring-primary">
+<img alt="Teacher profile photo" class="w-full h-full object-cover" data-alt="A close-up portrait of a friendly teacher in a bright, modern classroom setting. The lighting is soft and natural, creating a gentle and encouraging mood typical of a soft minimalist aesthetic. The color palette features warm beige and soft pastels, matching the 'Gentle Productivity' vibe. The subject smiles warmly, projecting calm organization." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBoMe5RE0vpkZEAlNBzOeTh7t7jVce8wWo7g5ADnMaT7cMEQcXRPOBUxzLVLu4EnVZx8GZkfQap6qBVtK0MMx9aLuNMmxk4IzLz_aiim-IKpiGwm71x1zO7nYaq1vwJDmDoOAiLWvZEznNVSUjNitsae55u2Navu95HZbQMR796XC8e99jqg2203MYMjhOUR-XQdD5AxUAHuFIs7SLpNeUbXD62fUmzJM5Po0veZEkJ4Cu6SmuOI5gftqlusrMSFRGKgXSTGiz1clI">
+</button>
+</header>
+<!-- Main Content: Notes List -->
+<main class="flex-grow px-container-padding py-unit-4 flex flex-col gap-unit-4 max-w-2xl mx-auto w-full">
+<!-- Note Card 1 -->
+<article class="bg-surface-container-lowest rounded-xl p-unit-4 shadow-sm hover:shadow-md transition-shadow flex items-start gap-unit-4 border border-outline-variant/30">
+<input aria-label="Mark note as complete" class="cute-checkbox mt-1" type="checkbox">
+<div class="flex-grow">
+<h3 class="font-title-lg text-title-lg text-on-surface mb-unit-1">Prepare Science Materials</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Gather beakers, food coloring, and worksheets for the afternoon experiment. Don't forget to check the safety goggles!</p>
+<div class="mt-unit-2 flex gap-unit-2">
+<span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full font-label-md text-label-md inline-block">Science</span>
+<span class="bg-primary-container text-on-primary-container px-3 py-1 rounded-full font-label-md text-label-md inline-block">Prep</span>
+</div>
+</div>
+<div class="flex flex-col gap-unit-2">
+<button aria-label="Edit note" class="text-on-surface-variant hover:text-primary transition-colors p-1">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button aria-label="Delete note" class="text-on-surface-variant hover:text-error transition-colors p-1">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</article>
+<!-- Note Card 2 -->
+<article class="bg-surface-container-low rounded-xl p-unit-4 shadow-sm hover:shadow-md transition-shadow flex items-start gap-unit-4 border border-outline-variant/30">
+<input aria-label="Mark note as incomplete" checked="" class="cute-checkbox mt-1" type="checkbox">
+<div class="flex-grow opacity-60 transition-opacity">
+<h3 class="font-title-lg text-title-lg text-on-surface mb-unit-1 line-through">Review Math Homework</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-through">Grade chapter 4 assignments and prepare feedback for students struggling with fractions.</p>
+<div class="mt-unit-2 flex gap-unit-2 opacity-50">
+<span class="bg-tertiary-container text-on-tertiary-container px-3 py-1 rounded-full font-label-md text-label-md inline-block">Grading</span>
+</div>
+</div>
+<div class="flex flex-col gap-unit-2 opacity-60">
+<button aria-label="Edit note" class="text-on-surface-variant hover:text-primary transition-colors p-1">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button aria-label="Delete note" class="text-on-surface-variant hover:text-error transition-colors p-1">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</article>
+<!-- Note Card 3 -->
+<article class="bg-primary-container/20 rounded-xl p-unit-4 shadow-sm hover:shadow-md transition-shadow flex items-start gap-unit-4 border border-primary/20">
+<input aria-label="Mark note as complete" class="cute-checkbox mt-1" type="checkbox">
+<div class="flex-grow">
+<h3 class="font-title-lg text-title-lg text-on-surface mb-unit-1">Parent-Teacher Conferences</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Send out reminder emails for next week's schedule. Double-check times for the Smith and Johnson families.</p>
+<div class="mt-unit-2 flex gap-unit-2">
+<span class="bg-error-container text-on-error-container px-3 py-1 rounded-full font-label-md text-label-md inline-block">Urgent</span>
+<span class="bg-surface-variant text-on-surface-variant px-3 py-1 rounded-full font-label-md text-label-md inline-block">Admin</span>
+</div>
+</div>
+<div class="flex flex-col gap-unit-2">
+<button aria-label="Edit note" class="text-on-surface-variant hover:text-primary transition-colors p-1">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button aria-label="Delete note" class="text-on-surface-variant hover:text-error transition-colors p-1">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</article>
+<!-- Note Card 4 -->
+<article class="bg-surface-container-lowest rounded-xl p-unit-4 shadow-sm hover:shadow-md transition-shadow flex items-start gap-unit-4 border border-outline-variant/30">
+<input aria-label="Mark note as complete" class="cute-checkbox mt-1" type="checkbox">
+<div class="flex-grow">
+<h3 class="font-title-lg text-title-lg text-on-surface mb-unit-1">Update Bulletin Board</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Change the theme to 'Spring Renewal'. Needs pastel construction paper and the new student art pieces.</p>
+</div>
+<div class="flex flex-col gap-unit-2">
+<button aria-label="Edit note" class="text-on-surface-variant hover:text-primary transition-colors p-1">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button aria-label="Delete note" class="text-on-surface-variant hover:text-error transition-colors p-1">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</article>
+</main>
+<!-- Floating Action Button (+) -->
+<button aria-label="Add new note" class="fixed bottom-24 right-container-padding bg-primary text-on-primary w-14 h-14 rounded-2xl shadow-lg flex items-center justify-center hover:bg-primary/90 active:scale-95 transition-all z-40 backdrop-blur-md bg-opacity-90">
+<span class="material-symbols-outlined text-[28px]">add</span>
+</button>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 pb-safe bg-surface/90 backdrop-blur-lg rounded-t-xl shadow-sm border-t border-transparent bg-surface md:hidden">
+<button aria-label="Home" class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary active:scale-90 transition-all duration-200 p-2">
+<span class="material-symbols-outlined mb-1">home</span>
+<span class="font-label-md text-label-md">Home</span>
+</button>
+<button aria-label="Calendar" class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary active:scale-90 transition-all duration-200 p-2">
+<span class="material-symbols-outlined mb-1">calendar_today</span>
+<span class="font-label-md text-label-md">Calendar</span>
+</button>
+<!-- Active Tab -->
+<button aria-label="Notes, current page" class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined mb-1 fill">description</span>
+<span class="font-label-md text-label-md">Notes</span>
+</button>
+<button aria-label="Profile" class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary active:scale-90 transition-all duration-200 p-2">
+<span class="material-symbols-outlined mb-1">person</span>
+<span class="font-label-md text-label-md">Profile</span>
+</button>
+</nav>
+<!-- Desktop Navigation Side Panel Placeholder (Hidden on Mobile) -->
+<aside class="hidden md:flex fixed left-0 top-16 bottom-0 w-64 bg-surface-container-low border-r border-outline-variant/20 flex-col py-unit-6 px-unit-4 gap-unit-2 z-40">
+<button class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-colors text-left">
+<span class="material-symbols-outlined">home</span>
+<span class="font-body-lg text-body-lg font-bold">Home</span>
+</button>
+<button class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-colors text-left">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-body-lg text-body-lg font-bold">Calendar</span>
+</button>
+<button class="flex items-center gap-3 px-4 py-3 rounded-lg bg-primary-container text-on-primary-container transition-colors text-left">
+<span class="material-symbols-outlined fill">description</span>
+<span class="font-body-lg text-body-lg font-bold">Notes</span>
+</button>
+<button class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-colors text-left">
+<span class="material-symbols-outlined">person</span>
+<span class="font-body-lg text-body-lg font-bold">Profile</span>
+</button>
+</aside>
+<script>
+        // Simple script to toggle line-through on title/desc when checkbox is clicked
+        document.querySelectorAll('.cute-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const parentArticle = this.closest('article');
+                const textElements = parentArticle.querySelectorAll('h3, p');
+                const tags = parentArticle.querySelector('.flex.gap-unit-2');
+                const actions = parentArticle.querySelector('.flex-col.gap-unit-2');
+                const contentDiv = parentArticle.querySelector('.flex-grow');
+
+                if (this.checked) {
+                    textElements.forEach(el => el.classList.add('line-through'));
+                    contentDiv.classList.add('opacity-60');
+                    if(tags) tags.classList.add('opacity-50');
+                    if(actions) actions.classList.add('opacity-60');
+                    parentArticle.classList.replace('bg-surface-container-lowest', 'bg-surface-container-low');
+                    parentArticle.classList.replace('bg-primary-container/20', 'bg-surface-container-low');
+                    parentArticle.classList.replace('border-primary/20', 'border-outline-variant/30');
+
+                } else {
+                    textElements.forEach(el => el.classList.remove('line-through'));
+                    contentDiv.classList.remove('opacity-60');
+                    if(tags) tags.classList.remove('opacity-50');
+                    if(actions) actions.classList.remove('opacity-60');
+                    
+                    // Reset backgrounds (simplified logic for demo)
+                    if(parentArticle.querySelector('.bg-error-container')) {
+                         parentArticle.classList.replace('bg-surface-container-low', 'bg-primary-container/20');
+                         parentArticle.classList.replace('border-outline-variant/30', 'border-primary/20');
+                    } else {
+                        parentArticle.classList.replace('bg-surface-container-low', 'bg-surface-container-lowest');
+                    }
+                }
+            });
+        });
+    </script>
+</body></html>

@@ -1,15 +1,15 @@
-FROM node:18-alpine AS base
+FROM node:24-alpine AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-# Kích hoạt pnpm (có sẵn trong Node 18+)
-RUN corepack enable
+# Cài pnpm đúng phiên bản khai báo trong package.json (pnpm 11 cần Node >= 22.13)
+RUN npm install -g pnpm@11.28.2
 
 # --- GIAI ĐOẠN 1: Tách riêng phần Web (Dùng cho Production) ---
 FROM base AS builder
 WORKDIR /app
 RUN pnpm add -g turbo
 COPY . .
-# Lọc ra đúng thư mục web và các package dùng chung (database, api, types)
+# Lọc ra đúng thư mục web và các package dùng chung (tokens, types, i18n, core, api)
 RUN turbo prune web --docker
 
 # --- GIAI ĐOẠN 2: Development (Dùng khi bạn code) ---

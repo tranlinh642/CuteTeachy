@@ -1,0 +1,446 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport">
+<title>Monthly Calendar - Serene Educator</title>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "tertiary-fixed-dim": "#c8c8b0",
+                      "surface-tint": "#795465",
+                      "surface-container-low": "#fdf1f1",
+                      "secondary-container": "#cce6f9",
+                      "on-surface-variant": "#4f4448",
+                      "on-primary": "#ffffff",
+                      "surface-variant": "#ebe0e0",
+                      "on-surface": "#201a1a",
+                      "on-secondary": "#ffffff",
+                      "on-primary-container": "#765162",
+                      "surface-container-highest": "#ebe0e0",
+                      "surface-container": "#f7ebeb",
+                      "tertiary": "#5e604d",
+                      "surface-bright": "#fff8f7",
+                      "primary-fixed": "#ffd8e7",
+                      "primary": "#795465",
+                      "surface-container-high": "#f1e5e5",
+                      "tertiary-fixed": "#e4e4cc",
+                      "on-primary-fixed-variant": "#5f3c4d",
+                      "tertiary-container": "#d7d7bf",
+                      "on-secondary-fixed-variant": "#314a59",
+                      "error-container": "#ffdad6",
+                      "primary-container": "#f8c8dc",
+                      "on-secondary-container": "#4f6877",
+                      "secondary-fixed": "#cce6f9",
+                      "outline-variant": "#d2c3c7",
+                      "outline": "#817478",
+                      "on-tertiary": "#ffffff",
+                      "on-error": "#ffffff",
+                      "surface-container-lowest": "#ffffff",
+                      "on-tertiary-fixed": "#1b1d0e",
+                      "primary-fixed-dim": "#e9bacd",
+                      "error": "#ba1a1a",
+                      "on-primary-fixed": "#2e1221",
+                      "background": "#fff8f7",
+                      "inverse-primary": "#e9bacd",
+                      "surface": "#fff8f7",
+                      "secondary-fixed-dim": "#b0cadc",
+                      "on-secondary-fixed": "#021e2b",
+                      "secondary": "#496271",
+                      "on-tertiary-fixed-variant": "#474836",
+                      "inverse-surface": "#352f2f",
+                      "inverse-on-surface": "#faeeee",
+                      "on-error-container": "#93000a",
+                      "on-background": "#201a1a",
+                      "surface-dim": "#e3d7d7",
+                      "on-tertiary-container": "#5c5d4a"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "container-padding": "20px",
+                      "unit-2": "8px",
+                      "unit-4": "16px",
+                      "unit-8": "32px",
+                      "unit-1": "4px",
+                      "gutter": "16px",
+                      "unit-6": "24px",
+                      "base": "4px"
+              },
+              "fontFamily": {
+                      "body-lg": [
+                              "Quicksand"
+                      ],
+                      "label-md": [
+                              "Quicksand"
+                      ],
+                      "headline-md": [
+                              "Quicksand"
+                      ],
+                      "body-sm": [
+                              "Quicksand"
+                      ],
+                      "display-lg-mobile": [
+                              "Quicksand"
+                      ],
+                      "display-lg": [
+                              "Quicksand"
+                      ],
+                      "title-lg": [
+                              "Quicksand"
+                      ]
+              },
+              "fontSize": {
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "label-md": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-sm": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "display-lg-mobile": [
+                              "28px",
+                              {
+                                      "lineHeight": "36px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "display-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "title-lg": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        /* Custom styles for soft minimalist aesthetic */
+        body {
+            -webkit-tap-highlight-color: transparent;
+        }
+        .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        .pt-safe {
+            padding-top: env(safe-area-inset-top);
+        }
+        /* Hide scrollbar for cleaner look */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-lg min-h-screen flex flex-col pt-safe pb-safe selection:bg-primary-container selection:text-on-primary-container">
+<!-- Top App Bar -->
+<header class="fixed top-0 w-full bg-background/80 dark:bg-background/80 backdrop-blur-md flex flex-col justify-between px-container-padding h-16 w-full z-50 pt-safe">
+<div class="flex items-center justify-between h-full w-full max-w-3xl mx-auto">
+<button aria-label="Menu" class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-surface-container-high transition-colors active:scale-95 transition-transform text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim">Calendar View</h1>
+<button aria-label="Profile" class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-surface-container-high transition-colors active:scale-95 transition-transform overflow-hidden">
+<img alt="Teacher profile photo" class="w-full h-full object-cover" data-alt="A softly lit, natural portrait of a gentle and approachable female teacher in a serene light-mode environment. The subject has warm beige skin tones and is wearing a pastel muted top, smiling warmly. The background is a beautifully blurred, out-of-focus classroom setting with generous whitespace, conveying a sense of organized calm and gentle productivity typical of modern soft minimalist design." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDop-4Hi_nPh8OYfh6cKOAcG1m-fWUsCibLRpagOgy4I0NVCpp8rXH1Ma0yIuFkxNTFbQlJEIFiSYMmqo0MfY96_DcPsiOKd5OTPtUbC4Smfq35Pk-7GWncYtK95bQUQIkAwPEKwAVZoEp8D-hG3iwb8rQ4Zq9g5lUsZ7F6kLXrWHixLVqQ--QaRMRGvc9nVdHe8WEqhkigdmB-TxKiKtM3egqBfO8jCcuVX25B6v4SoE8H4gM6niuoFE5wAvVAxNYKjUXQRVFZlGQ">
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-20 pb-24 px-container-padding flex flex-col items-center w-full max-w-md mx-auto">
+<!-- Month Navigation -->
+<div class="flex items-center justify-between w-full mb-unit-6 px-4">
+<button aria-label="Previous Month" class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-surface-container transition-colors text-on-surface-variant active:scale-90">
+<span class="material-symbols-outlined" data-icon="chevron_left">chevron_left</span>
+</button>
+<h2 class="font-title-lg text-title-lg text-primary text-center">October 2023</h2>
+<button aria-label="Next Month" class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-surface-container transition-colors text-on-surface-variant active:scale-90">
+<span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+<!-- Calendar Container -->
+<div class="w-full bg-surface-container-low rounded-2xl p-4 shadow-sm mb-unit-8">
+<!-- Weekday Headers -->
+<div class="calendar-grid mb-4">
+<div class="text-center font-label-md text-label-md text-on-surface-variant">M</div>
+<div class="text-center font-label-md text-label-md text-on-surface-variant">T</div>
+<div class="text-center font-label-md text-label-md text-on-surface-variant">W</div>
+<div class="text-center font-label-md text-label-md text-on-surface-variant">T</div>
+<div class="text-center font-label-md text-label-md text-on-surface-variant">F</div>
+<div class="text-center font-label-md text-label-md text-on-surface-variant opacity-70">S</div>
+<div class="text-center font-label-md text-label-md text-on-surface-variant opacity-70">S</div>
+</div>
+<!-- Calendar Days Grid -->
+<div class="calendar-grid">
+<!-- Empty slots for days before 1st -->
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<!-- Day 1 -->
+<button class="relative flex flex-col items-center justify-center aspect-square rounded-full hover:bg-surface-container-high transition-colors">
+<span class="font-body-lg text-body-lg text-on-surface opacity-50">1</span>
+</button>
+<!-- Day 2 -->
+<button class="relative flex flex-col items-center justify-center aspect-square rounded-full hover:bg-surface-container-high transition-colors">
+<span class="font-body-lg text-body-lg text-on-surface opacity-50">2</span>
+</button>
+<!-- Day 3 -->
+<button class="relative flex flex-col items-center justify-center aspect-square rounded-full hover:bg-surface-container-high transition-colors">
+<span class="font-body-lg text-body-lg text-on-surface">3</span>
+<div class="absolute bottom-1 w-1 h-1 rounded-full bg-primary"></div>
+</button>
+<!-- Day 4 -->
+<button class="relative flex flex-col items-center justify-center aspect-square rounded-full hover:bg-surface-container-high transition-colors">
+<span class="font-body-lg text-body-lg text-on-surface">4</span>
+</button>
+<!-- Day 5 -->
+<button class="relative flex flex-col items-center justify-center aspect-square rounded-full hover:bg-surface-container-high transition-colors">
+<span class="font-body-lg text-body-lg text-on-surface">5</span>
+<div class="absolute bottom-1 w-1 h-1 rounded-full bg-secondary"></div>
+</button>
+<!-- Day 6 -->
+<button class="relative flex flex-col items-center justify-center aspect-square rounded-full hover:bg-surface-container-high transition-colors">
+<span class="font-body-lg text-body-lg text-on-surface">6</span>
+</button>
+<!-- Day 7 -->
+<button class="relative flex flex-col items-center justify-center aspect-square rounded-full hover:bg-surface-container-high transition-colors">
+<span class="font-body-lg text-body-lg text-on-surface">7</span>
+</button>
+<!-- Day 8 -->
+<button class="relative flex flex-col items-center justify-center aspect-square rounded-full hover:bg-surface-container-high transition-colors">
+<span class="font-body-lg text-body-lg text-on-surface opacity-70">8</span>
+</button>
+<!-- Day 9 -->
+<button class="relative flex flex-col items-center justify-center aspect-square rounded-full hover:bg-surface-container-high transition-colors">
+<span class="font-body-lg text-body-lg text-on-surface opacity-70">9</span>
+</button>
+<!-- Day 10 -->
+<button class="relative flex flex-col items-center justify-center aspect-square rounded-full hover:bg-surface-container-high transition-colors">
+<span class="font-body-lg text-body-lg text-on-surface">10</span>
+</button>
+<!-- Day 11 (Today / Selected) -->
+<button class="relative flex flex-col items-center justify-center aspect-square rounded-full bg-primary text-on-primary shadow-sm hover:opacity-90 transition-opacity">
+<span class="font-body-lg text-body-lg">11</span>
+<div class="absolute bottom-1 w-1 h-1 rounded-full bg-on-primary"></div>
+</button>
+<!-- Day 12 -->
+<button class="relative flex flex-col items-center justify-center aspect-square rounded-full hover:bg-surface-container-high transition-colors">
+<span class="font-body-lg text-body-lg text-on-surface">12</span>
+<div class="absolute bottom-1 flex gap-0.5">
+<div class="w-1 h-1 rounded-full bg-primary"></div>
+<div class="w-1 h-1 rounded-full bg-secondary"></div>
+</div>
+</button>
+<!-- Day 13 -->
+<button class="relative flex flex-col items-center justify-center aspect-square rounded-full hover:bg-surface-container-high transition-colors">
+<span class="font-body-lg text-body-lg text-on-surface">13</span>
+</button>
+<!-- Day 14 -->
+<button class="relative flex flex-col items-center justify-center aspect-square rounded-full hover:bg-surface-container-high transition-colors">
+<span class="font-body-lg text-body-lg text-on-surface">14</span>
+</button>
+<!-- Day 15 -->
+<button class="relative flex flex-col items-center justify-center aspect-square rounded-full hover:bg-surface-container-high transition-colors">
+<span class="font-body-lg text-body-lg text-on-surface opacity-70">15</span>
+</button>
+<!-- Day 16 -->
+<button class="relative flex flex-col items-center justify-center aspect-square rounded-full hover:bg-surface-container-high transition-colors">
+<span class="font-body-lg text-body-lg text-on-surface opacity-70">16</span>
+</button>
+<!-- Day 17 -->
+<button class="relative flex flex-col items-center justify-center aspect-square rounded-full hover:bg-surface-container-high transition-colors">
+<span class="font-body-lg text-body-lg text-on-surface">17</span>
+</button>
+<!-- Day 18 -->
+<button class="relative flex flex-col items-center justify-center aspect-square rounded-full hover:bg-surface-container-high transition-colors">
+<span class="font-body-lg text-body-lg text-on-surface">18</span>
+<div class="absolute bottom-1 w-1 h-1 rounded-full bg-primary"></div>
+</button>
+<!-- Day 19 -->
+<button class="relative flex flex-col items-center justify-center aspect-square rounded-full hover:bg-surface-container-high transition-colors">
+<span class="font-body-lg text-body-lg text-on-surface">19</span>
+</button>
+<!-- Day 20 -->
+<button class="relative flex flex-col items-center justify-center aspect-square rounded-full hover:bg-surface-container-high transition-colors">
+<span class="font-body-lg text-body-lg text-on-surface">20</span>
+</button>
+<!-- Day 21 -->
+<button class="relative flex flex-col items-center justify-center aspect-square rounded-full hover:bg-surface-container-high transition-colors">
+<span class="font-body-lg text-body-lg text-on-surface">21</span>
+<div class="absolute bottom-1 w-1 h-1 rounded-full bg-secondary"></div>
+</button>
+<!-- Day 22 -->
+<button class="relative flex flex-col items-center justify-center aspect-square rounded-full hover:bg-surface-container-high transition-colors">
+<span class="font-body-lg text-body-lg text-on-surface opacity-70">22</span>
+</button>
+<!-- Day 23 -->
+<button class="relative flex flex-col items-center justify-center aspect-square rounded-full hover:bg-surface-container-high transition-colors">
+<span class="font-body-lg text-body-lg text-on-surface opacity-70">23</span>
+</button>
+<!-- Day 24 -->
+<button class="relative flex flex-col items-center justify-center aspect-square rounded-full hover:bg-surface-container-high transition-colors">
+<span class="font-body-lg text-body-lg text-on-surface">24</span>
+</button>
+<!-- Day 25 -->
+<button class="relative flex flex-col items-center justify-center aspect-square rounded-full hover:bg-surface-container-high transition-colors">
+<span class="font-body-lg text-body-lg text-on-surface">25</span>
+</button>
+<!-- Day 26 -->
+<button class="relative flex flex-col items-center justify-center aspect-square rounded-full hover:bg-surface-container-high transition-colors">
+<span class="font-body-lg text-body-lg text-on-surface">26</span>
+</button>
+<!-- Day 27 -->
+<button class="relative flex flex-col items-center justify-center aspect-square rounded-full hover:bg-surface-container-high transition-colors">
+<span class="font-body-lg text-body-lg text-on-surface">27</span>
+<div class="absolute bottom-1 flex gap-0.5">
+<div class="w-1 h-1 rounded-full bg-primary"></div>
+<div class="w-1 h-1 rounded-full bg-secondary"></div>
+</div>
+</button>
+<!-- Day 28 -->
+<button class="relative flex flex-col items-center justify-center aspect-square rounded-full hover:bg-surface-container-high transition-colors">
+<span class="font-body-lg text-body-lg text-on-surface">28</span>
+</button>
+<!-- Day 29 -->
+<button class="relative flex flex-col items-center justify-center aspect-square rounded-full hover:bg-surface-container-high transition-colors">
+<span class="font-body-lg text-body-lg text-on-surface opacity-70">29</span>
+</button>
+<!-- Day 30 -->
+<button class="relative flex flex-col items-center justify-center aspect-square rounded-full hover:bg-surface-container-high transition-colors">
+<span class="font-body-lg text-body-lg text-on-surface opacity-70">30</span>
+</button>
+<!-- Day 31 -->
+<button class="relative flex flex-col items-center justify-center aspect-square rounded-full hover:bg-surface-container-high transition-colors">
+<span class="font-body-lg text-body-lg text-on-surface">31</span>
+</button>
+</div>
+</div>
+<!-- Schedule Preview Card for Selected Day -->
+<div class="w-full bg-surface-bright rounded-2xl p-5 shadow-sm border border-surface-container border-opacity-50">
+<h3 class="font-title-lg text-title-lg text-on-surface mb-4">Wed, Oct 11</h3>
+<div class="space-y-4">
+<!-- Class Item -->
+<div class="flex items-start gap-4">
+<div class="w-2 h-10 rounded-full bg-primary mt-1"></div>
+<div class="flex-grow">
+<div class="flex justify-between items-center">
+<h4 class="font-body-lg text-body-lg text-on-surface font-semibold">Grade 4 Science</h4>
+<span class="font-body-sm text-body-sm text-on-surface-variant">09:00 AM</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Ecosystems Introduction</p>
+</div>
+</div>
+<!-- Meeting Item -->
+<div class="flex items-start gap-4">
+<div class="w-2 h-10 rounded-full bg-secondary mt-1"></div>
+<div class="flex-grow">
+<div class="flex justify-between items-center">
+<h4 class="font-body-lg text-body-lg text-on-surface font-semibold">Staff Meeting</h4>
+<span class="font-body-sm text-body-sm text-on-surface-variant">02:30 PM</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Curriculum planning</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Floating Action Button -->
+<button aria-label="Add Event" class="fixed bottom-24 right-container-padding w-14 h-14 bg-primary-container text-on-primary-container rounded-2xl shadow-sm hover:shadow-md active:scale-95 transition-all duration-200 flex items-center justify-center z-40 backdrop-blur-md bg-opacity-90">
+<span class="material-symbols-outlined text-3xl" data-icon="add">add</span>
+</button>
+<!-- Bottom Navigation Bar (Mobile) -->
+<nav class="md:hidden bg-surface/90 dark:bg-surface/90 backdrop-blur-lg fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 pb-safe rounded-t-xl shadow-sm border-t border-surface-container-low border-opacity-20">
+<!-- Home (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary active:scale-90 transition-all duration-200 w-16 h-14" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="home">home</span>
+<span class="font-label-md text-label-md">Home</span>
+</a>
+<!-- Calendar (Active) -->
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 active:scale-90 transition-all duration-200 min-w-16 h-14" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="calendar_today" data-weight="fill" style="font-variation-settings: 'FILL' 1;">calendar_today</span>
+<span class="font-label-md text-label-md">Calendar</span>
+</a>
+<!-- Notes (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary active:scale-90 transition-all duration-200 w-16 h-14" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="description">description</span>
+<span class="font-label-md text-label-md">Notes</span>
+</a>
+<!-- Profile (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary active:scale-90 transition-all duration-200 w-16 h-14" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="person">person</span>
+<span class="font-label-md text-label-md">Profile</span>
+</a>
+</nav>
+<!-- Web Side Navigation cluster (hidden on mobile, visible on md screens) for semantic shell completeness, though prompt asked for bottom bar primarily -->
+<nav class="hidden md:flex fixed left-0 top-16 h-full w-64 bg-surface/90 flex-col py-6 px-4 z-40 border-r border-surface-container">
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container transition-colors mb-2" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-body-lg text-body-lg">Home</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl bg-primary-container text-on-primary-container mb-2 font-bold" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_today" data-weight="fill" style="font-variation-settings: 'FILL' 1;">calendar_today</span>
+<span class="font-body-lg text-body-lg">Calendar</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container transition-colors mb-2" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span class="font-body-lg text-body-lg">Notes</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container transition-colors mb-2" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-body-lg text-body-lg">Profile</span>
+</a>
+</nav>
+</body></html>

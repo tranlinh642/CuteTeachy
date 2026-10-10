@@ -1,0 +1,334 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Bloom &amp; Plan - Time Picker</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "secondary-fixed-dim": "#b0cadc",
+                      "primary": "#795465",
+                      "surface-container": "#f7ebeb",
+                      "on-surface-variant": "#4f4448",
+                      "outline-variant": "#d2c3c7",
+                      "on-secondary-fixed-variant": "#314a59",
+                      "on-primary-fixed-variant": "#5f3c4d",
+                      "inverse-on-surface": "#faeeee",
+                      "surface": "#fff8f7",
+                      "on-tertiary-fixed": "#1b1d0e",
+                      "on-tertiary": "#ffffff",
+                      "error-container": "#ffdad6",
+                      "primary-fixed-dim": "#e9bacd",
+                      "surface-variant": "#ebe0e0",
+                      "on-primary-container": "#765162",
+                      "tertiary": "#5e604d",
+                      "on-tertiary-container": "#5c5d4a",
+                      "on-secondary": "#ffffff",
+                      "outline": "#817478",
+                      "surface-container-lowest": "#ffffff",
+                      "on-surface": "#201a1a",
+                      "primary-container": "#f8c8dc",
+                      "tertiary-fixed-dim": "#c8c8b0",
+                      "on-secondary-fixed": "#021e2b",
+                      "tertiary-fixed": "#e4e4cc",
+                      "on-background": "#201a1a",
+                      "secondary-container": "#cce6f9",
+                      "on-secondary-container": "#4f6877",
+                      "on-primary-fixed": "#2e1221",
+                      "secondary-fixed": "#cce6f9",
+                      "inverse-surface": "#352f2f",
+                      "surface-container-low": "#fdf1f1",
+                      "surface-dim": "#e3d7d7",
+                      "inverse-primary": "#e9bacd",
+                      "primary-fixed": "#ffd8e7",
+                      "error": "#ba1a1a",
+                      "surface-bright": "#fff8f7",
+                      "on-error-container": "#93000a",
+                      "surface-container-highest": "#ebe0e0",
+                      "surface-tint": "#795465",
+                      "background": "#fff8f7",
+                      "secondary": "#496271",
+                      "on-tertiary-fixed-variant": "#474836",
+                      "on-primary": "#ffffff",
+                      "tertiary-container": "#d7d7bf",
+                      "surface-container-high": "#f1e5e5",
+                      "on-error": "#ffffff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "unit-6": "24px",
+                      "unit-2": "8px",
+                      "unit-1": "4px",
+                      "unit-4": "16px",
+                      "gutter": "16px",
+                      "container-padding": "20px",
+                      "base": "4px",
+                      "unit-8": "32px"
+              },
+              "fontFamily": {
+                      "title-lg": [
+                              "Quicksand"
+                      ],
+                      "display-lg-mobile": [
+                              "Quicksand"
+                      ],
+                      "body-lg": [
+                              "Quicksand"
+                      ],
+                      "label-md": [
+                              "Quicksand"
+                      ],
+                      "body-sm": [
+                              "Quicksand"
+                      ],
+                      "display-lg": [
+                              "Quicksand"
+                      ],
+                      "headline-md": [
+                              "Quicksand"
+                      ]
+              },
+              "fontSize": {
+                      "title-lg": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg-mobile": [
+                              "28px",
+                              {
+                                      "lineHeight": "36px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "label-md": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-sm": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "display-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        .material-symbols-outlined {
+          font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined[data-weight="fill"] {
+          font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        /* Time Scroller Styles */
+        .time-scroller::-webkit-scrollbar {
+            display: none;
+        }
+        .time-scroller {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+      </style>
+</head>
+<body class="bg-background text-on-background font-body-lg min-h-screen flex flex-col relative overflow-hidden">
+<!-- Top Navigation Bar -->
+<nav class="bg-surface dark:bg-surface-dim w-full h-16 flex justify-between items-center px-unit-8 max-w-7xl mx-auto z-10 relative shadow-sm">
+<div class="font-display-lg text-display-lg text-primary dark:text-primary-fixed-dim">
+            Bloom &amp; Plan
+        </div>
+<div class="flex items-center gap-unit-6 hidden md:flex">
+<a class="text-primary dark:text-primary-fixed-dim border-b-2 border-primary font-title-lg text-title-lg transition-colors duration-200" href="#">Dashboard</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed transition-colors duration-200 font-title-lg text-title-lg cursor-pointer" href="#">Planner</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed transition-colors duration-200 font-title-lg text-title-lg cursor-pointer" href="#">Reflections</a>
+</div>
+<div class="flex items-center gap-unit-4 text-primary dark:text-primary-fixed-dim">
+<button class="hover:text-primary-fixed-dim transition-colors">
+<span class="material-symbols-outlined cursor-pointer duration-200" data-icon="help">help</span>
+</button>
+<button class="hover:text-primary-fixed-dim transition-colors">
+<span class="material-symbols-outlined cursor-pointer duration-200" data-icon="settings">settings</span>
+</button>
+</div>
+</nav>
+<!-- Main Content Area (Blurred Background Context) -->
+<main class="flex-grow flex flex-col max-w-7xl mx-auto w-full px-container-padding py-unit-8 gap-unit-6 opacity-30 pointer-events-none filter blur-sm transition-all duration-300">
+<header class="mb-unit-4">
+<h1 class="font-display-lg text-display-lg text-on-surface mb-unit-2">Good morning, Sarah.</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Here is your schedule for today. Take a deep breath.</p>
+</header>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-unit-6">
+<!-- Left Column: Tasks -->
+<div class="md:col-span-2 flex flex-col gap-unit-4">
+<h2 class="font-title-lg text-title-lg text-on-surface border-b border-surface-variant pb-unit-2">Today's Focus</h2>
+<!-- Task Card 1 -->
+<div class="bg-surface-container rounded-lg p-unit-4 shadow-sm flex items-start gap-unit-4">
+<div class="mt-1">
+<span class="material-symbols-outlined text-primary" data-icon="radio_button_unchecked">radio_button_unchecked</span>
+</div>
+<div class="flex-grow">
+<h3 class="font-body-lg text-body-lg font-bold text-on-surface">Grade 5th Grade Science Projects</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-unit-1">Focus on the solar system models.</p>
+<div class="mt-unit-2 flex gap-unit-2">
+<span class="bg-primary-container text-on-primary-container font-label-md text-label-md px-unit-2 py-unit-1 rounded-full">High Priority</span>
+<span class="bg-secondary-container text-on-secondary-container font-label-md text-label-md px-unit-2 py-unit-1 rounded-full">Grading</span>
+</div>
+</div>
+</div>
+<!-- Task Card 2 -->
+<div class="bg-surface-container rounded-lg p-unit-4 shadow-sm flex items-start gap-unit-4">
+<div class="mt-1">
+<span class="material-symbols-outlined text-outline" data-icon="check_circle" data-weight="fill">check_circle</span>
+</div>
+<div class="flex-grow opacity-60">
+<h3 class="font-body-lg text-body-lg font-bold text-on-surface line-through">Prepare Math Lesson Plan</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-unit-1">Fractions introduction.</p>
+</div>
+</div>
+</div>
+<!-- Right Column: Schedule & Mindfulness -->
+<div class="flex flex-col gap-unit-6">
+<!-- Schedule Widget -->
+<div class="bg-surface-container-highest rounded-xl p-unit-6 shadow-sm">
+<h2 class="font-title-lg text-title-lg text-on-surface mb-unit-4">Upcoming</h2>
+<ul class="flex flex-col gap-unit-4">
+<li class="flex items-center justify-between border-l-4 border-secondary pl-unit-4 py-unit-1">
+<div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">10:00 AM</p>
+<p class="font-body-lg text-body-lg font-bold text-on-surface">Staff Meeting</p>
+</div>
+</li>
+<li class="flex items-center justify-between border-l-4 border-primary pl-unit-4 py-unit-1">
+<div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">12:30 PM</p>
+<p class="font-body-lg text-body-lg font-bold text-on-surface">Lunch Break</p>
+</div>
+</li>
+<li class="flex items-center justify-between border-l-4 border-tertiary pl-unit-4 py-unit-1">
+<div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">3:15 PM</p>
+<p class="font-body-lg text-body-lg font-bold text-on-surface">Parent Conf.</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</main>
+<!-- Overlay Backdrop -->
+<div class="fixed inset-0 bg-inverse-surface/40 backdrop-blur-[2px] z-40 flex items-center justify-center p-unit-4">
+<!-- Time Picker Modal -->
+<div class="bg-surface rounded-xl shadow-xl w-full max-w-sm overflow-hidden flex flex-col relative z-50 transform transition-all">
+<!-- Header -->
+<div class="px-unit-6 py-unit-4 border-b border-surface-variant flex items-center justify-center bg-surface-container-low">
+<h2 class="font-title-lg text-title-lg text-on-surface">Select Time</h2>
+</div>
+<!-- Time Selection Area -->
+<div class="p-unit-6 flex flex-col items-center gap-unit-6">
+<!-- Scrollers Container -->
+<div class="flex items-center justify-center gap-unit-4 w-full h-[120px] relative">
+<!-- Selection Highlight Overlay -->
+<div class="absolute top-1/2 left-0 right-0 h-[40px] -translate-y-1/2 bg-secondary-container/30 rounded-lg pointer-events-none z-0 border-y border-secondary/20"></div>
+<!-- Hours Scroller -->
+<div class="h-full w-16 overflow-y-scroll time-scroller snap-y snap-mandatory relative z-10 text-center">
+<div class="h-[40px]"></div> <!-- Spacer -->
+<div class="h-[40px] snap-center flex items-center justify-center font-display-lg text-display-lg text-outline-variant">09</div>
+<div class="h-[40px] snap-center flex items-center justify-center font-display-lg text-display-lg text-on-surface font-bold">10</div>
+<div class="h-[40px] snap-center flex items-center justify-center font-display-lg text-display-lg text-outline-variant">11</div>
+<div class="h-[40px] snap-center flex items-center justify-center font-display-lg text-display-lg text-outline-variant">12</div>
+<div class="h-[40px] snap-center flex items-center justify-center font-display-lg text-display-lg text-outline-variant">01</div>
+<div class="h-[40px]"></div> <!-- Spacer -->
+</div>
+<!-- Separator -->
+<div class="font-display-lg text-display-lg text-on-surface z-10 pb-2">:</div>
+<!-- Minutes Scroller -->
+<div class="h-full w-16 overflow-y-scroll time-scroller snap-y snap-mandatory relative z-10 text-center">
+<div class="h-[40px]"></div> <!-- Spacer -->
+<div class="h-[40px] snap-center flex items-center justify-center font-display-lg text-display-lg text-outline-variant">25</div>
+<div class="h-[40px] snap-center flex items-center justify-center font-display-lg text-display-lg text-on-surface font-bold">30</div>
+<div class="h-[40px] snap-center flex items-center justify-center font-display-lg text-display-lg text-outline-variant">35</div>
+<div class="h-[40px] snap-center flex items-center justify-center font-display-lg text-display-lg text-outline-variant">40</div>
+<div class="h-[40px] snap-center flex items-center justify-center font-display-lg text-display-lg text-outline-variant">45</div>
+<div class="h-[40px]"></div> <!-- Spacer -->
+</div>
+</div>
+<!-- AM/PM Toggles -->
+<div class="flex bg-surface-variant p-unit-1 rounded-full w-48 mx-auto mt-unit-2 shadow-inner">
+<button class="flex-1 py-unit-2 rounded-full font-label-md text-label-md text-on-surface-variant transition-colors hover:bg-surface-dim focus:outline-none">
+                        AM
+                    </button>
+<button class="flex-1 py-unit-2 rounded-full bg-primary-container text-on-primary-container font-label-md text-label-md shadow-sm transition-colors focus:outline-none font-bold">
+                        PM
+                    </button>
+</div>
+</div>
+<!-- Actions -->
+<div class="px-unit-6 py-unit-4 border-t border-surface-variant flex items-center justify-between bg-surface-container-lowest">
+<button class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface px-unit-4 py-unit-2 rounded hover:bg-surface-variant transition-colors focus:outline-none">
+                    Cancel
+                </button>
+<button class="font-label-md text-label-md text-primary font-bold hover:text-primary-fixed-dim px-unit-4 py-unit-2 rounded hover:bg-primary-container/50 transition-colors focus:outline-none">
+                    Done
+                </button>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<footer class="bg-transparent w-full py-unit-6 flex flex-col items-center justify-center space-y-unit-2 mt-auto z-10 relative">
+<div class="font-title-lg text-title-lg text-primary">
+            Bloom &amp; Plan
+        </div>
+<div class="flex gap-unit-4">
+<a class="text-on-surface-variant dark:text-outline-variant hover:underline hover:text-primary dark:hover:text-primary-fixed transition-all duration-200 font-body-sm text-body-sm" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:underline hover:text-primary dark:hover:text-primary-fixed transition-all duration-200 font-body-sm text-body-sm" href="#">Terms of Service</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:underline hover:text-primary dark:hover:text-primary-fixed transition-all duration-200 font-body-sm text-body-sm" href="#">Contact Support</a>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant">
+            © 2024 Bloom &amp; Plan. Designed for Educators.
+        </p>
+</footer>
+</body></html>
