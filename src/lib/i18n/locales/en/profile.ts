@@ -1,0 +1,53 @@
+import type { profile as Schema } from '../vi/profile';
+
+export const profile: typeof Schema = {
+  title: 'Profile & Settings',
+  pushNotifications: 'Push Notifications',
+  themePreferences: 'Theme Preferences',
+  accountDetails: 'Account Details',
+  language: 'Language',
+  languages: {
+    vi: 'Tiếng Việt',
+    en: 'English',
+  },
+  logout: 'Log Out',
+  logoutConfirm: 'Are you sure you want to log out?',
+  fullName: 'Full name',
+  email: 'Email',
+  jobTitle: 'Job title',
+  roles: {
+    female: 'Teacher',
+    male: 'Teacher',
+    other: 'Teacher',
+  },
+  honorifics: {
+    female: 'Ms.',
+    male: 'Mr.',
+    other: '',
+  },
+  edit: {
+    button: 'Edit Profile',
+    modalTitle: 'Edit Profile',
+    fullNameLabel: 'Full name',
+    fullNamePlaceholder: 'Enter your full name…',
+    displayNameLabel: 'Display name',
+    displayNamePlaceholder: 'Short name (e.g. Linh, Nam)',
+    titleLabel: 'Professional Title',
+    titlePlaceholder: 'e.g. Biology Teacher, Math Teacher…',
+    genderLabel: 'Gender',
+    genders: {
+      female: 'Female',
+      male: 'Male',
+      other: 'Other',
+    },
+    save: 'Save Changes',
+    success: 'Profile updated successfully',
+  },
+  themeTitle: 'Primary Color Palette',
+  themes: {
+    auto: 'Auto by Gender',
+    pink: 'Pastel Plum / Pink (Female)',
+    blue: 'Slate Blue (Male)',
+  },
+};
+

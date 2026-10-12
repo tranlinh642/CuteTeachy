@@ -1,0 +1,51 @@
+export const profile = {
+  title: 'Cá nhân & Cài đặt',
+  pushNotifications: 'Thông báo đẩy',
+  themePreferences: 'Giao diện',
+  accountDetails: 'Thông tin tài khoản',
+  language: 'Ngôn ngữ',
+  languages: {
+    vi: 'Tiếng Việt',
+    en: 'English',
+  },
+  logout: 'Đăng xuất',
+  logoutConfirm: 'Bạn có chắc muốn đăng xuất?',
+  fullName: 'Họ và tên',
+  email: 'Email',
+  jobTitle: 'Chức danh',
+  roles: {
+    female: 'Cô giáo',
+    male: 'Thầy giáo',
+    other: 'Giáo viên',
+  },
+  honorifics: {
+    female: 'Cô',
+    male: 'Thầy',
+    other: '',
+  },
+  edit: {
+    button: 'Chỉnh sửa thông tin',
+    modalTitle: 'Chỉnh sửa hồ sơ',
+    fullNameLabel: 'Họ và tên',
+    fullNamePlaceholder: 'Nhập họ và tên…',
+    displayNameLabel: 'Tên hiển thị',
+    displayNamePlaceholder: 'Tên thường dùng (vd. Linh, Nam)',
+    titleLabel: 'Chức danh / Môn dạy',
+    titlePlaceholder: 'Vd. Giáo viên Sinh học, Thầy giáo Toán…',
+    genderLabel: 'Giới tính',
+    genders: {
+      female: 'Nữ (Cô giáo)',
+      male: 'Nam (Thầy giáo)',
+      other: 'Khác',
+    },
+    save: 'Lưu thay đổi',
+    success: 'Đã cập nhật thông tin',
+  },
+  themeTitle: 'Bảng màu chủ đạo',
+  themes: {
+    auto: 'Tự động theo giới tính',
+    pink: 'Hồng phấn pastel (Cô giáo)',
+    blue: 'Xanh phiến thạch (Thầy giáo)',
+  },
+};
+

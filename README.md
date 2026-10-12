@@ -1,75 +1,84 @@
-# CuteTeachy – Frontend monorepo
+# CuteTeachy – Serene Educator (PWA)
 
-Planner cho giáo viên (lịch dạy theo tuần/tháng, ghi chú, to-do, tag). Monorepo **Turborepo + pnpm** gồm bản web và bản app.
+Ứng dụng quản lý kế hoạch giảng dạy cho giáo viên (lịch dạy theo tuần/tháng, ghi chú, to-do, nhãn), xây dựng trên nền tảng **Next.js 16 (App Router) + React 19 + TypeScript + Tailwind CSS v4**, kiến trúc chuẩn **100% Bulletproof React** ([alan2207/bulletproof-react](https://github.com/alan2207/bulletproof-react)).
 
-| Thư mục | Package | Vai trò |
-|---|---|---|
-| `apps/web` | `web` | Next.js 16 (App Router) + Tailwind v4 – cổng `3000` |
-| `apps/mobile` | `mobile` | Expo 57 + expo-router, `StyleSheet` + tokens |
-| `packages/tokens` | `@cute-teachy/tokens` | Design tokens (màu, tone, typography, spacing, radius, shadow, icon) + `css/theme.css` cho Tailwind |
-| `packages/types` | `@cute-teachy/types` | Kiểu dữ liệu domain – **mỗi domain 1 file** trong `src/interfaces/` |
-| `packages/i18n` | `@cute-teachy/i18n` | Bản dịch `vi` (gốc) + `en`, `I18nProvider`, `useTranslation` |
-| `packages/core` | `@cute-teachy/core` | Logic thuần: date utils, validation (zod), selectors, zustand stores (session, preferences) |
-| `packages/api` | `@cute-teachy/api` | Axios + interceptors, services, mock backend, hooks TanStack Query |
-| `packages/eslint-config`, `packages/typescript-config` | `@repo/*` | Cấu hình dùng chung |
+Ứng dụng là **PWA (Progressive Web App)** cài đặt trực tiếp trên Mobile (iOS/Android) và Desktop, hỗ trợ offline-first với Serwist service worker và IndexedDB cache persistence.
 
-Tài liệu nguồn: `docs/ba/` (BA – NotebookLM), `docs/design/stitch/` (thiết kế Google Stitch).
+---
+
+## Cấu trúc thư mục (Bulletproof React Layout)
+
+```
+cute-teachy/
+├── public/                 # Tài nguyên tĩnh, icons PWA, manifest.json, sw.js
+├── src/
+│   ├── app/                # Next.js App Router (pages, layout, providers, sw.ts)
+│   ├── assets/             # Assets, CSS theme (@theme), styles
+│   ├── components/         # Shared components dùng chung
+│   │   ├── ui/             # UI primitives (Button, Card, Dialog, Input, Avatar, ...)
+│   │   ├── layout/         # Shell điều hướng (AppShell, Sidebar, Topbar, MobileBottomNav)
+│   │   ├── pickers/        # Bộ chọn ngày/giờ (DateField, TimeField, DatePicker, ...)
+│   │   ├── feedback/       # Chỉ báo phản hồi (OfflineIndicator)
+│   │   └── pwa/            # Thành phần PWA (PwaInstallBanner)
+│   ├── config/             # Cấu hình ứng dụng, constants, env
+│   ├── features/           # Các module chức năng độc lập (Tracer-bullet)
+│   │   ├── auth/           # Đăng nhập, xác thực, logout
+│   │   ├── calendar/       # Lịch dạy, thời khóa biểu
+│   │   ├── notes/          # Ghi chú, checklist
+│   │   ├── profile/        # Quản lý hồ sơ, chuyển đổi giới tính & adaptive theme
+│   │   ├── tags/           # Quản lý nhãn màu sắc (Tone)
+│   │   ├── tasks/          # Nhiệm vụ, công việc
+│   │   └── weekly/         # Dashboard tuần, lời chúc, thống kê
+│   ├── hooks/              # Global custom hooks (usePwaInstall, useOnlineStatus, ...)
+│   ├── lib/                # Cấu hình các thư viện bên ngoài
+│   │   ├── api/            # Axios HTTP client, ApiError, endpoints, services
+│   │   ├── query/          # TanStack QueryClient, IndexedDB persister, queryKeys
+│   │   ├── i18n/           # Hệ thống đa ngôn ngữ (vi, en), translator
+│   │   └── theme/          # Design tokens, theme resolver, anti-flash script
+│   ├── stores/             # Global Zustand stores (session, preferences)
+│   ├── testing/            # Mocks, seed data, mock router, test utils
+│   ├── types/              # Domain interfaces & TypeScript types
+│   └── utils/              # Tiện ích thuần: date, user selectors, validation schemas, cn
+├── next.config.js          # Cấu hình Next.js + Serwist PWA
+├── postcss.config.mjs      # Cấu hình PostCSS + Tailwind CSS v4
+├── eslint.config.js        # Cấu hình ESLint flat config
+├── vitest.config.ts        # Cấu hình Vitest unit testing
+├── tsconfig.json           # Cấu hình TypeScript với alias @/* trỏ vào ./src/*
+└── package.json            # Scripts & dependencies độc lập
+```
+
+---
 
 ## Chạy dự án
 
-Yêu cầu: **Node ≥ 22.13** (khuyên dùng Node 24 LTS) và **pnpm 11.28.2** (`npm i -g pnpm@11` – pnpm tự chuyển đúng phiên bản theo `devEngines`).
+Yêu cầu: **Node ≥ 22.13** và **pnpm ≥ 11**.
 
 ```sh
+# Cài đặt thư viện
 pnpm install
-pnpm web          # http://localhost:3000
-pnpm mobile       # Expo (quét QR bằng Expo Go)
-pnpm check-types  # kiểm tra kiểu toàn repo
-pnpm test         # vitest cho các package
+
+# Khởi chạy môi trường phát triển (http://localhost:3000)
+pnpm dev
+
+# Kiểm tra kiểu TypeScript (0 lỗi)
+pnpm check-types
+
+# Kiểm tra linter (0 cảnh báo)
 pnpm lint
+
+# Chạy toàn bộ test suites (Vitest)
+pnpm test
+
+# Build ứng dụng sản phẩm (Next.js + Serwist Service Worker)
+pnpm build
 ```
 
-Biến môi trường (BE NestJS chạy cổng `4000`):
+---
 
-| App | Biến | Mặc định |
-|---|---|---|
-| web | `NEXT_PUBLIC_API_URL` | `http://localhost:4000` |
-| mobile | `EXPO_PUBLIC_API_URL` | `http://localhost:4000` |
+## Quy ước code (Architecture Rules)
 
-Hiện tại `@cute-teachy/api` chạy **mode `mock`** (dữ liệu seed, tài khoản demo `linh@cuteteachy.vn` / `123456`). Khi có BE, đổi `mode: 'http'` trong providers của từng app – UI không cần sửa.
-
-## Kiến trúc
-
-```
-routes (app/)  →  features/*  →  components/ui, components/layout  →  @cute-teachy/tokens
-                      │
-                      └─ hooks  →  @cute-teachy/api (server data)  +  @cute-teachy/core (logic, client state)
-```
-
-- **Dùng chung 100%:** tokens, types, i18n, core, api. **UI riêng từng nền tảng** nhưng tên component và props giống nhau (`Button`, `IconButton`, `Chip`, `Card`, …).
-- **Server data** → hook TanStack Query trong `@cute-teachy/api`. **Client state** (phiên đăng nhập, ngôn ngữ, cài đặt) → zustand trong `@cute-teachy/core`.
-- **Route mỏng:** file trong `app/` chỉ ghép feature, không chứa logic.
-- **Feature độc lập:** `features/<tên>/{components,hooks,index.ts}`; feature khác chỉ import qua `index.ts`.
-
-## Quy ước code
-
-1. **Không hard-code chữ hiển thị.** Mọi text dùng `t('namespace.key')`. Thêm key vào **cả** `packages/i18n/src/locales/vi/<ns>.ts` và `en/<ns>.ts` (bản `en` được type theo `vi`, thiếu key sẽ báo lỗi). Tên thứ/tháng lấy qua formatter `Intl` trong `core`.
-2. **Mỗi interface/domain một file**, barrel `index.ts` chỉ re-export. Props interface đặt cạnh component, dùng `readonly`.
-3. **Không dùng giá trị thiết kế rời rạc** – lấy từ tokens (web: class Tailwind sinh từ `theme.css`; mobile: `src/theme`). Sửa token trong `packages/tokens/src/tokens.ts` rồi chạy `pnpm --filter @cute-teachy/tokens generate`.
-4. **Validation** dùng schema zod trong `core`; message là i18n key.
-5. **Accessibility (WCAG AA):** vùng chạm ≥ 44px, icon button bắt buộc có label, focus ring rõ ràng.
-6. Logic mới trong `packages/*` cần kèm unit test (vitest).
-
-## Thêm một tính năng mới (ví dụ)
-
-1. Kiểu dữ liệu → `packages/types/src/interfaces/<domain>.interface.ts`.
-2. Endpoint + service + mock handler + hook → `packages/api`.
-3. Logic thuần / schema → `packages/core` (+ test).
-4. Chuỗi hiển thị → `packages/i18n` (vi + en).
-5. UI → `apps/web/src/features/<domain>` và `apps/mobile/src/features/<domain>`, rồi gắn vào route.
-
-## Quản lý Skills (Tối ưu Token Context)
-
-Dự án đã tối ưu giảm 90% dung lượng skill prompt (giữ lại các skill chính: thiết kế giao diện, Office, NotebookLM). Khi cần làm việc với GCP/BigQuery:
-- Bật lại: `powershell -ExecutionPolicy Bypass -File scripts/toggle-datacloud-skills.ps1 -Action enable`
-- Tắt lại: `powershell -ExecutionPolicy Bypass -File scripts/toggle-datacloud-skills.ps1 -Action disable`
-
+1. **Feature Encapsulation:** Mỗi feature trong `src/features/<tên>/` chứa đầy đủ `api/`, `components/`, `hooks/` và một public barrel `index.ts`. Các component ngoài feature chỉ được import thông qua public barrel `index.ts`.
+2. **Không hard-code text hiển thị:** Toàn bộ văn bản giao diện đi qua hook `useTranslation()` (`t('namespace.key')`). Bản dịch lưu trữ tại `src/lib/i18n/locales/vi` (gốc) và `src/lib/i18n/locales/en`.
+3. **Accessibility (WCAG 2.1 AA):** Vùng chạm tối thiểu ≥ 44px, độ tương phản màu chuẩn Material Design 3, focus ring rõ nét, aria-label đầy đủ.
+4. **Theme Thích Ứng Giới Tính (Adaptive Theme):** Tự động đổi màu sắc ứng dụng theo giới tính giáo viên (`male` -> `blue`, `female`/`other` -> `pink`), có inline script chống chớp màu (Anti-Flash).
+5. **Offline-First & PWA:** Service Worker lưu cache App Shell (`APP_SHELL_ROUTES`), TanStack Query duy trì cache 7 ngày trong IndexedDB (`idb-keyval`).

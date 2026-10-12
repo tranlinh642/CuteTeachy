@@ -15,11 +15,8 @@ node_modules
 # Testing
 coverage
 
-# Turbo
-.turbo
-
-# Vercel
-.vercel
+# TypeScript
+*.tsbuildinfo
 
 # Build Outputs
 .next/

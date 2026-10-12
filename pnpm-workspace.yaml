@@ -1,8 +1,3 @@
-packages:
-  - "apps/*"
-  - "packages/*"
-
-# pnpm 11 chặn build script mặc định – chỉ cho phép các package tin cậy cần biên dịch binary
 allowBuilds:
   esbuild: true
   sharp: true
