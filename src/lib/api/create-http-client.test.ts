@@ -189,4 +189,48 @@ describe('createHttpClient single-flight 401 refresh', () => {
     expect(refreshCalled).toBe(false);
     expect(onUnauthorized).toHaveBeenCalled();
   });
+
+  it('calls onOnboardingRequired when response is 403 with code onboarding_required', async () => {
+    const customAdapter: AxiosAdapter = async (config: InternalAxiosRequestConfig): Promise<AxiosResponse> => {
+      throw new AxiosError('Forbidden', '403', config, {}, {
+        data: { code: 'onboarding_required', message: 'Onboarding required' },
+        status: 403,
+        statusText: 'Forbidden',
+        headers: {},
+        config,
+      });
+    };
+
+    const onOnboardingRequired = vi.fn();
+    const client = createHttpClient({
+      mode: 'http',
+      onOnboardingRequired,
+    });
+    client.defaults.adapter = customAdapter;
+
+    await expect(client.get('/tasks')).rejects.toThrow();
+    expect(onOnboardingRequired).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not call onOnboardingRequired for other 403 errors', async () => {
+    const customAdapter: AxiosAdapter = async (config: InternalAxiosRequestConfig): Promise<AxiosResponse> => {
+      throw new AxiosError('Forbidden', '403', config, {}, {
+        data: { code: 'forbidden', message: 'Forbidden access' },
+        status: 403,
+        statusText: 'Forbidden',
+        headers: {},
+        config,
+      });
+    };
+
+    const onOnboardingRequired = vi.fn();
+    const client = createHttpClient({
+      mode: 'http',
+      onOnboardingRequired,
+    });
+    client.defaults.adapter = customAdapter;
+
+    await expect(client.get('/admin')).rejects.toThrow();
+    expect(onOnboardingRequired).not.toHaveBeenCalled();
+  });
 });

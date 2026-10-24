@@ -26,6 +26,7 @@ export const createHttpClient = (config: ApiConfig = {}): AxiosInstance => {
     },
     getLocale = () => usePreferencesStore.getState().locale,
     onUnauthorized = () => useSessionStore.getState().clearSession(),
+    onOnboardingRequired,
   } = config;
 
   const http = axios.create({
@@ -52,64 +53,73 @@ export const createHttpClient = (config: ApiConfig = {}): AxiosInstance => {
   http.interceptors.response.use(
     (response) => response,
     async (error: unknown) => {
-      if (isAxiosError(error) && error.response?.status === 401) {
-        const originalRequest = error.config as (InternalAxiosRequestConfig & { _retry?: boolean }) | undefined;
-        const authHeader = originalRequest?.headers
-          ? typeof originalRequest.headers.get === 'function'
-            ? originalRequest.headers.get('Authorization')
-            : (originalRequest.headers as Record<string, unknown>)['Authorization']
-          : undefined;
+      if (isAxiosError(error)) {
+        if (error.response?.status === 401) {
+          const originalRequest = error.config as (InternalAxiosRequestConfig & { _retry?: boolean }) | undefined;
+          const authHeader = originalRequest?.headers
+            ? typeof originalRequest.headers.get === 'function'
+              ? originalRequest.headers.get('Authorization')
+              : (originalRequest.headers as Record<string, unknown>)['Authorization']
+            : undefined;
 
-        const isRefreshRequest = originalRequest?.url?.endsWith(ENDPOINTS.auth.refresh);
+          const isRefreshRequest = originalRequest?.url?.endsWith(ENDPOINTS.auth.refresh);
 
-        // Only retry if request had an authorization token, was not already retried, and is not /auth/refresh
-        if (originalRequest && !originalRequest._retry && authHeader && !isRefreshRequest) {
-          originalRequest._retry = true;
+          // Only retry if request had an authorization token, was not already retried, and is not /auth/refresh
+          if (originalRequest && !originalRequest._retry && authHeader && !isRefreshRequest) {
+            originalRequest._retry = true;
 
-          const refreshToken = readRefreshToken();
-          if (!refreshToken) {
-            onUnauthorized();
-            return Promise.reject(toApiError(error));
-          }
-
-          if (!refreshPromise) {
-            refreshPromise = http
-              .post<AuthSession>(
-                ENDPOINTS.auth.refresh,
-                { refreshToken },
-                {
-                  headers: { Authorization: '' },
-                },
-              )
-              .then((res) => {
-                const newSession = res.data;
-                onTokenRefreshed(newSession);
-                return newSession.accessToken;
-              })
-              .catch((refreshErr: unknown) => {
-                onUnauthorized();
-                throw toApiError(refreshErr);
-              })
-              .finally(() => {
-                refreshPromise = null;
-              });
-          }
-
-          try {
-            const newAccessToken = await refreshPromise;
-            if (typeof originalRequest.headers.set === 'function') {
-              originalRequest.headers.set('Authorization', `Bearer ${newAccessToken}`);
-            } else {
-              (originalRequest.headers as Record<string, string>)['Authorization'] = `Bearer ${newAccessToken}`;
+            const refreshToken = readRefreshToken();
+            if (!refreshToken) {
+              onUnauthorized();
+              return Promise.reject(toApiError(error));
             }
-            return await http(originalRequest);
-          } catch (replayErr) {
-            return Promise.reject(toApiError(replayErr));
+
+            if (!refreshPromise) {
+              refreshPromise = http
+                .post<AuthSession>(
+                  ENDPOINTS.auth.refresh,
+                  { refreshToken },
+                  {
+                    headers: { Authorization: '' },
+                  },
+                )
+                .then((res) => {
+                  const newSession = res.data;
+                  onTokenRefreshed(newSession);
+                  return newSession.accessToken;
+                })
+                .catch((refreshErr: unknown) => {
+                  onUnauthorized();
+                  throw toApiError(refreshErr);
+                })
+                .finally(() => {
+                  refreshPromise = null;
+                });
+            }
+
+            try {
+              const newAccessToken = await refreshPromise;
+              if (typeof originalRequest.headers.set === 'function') {
+                originalRequest.headers.set('Authorization', `Bearer ${newAccessToken}`);
+              } else {
+                (originalRequest.headers as Record<string, string>)['Authorization'] = `Bearer ${newAccessToken}`;
+              }
+              return await http(originalRequest);
+            } catch (replayErr) {
+              return Promise.reject(toApiError(replayErr));
+            }
           }
+
+          // 401 without retry capability
+          onUnauthorized();
         }
 
-        // 401 without retry capability
-        onUnauthorized();
+        if (
+          error.response?.status === 403 &&
+          (error.response.data as { code?: string } | undefined)?.code === 'onboarding_required'
+        ) {
+          onOnboardingRequired?.();
+        }
       }
 
       return Promise.reject(toApiError(error));

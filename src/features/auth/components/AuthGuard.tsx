@@ -9,15 +9,20 @@ export interface AuthGuardProps {
   readonly children: ReactNode;
 }
 
-/** Bảo vệ route phía client: đợi store nạp xong, chưa đăng nhập → /login. */
+/** Bảo vệ route phía client: đợi store nạp xong, chưa đăng nhập → /login, chưa onboarding → /onboarding. */
 export function AuthGuard({ children }: AuthGuardProps) {
   const router = useRouter();
-  const { hydrated, isAuthenticated } = useAuthStatus();
+  const { hydrated, isAuthenticated, isOnboarded } = useAuthStatus();
 
   useEffect(() => {
-    if (hydrated && !isAuthenticated) router.replace('/login');
-  }, [hydrated, isAuthenticated, router]);
+    if (!hydrated) return;
+    if (!isAuthenticated) {
+      router.replace('/login');
+    } else if (!isOnboarded) {
+      router.replace('/onboarding');
+    }
+  }, [hydrated, isAuthenticated, isOnboarded, router]);
 
-  if (!hydrated || !isAuthenticated) return <FullPageLoader />;
-  return children;
+  if (!hydrated || !isAuthenticated || !isOnboarded) return <FullPageLoader />;
+  return <>{children}</>;
 }

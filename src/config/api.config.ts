@@ -19,4 +19,6 @@ export interface ApiConfig {
   readonly getLocale?: () => Locale;
   /** Called on HTTP 401 – typically clears the session and redirects to login. */
   readonly onUnauthorized?: () => void;
+  /** Called on HTTP 403 onboarding_required – typically redirects to /onboarding. */
+  readonly onOnboardingRequired?: () => void;
 }

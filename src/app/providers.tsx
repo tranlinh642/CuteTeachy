@@ -23,6 +23,12 @@ const createApiConfig = (): ApiConfig => ({
   getLocale: () => usePreferencesStore.getState().locale,
   // 401 -> xóa phiên; AuthGuard sẽ tự chuyển về /login.
   onUnauthorized: () => useSessionStore.getState().clearSession(),
+  // 403 onboarding_required -> chuyển về /onboarding.
+  onOnboardingRequired: () => {
+    if (typeof window !== 'undefined' && window.location.pathname !== '/onboarding') {
+      window.location.replace('/onboarding');
+    }
+  },
 });
 
 // Đảm bảo chỉ khởi tạo store một lần (StrictMode gọi effect hai lần ở dev).

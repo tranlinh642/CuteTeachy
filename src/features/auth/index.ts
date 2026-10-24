@@ -6,4 +6,5 @@ export { LogoutButton } from './components/LogoutButton';
 export { UserGreeting } from './components/UserGreeting';
 export { useAuthStatus } from './hooks/use-auth-status';
 export { useCurrentUser } from './hooks/use-current-user';
+export { resolveAuthRedirect, type AuthRedirectParams } from './utils/auth-redirect';
 export * from './api';

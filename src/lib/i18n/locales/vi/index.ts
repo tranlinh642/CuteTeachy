@@ -4,6 +4,7 @@ import { common } from './common';
 import { home } from './home';
 import { navigation } from './navigation';
 import { notes } from './notes';
+import { onboarding } from './onboarding';
 import { pickers } from './pickers';
 import { profile } from './profile';
 import { pwa } from './pwa';
@@ -20,6 +21,7 @@ export const vi = {
   common,
   navigation,
   auth,
+  onboarding,
   home,
   weekly,
   calendar,

@@ -1,0 +1,22 @@
+export const onboarding = {
+  title: 'Hoàn tất thông tin',
+  subtitle: 'Hãy cho CuteTeachy biết thông tin để cá nhân hóa giao diện và danh xưng phù hợp nhé',
+  fullNameLabel: 'Họ và tên',
+  fullNamePlaceholder: 'Nhập họ và tên đầy đủ…',
+  displayNameLabel: 'Tên hiển thị',
+  displayNamePlaceholder: 'Tên thường dùng (vd. Linh, Nam)',
+  displayNameHint: 'Tên sẽ xuất hiện trong lời chào hàng ngày',
+  titleLabel: 'Chức danh / Môn dạy',
+  titlePlaceholder: 'Vd. Giáo viên Sinh học, Thầy giáo Toán…',
+  genderLabel: 'Giới tính',
+  genderHint: 'Giới tính giúp ứng dụng tự động chọn danh xưng (Thầy/Cô) và màu sắc giao diện phù hợp',
+  genders: {
+    female: 'Cô giáo (Nữ)',
+    male: 'Thầy giáo (Nam)',
+    other: 'Khác / Trung tính',
+  },
+  submit: 'Bắt đầu ngay',
+  saving: 'Đang lưu…',
+  logout: 'Đăng xuất',
+  logoutConfirm: 'Bạn có chắc chắn muốn đăng xuất?',
+};
