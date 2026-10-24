@@ -144,5 +144,5 @@ Thay đổi contract **chỉ** qua cập nhật file spec này (do Coordinator d
 ## Out of Scope
 
 - Đặt mật khẩu cho Account chỉ có Google; huỷ liên kết Login Provider; đổi email; 2FA.
-- ~~Đồng bộ cài đặt (ngôn ngữ, push, theme) lên server.~~ — đã chuyển vào phạm vi SPEC-005 cho `locale`, `timeZone`, push (xem `CuteTeachy-BE/docs/ba/ba-backend.md` §4); theme vẫn chỉ lưu trên thiết bị.
+- ~~Đồng bộ cài đặt (ngôn ngữ, push, theme) lên server.~~ — đã chuyển vào phạm vi SPEC-003 cho `locale`, `timeZone`, push settings (xem `CuteTeachy-BE/docs/ba/ba-backend.md` §4); theme vẫn chỉ lưu trên thiết bị.
 - Xử lý riêng cho redirect OAuth trong iOS PWA standalone.
