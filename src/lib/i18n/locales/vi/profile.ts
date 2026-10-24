@@ -23,6 +23,20 @@ export const profile = {
     male: 'Thầy',
     other: '',
   },
+  avatar: {
+    title: 'Ảnh đại diện',
+    upload: 'Tải ảnh lên',
+    change: 'Đổi ảnh',
+    delete: 'Xóa ảnh',
+    deleteConfirmTitle: 'Xóa ảnh đại diện',
+    deleteConfirmMessage: 'Bạn có chắc chắn muốn xóa ảnh đại diện?',
+    uploading: 'Đang tải ảnh lên…',
+    deleting: 'Đang xóa ảnh…',
+    uploadSuccess: 'Cập nhật ảnh đại diện thành công',
+    deleteSuccess: 'Đã xóa ảnh đại diện',
+    hint: 'Tối đa 2MB. Hỗ trợ định dạng JPEG, PNG, WebP',
+    chooseFile: 'Chọn ảnh từ thiết bị',
+  },
   edit: {
     button: 'Chỉnh sửa thông tin',
     modalTitle: 'Chỉnh sửa hồ sơ',
@@ -48,4 +62,3 @@ export const profile = {
     blue: 'Xanh phiến thạch (Thầy giáo)',
   },
 };
-

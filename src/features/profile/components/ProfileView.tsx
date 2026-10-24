@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   formatTeacherDisplayName,
   getAvatarName,
@@ -13,9 +13,23 @@ import { APP_VERSION } from '@/config';
 import type { ThemePreference } from '@/lib/theme';
 import { useTranslation } from '@/lib/i18n';
 import type { Locale } from '@/types';
-import { Avatar, Button, Card, Icon, IconButton, SectionHeader, SegmentedControl, Switch } from '@/components/ui';
+import { toApiError } from '@/lib/api';
+import {
+  Avatar,
+  Button,
+  Card,
+  ConfirmDialog,
+  Icon,
+  IconButton,
+  SectionHeader,
+  SegmentedControl,
+  Spinner,
+  Switch,
+} from '@/components/ui';
 import { LogoutButton } from '@/features/auth';
 import { EditProfileDialog } from './EditProfileDialog';
+import { useUploadAvatar, useDeleteAvatar } from '../api';
+import { validateAvatarFile } from '../utils/avatar-file';
 
 export function ProfileView() {
   const { t } = useTranslation();
@@ -27,8 +41,14 @@ export function ProfileView() {
   const themePreference = usePreferencesStore((s) => s.themePreference);
   const setThemePreference = usePreferencesStore((s) => s.setThemePreference);
 
+  const uploadAvatar = useUploadAvatar();
+  const deleteAvatar = useDeleteAvatar();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [avatarError, setAvatarError] = useState<string | null>(null);
+  const [confirmDeleteAvatarOpen, setConfirmDeleteAvatarOpen] = useState(false);
 
   // Tự động ẩn thông báo thành công sau 4 giây, có dọn dẹp khi unmount
   useEffect(() => {
@@ -39,6 +59,42 @@ export function ProfileView() {
 
   const handleEditSuccess = () => {
     setSuccessMessage(t('profile.edit.success'));
+  };
+
+  const handleAvatarFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+
+    setAvatarError(null);
+
+    // Kiểm tra trước khi gửi: <= 2 MB, jpeg/png/webp; sai -> báo lỗi ngay, không gọi API
+    const validation = validateAvatarFile(file);
+    if (!validation.valid && validation.errorKey) {
+      setAvatarError(t(validation.errorKey));
+      return;
+    }
+
+    try {
+      await uploadAvatar.mutateAsync(file);
+      setSuccessMessage(t('profile.avatar.uploadSuccess'));
+    } catch (err) {
+      const apiErr = toApiError(err);
+      setAvatarError(t(apiErr.messageKey));
+    }
+  };
+
+  const handleConfirmDeleteAvatar = async () => {
+    setAvatarError(null);
+    try {
+      await deleteAvatar.mutateAsync();
+      setConfirmDeleteAvatarOpen(false);
+      setSuccessMessage(t('profile.avatar.deleteSuccess'));
+    } catch (err) {
+      setConfirmDeleteAvatarOpen(false);
+      const apiErr = toApiError(err);
+      setAvatarError(t(apiErr.messageKey));
+    }
   };
 
   const languageOptions: readonly { value: Locale; label: string }[] = [
@@ -81,15 +137,81 @@ export function ProfileView() {
         </div>
       )}
 
+      {/* Thông báo lỗi avatar */}
+      {avatarError && (
+        <div
+          role="alert"
+          className="flex items-center justify-between rounded-xl bg-error-container/80 px-4 py-2 text-body-md font-medium text-on-error-container shadow-sm"
+        >
+          <div className="flex items-center gap-2">
+            <Icon name="close" size={20} />
+            <span>{avatarError}</span>
+          </div>
+          <IconButton
+            icon="close"
+            size="sm"
+            variant="ghost"
+            onClick={() => setAvatarError(null)}
+            aria-label={t('common.actions.close')}
+          />
+        </div>
+      )}
+
       {/* Thông tin tài khoản */}
       <Card variant="tonalSubtle" padding="lg" className="flex items-center justify-between gap-5">
         <div className="flex items-center gap-5 min-w-0">
-          <Avatar
-            name={getAvatarName(user)}
-            size="lg"
-            label={getTeacherAvatarLabel(user, t)}
-            ring
-          />
+          <div className="flex flex-col items-center gap-2 shrink-0">
+            <div className="relative">
+              <Avatar
+                name={getAvatarName(user)}
+                src={user?.avatarUrl}
+                size="lg"
+                label={getTeacherAvatarLabel(user, t)}
+                ring
+              />
+              {uploadAvatar.isPending && (
+                <div
+                  role="status"
+                  aria-label={t('profile.avatar.uploading')}
+                  className="bg-surface/70 absolute inset-0 flex items-center justify-center rounded-full backdrop-blur-xs"
+                >
+                  <Spinner size="md" />
+                </div>
+              )}
+            </div>
+            <div className="flex items-center gap-1.5">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="sr-only"
+                onChange={handleAvatarFileChange}
+                disabled={uploadAvatar.isPending || deleteAvatar.isPending}
+              />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadAvatar.isPending || deleteAvatar.isPending}
+                className="text-label-sm text-primary hover:text-primary-fixed-dim hover:underline font-bold disabled:opacity-50 cursor-pointer"
+              >
+                {user?.avatarUrl ? t('profile.avatar.change') : t('profile.avatar.upload')}
+              </button>
+              {user?.avatarUrl && (
+                <>
+                  <span className="text-outline-variant text-label-sm" aria-hidden="true">•</span>
+                  <button
+                    type="button"
+                    onClick={() => setConfirmDeleteAvatarOpen(true)}
+                    disabled={uploadAvatar.isPending || deleteAvatar.isPending}
+                    className="text-label-sm text-error hover:underline font-medium disabled:opacity-50 cursor-pointer"
+                  >
+                    {t('profile.avatar.delete')}
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+
           <div className="flex flex-col gap-1 min-w-0">
             <h2 className="text-headline-md font-bold text-on-primary-container truncate">
               {formatTeacherDisplayName(user, t)}
@@ -196,6 +318,17 @@ export function ProfileView() {
         open={isEditDialogOpen}
         onClose={() => setIsEditDialogOpen(false)}
         onSuccess={handleEditSuccess}
+      />
+
+      <ConfirmDialog
+        open={confirmDeleteAvatarOpen}
+        onClose={() => setConfirmDeleteAvatarOpen(false)}
+        onConfirm={handleConfirmDeleteAvatar}
+        title={t('profile.avatar.deleteConfirmTitle')}
+        message={t('profile.avatar.deleteConfirmMessage')}
+        confirmLabel={t('common.actions.delete')}
+        loading={deleteAvatar.isPending}
+        destructive
       />
     </div>
   );

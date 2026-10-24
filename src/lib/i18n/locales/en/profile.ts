@@ -25,6 +25,20 @@ export const profile: typeof Schema = {
     male: 'Mr.',
     other: '',
   },
+  avatar: {
+    title: 'Profile Picture',
+    upload: 'Upload photo',
+    change: 'Change photo',
+    delete: 'Remove photo',
+    deleteConfirmTitle: 'Remove Profile Picture',
+    deleteConfirmMessage: 'Are you sure you want to remove your profile picture?',
+    uploading: 'Uploading photo…',
+    deleting: 'Removing photo…',
+    uploadSuccess: 'Profile picture updated successfully',
+    deleteSuccess: 'Profile picture removed',
+    hint: 'Max 2MB. Supported formats: JPEG, PNG, WebP',
+    chooseFile: 'Choose photo from device',
+  },
   edit: {
     button: 'Edit Profile',
     modalTitle: 'Edit Profile',
@@ -50,4 +64,3 @@ export const profile: typeof Schema = {
     blue: 'Slate Blue (Male)',
   },
 };
-
