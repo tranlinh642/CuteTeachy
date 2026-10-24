@@ -1,5 +1,6 @@
-﻿'use client';
+'use client';
 
+import Link from 'next/link';
 import { MOCK_DEMO_CREDENTIALS } from '../api';
 import { useTranslation } from '@/lib/i18n';
 import { Button, Checkbox, Icon, IconButton, TextField } from '@/components/ui';
@@ -65,6 +66,16 @@ export function LoginForm() {
       <Button type="submit" size="lg" fullWidth loading={form.isSubmitting}>
         {t('auth.login.submit')}
       </Button>
+
+      <div className="flex items-center justify-center gap-1 text-body-sm text-on-surface-variant">
+        <span>{t('auth.login.noAccount')}</span>
+        <Link
+          href="/register"
+          className="text-primary hover:underline min-h-touch inline-flex items-center font-medium"
+        >
+          {t('auth.login.signUp')}
+        </Link>
+      </div>
 
       {isMockApi && (
         <button
