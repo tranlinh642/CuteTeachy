@@ -13,6 +13,17 @@ export interface RegisterCredentials {
   readonly remember?: boolean;
 }
 
+export interface VerifyEmailInput {
+  readonly email: string;
+  readonly code: string;
+}
+
+export interface ResetPasswordInput {
+  readonly email: string;
+  readonly code: string;
+  readonly newPassword: string;
+}
+
 export interface AuthSession {
   readonly user: User;
   readonly accessToken: string;

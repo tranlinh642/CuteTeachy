@@ -28,6 +28,24 @@ function OAuthErrorMessage() {
   );
 }
 
+function ResetSuccessBanner() {
+  const { t } = useTranslation();
+  const searchParams = useSearchParams();
+  const resetParam = searchParams.get('reset');
+
+  if (resetParam !== 'success') return null;
+
+  return (
+    <div
+      role="status"
+      className="bg-secondary-container text-on-secondary-container text-body-sm mb-5 flex items-center gap-2 rounded-md px-4 py-3"
+    >
+      <Icon name="check" size={18} />
+      <span>{t('auth.login.resetSuccessBanner')}</span>
+    </div>
+  );
+}
+
 /** Trang đăng nhập: panel thương hiệu (desktop) + thẻ form. */
 export function LoginScreen() {
   const { t } = useTranslation();
@@ -65,6 +83,7 @@ export function LoginScreen() {
           </header>
           <Card variant="filled" padding="lg" className="bg-tertiary-container/40">
             <Suspense fallback={null}>
+              <ResetSuccessBanner />
               <OAuthErrorMessage />
             </Suspense>
             <LoginForm />

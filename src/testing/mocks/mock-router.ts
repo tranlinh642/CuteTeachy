@@ -64,9 +64,9 @@ export const ok = (data: unknown): MockResponse => ({ status: 200, data });
 export const created = (data: unknown): MockResponse => ({ status: 201, data });
 export const noContent = (): MockResponse => ({ status: 204 });
 export const notFound = (): MockResponse => ({ status: 404, data: { code: 'not_found', message: 'Not found' } });
-export const badRequest = (message = 'Invalid payload'): MockResponse => ({
+export const badRequest = (message = 'Invalid payload', code = 'validation'): MockResponse => ({
   status: 400,
-  data: { code: 'validation', message },
+  data: { code, message },
 });
 export const unauthorized = (code = 'unauthorized', message = 'Unauthorized'): MockResponse => ({
   status: 401,
@@ -89,5 +89,12 @@ export const unsupportedMediaType = (
   message = 'Unsupported media type',
 ): MockResponse => ({
   status: 415,
+  data: { code, message },
+});
+export const tooManyRequests = (
+  code = 'rate_limited',
+  message = 'Too many requests, please try again later',
+): MockResponse => ({
+  status: 429,
   data: { code, message },
 });

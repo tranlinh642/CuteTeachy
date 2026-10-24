@@ -13,6 +13,10 @@ export const ENDPOINTS = {
     googleExchange: '/auth/google/exchange',
     profile: '/auth/profile',
     avatar: '/auth/profile/avatar',
+    verifyEmail: '/auth/email/verify',
+    resendEmailCode: '/auth/email/resend',
+    forgotPassword: '/auth/password/forgot',
+    resetPassword: '/auth/password/reset',
   },
   tasks: {
     root: '/tasks',

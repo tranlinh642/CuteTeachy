@@ -1,4 +1,12 @@
-import type { AuthSession, LoginCredentials, RegisterCredentials, UpdateProfileInput, User } from '@/types';
+import type {
+  AuthSession,
+  LoginCredentials,
+  RegisterCredentials,
+  ResetPasswordInput,
+  UpdateProfileInput,
+  User,
+  VerifyEmailInput,
+} from '@/types';
 import type { AxiosInstance } from 'axios';
 import { ENDPOINTS } from '../endpoints';
 
@@ -27,6 +35,14 @@ export const createAuthService = (http: AxiosInstance) => ({
   },
   deleteAvatar: () =>
     http.delete<User>(ENDPOINTS.auth.avatar).then((res) => res.data),
+  verifyEmail: (input: VerifyEmailInput) =>
+    http.post<AuthSession>(ENDPOINTS.auth.verifyEmail, input).then((res) => res.data),
+  resendEmailCode: (email: string) =>
+    http.post<void>(ENDPOINTS.auth.resendEmailCode, { email }).then(() => undefined),
+  forgotPassword: (email: string) =>
+    http.post<void>(ENDPOINTS.auth.forgotPassword, { email }).then(() => undefined),
+  resetPassword: (input: ResetPasswordInput) =>
+    http.post<void>(ENDPOINTS.auth.resetPassword, input).then(() => undefined),
 });
 
 export type AuthService = ReturnType<typeof createAuthService>;
