@@ -4,7 +4,8 @@ export const LIMITS = {
   notesMax: 1000,
   noteContentMax: 5000,
   tagNameMax: 24,
-  passwordMin: 6,
+  passwordMin: 8,
+  passwordMax: 72,
 } as const;
 
 export const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

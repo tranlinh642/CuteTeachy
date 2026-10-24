@@ -1,4 +1,4 @@
-import type { Locale } from '@/types';
+import type { AuthSession, Locale } from '@/types';
 
 /** NestJS dev server (web dev runs on :3000, so the BE uses :4000). */
 export const DEFAULT_API_URL = 'http://localhost:4000';
@@ -14,6 +14,8 @@ export interface ApiConfig {
   readonly mockLatencyMs?: number;
   readonly timeoutMs?: number;
   readonly getAccessToken?: () => string | null;
+  readonly getRefreshToken?: () => string | null;
+  readonly onTokenRefreshed?: (session: AuthSession) => void;
   readonly getLocale?: () => Locale;
   /** Called on HTTP 401 – typically clears the session and redirects to login. */
   readonly onUnauthorized?: () => void;

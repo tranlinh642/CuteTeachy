@@ -21,8 +21,11 @@ export function useLogout() {
   const queryClient = useQueryClient();
   const clearSession = useSessionStore((state) => state.clearSession);
 
-  return useMutation<void, ApiError, void>({
-    mutationFn: () => auth.logout(),
+  return useMutation<void, ApiError, string | void>({
+    mutationFn: (refreshToken?: string | void) => {
+      const token = typeof refreshToken === 'string' ? refreshToken : useSessionStore.getState().session?.refreshToken;
+      return auth.logout(token);
+    },
     // Always clear locally, even if the server call fails.
     onSettled: () => {
       clearSession();

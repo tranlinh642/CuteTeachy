@@ -1,7 +1,20 @@
 import type { TranslationKey } from '@/lib/i18n';
 import { isAxiosError } from 'axios';
 
-export type ApiErrorCode = 'network' | 'unauthorized' | 'not_found' | 'validation' | 'invalid_credentials' | 'unknown';
+export type ApiErrorCode =
+  | 'network'
+  | 'unauthorized'
+  | 'not_found'
+  | 'validation'
+  | 'invalid_credentials'
+  | 'email_taken'
+  | 'onboarding_required'
+  | 'email_not_verified'
+  | 'invalid_code'
+  | 'file_too_large'
+  | 'unsupported_file_type'
+  | 'rate_limited'
+  | 'unknown';
 
 const CODE_TO_KEY: Readonly<Record<ApiErrorCode, TranslationKey>> = {
   network: 'errors.network',
@@ -9,8 +22,30 @@ const CODE_TO_KEY: Readonly<Record<ApiErrorCode, TranslationKey>> = {
   not_found: 'errors.notFound',
   validation: 'errors.validation',
   invalid_credentials: 'auth.errors.invalidCredentials',
+  email_taken: 'auth.errors.emailTaken',
+  onboarding_required: 'auth.errors.onboardingRequired',
+  email_not_verified: 'auth.errors.emailNotVerified',
+  invalid_code: 'auth.errors.invalidCode',
+  file_too_large: 'errors.fileTooLarge',
+  unsupported_file_type: 'errors.unsupportedFileType',
+  rate_limited: 'errors.rateLimited',
   unknown: 'errors.generic',
 };
+
+const KNOWN_CODES = new Set<ApiErrorCode>([
+  'network',
+  'unauthorized',
+  'not_found',
+  'validation',
+  'invalid_credentials',
+  'email_taken',
+  'onboarding_required',
+  'email_not_verified',
+  'invalid_code',
+  'file_too_large',
+  'unsupported_file_type',
+  'rate_limited',
+]);
 
 /** Normalised error thrown by every service call. */
 export class ApiError extends Error {
@@ -31,9 +66,15 @@ export class ApiError extends Error {
 }
 
 const statusToCode = (status: number, serverCode?: string): ApiErrorCode => {
-  if (serverCode === 'invalid_credentials') return 'invalid_credentials';
+  if (serverCode && KNOWN_CODES.has(serverCode as ApiErrorCode)) {
+    return serverCode as ApiErrorCode;
+  }
   if (status === 401) return 'unauthorized';
   if (status === 404) return 'not_found';
+  if (status === 409) return 'email_taken';
+  if (status === 413) return 'file_too_large';
+  if (status === 415) return 'unsupported_file_type';
+  if (status === 429) return 'rate_limited';
   if (status === 400 || status === 422) return 'validation';
   return 'unknown';
 };

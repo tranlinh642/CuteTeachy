@@ -16,4 +16,7 @@ export const errors: typeof ErrorsSchema = {
   notFound: 'Not found',
   validation: 'Some fields are invalid',
   pageNotFound: "We couldn't find that page",
+  fileTooLarge: 'File is too large (max 2MB)',
+  unsupportedFileType: 'Unsupported file type',
+  rateLimited: 'Too many requests, please try again later',
 };

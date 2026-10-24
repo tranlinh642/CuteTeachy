@@ -20,5 +20,9 @@ export const auth: typeof Schema = {
   errors: {
     invalidCredentials: 'Incorrect email or password',
     sessionExpired: 'Your session has expired, please sign in again',
+    emailTaken: 'This email is already in use',
+    onboardingRequired: 'Please complete your onboarding profile',
+    emailNotVerified: 'Email has not been verified',
+    invalidCode: 'Invalid or expired code',
   },
 };

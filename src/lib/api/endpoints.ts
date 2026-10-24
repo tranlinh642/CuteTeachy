@@ -3,10 +3,16 @@
  */
 export const ENDPOINTS = {
   auth: {
+    register: '/auth/register',
     login: '/auth/login',
+    refresh: '/auth/refresh',
     logout: '/auth/logout',
     me: '/auth/me',
+    google: '/auth/google',
+    googleCallback: '/auth/google/callback',
+    googleExchange: '/auth/google/exchange',
     profile: '/auth/profile',
+    avatar: '/auth/profile/avatar',
   },
   tasks: {
     root: '/tasks',

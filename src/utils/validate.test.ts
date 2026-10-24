@@ -8,7 +8,7 @@ describe('validate', () => {
     const result = validate(loginSchema, { email: 'not-an-email', password: '123' });
     expect(result.success).toBe(false);
     expect(result.errors?.email).toEqual({ key: 'validation.email', params: undefined });
-    expect(result.errors?.password).toEqual({ key: 'validation.minLength', params: { count: 6 } });
+    expect(result.errors?.password).toEqual({ key: 'validation.minLength', params: { count: 8 } });
   });
 
   it('normalises optional task fields', () => {

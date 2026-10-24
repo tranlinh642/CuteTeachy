@@ -36,14 +36,18 @@ describe('user selectors', () => {
     expect(getTeacherRole('female', mockViT)).toBe('Cô giáo');
     expect(getTeacherRole('other', mockViT)).toBe('Giáo viên');
     expect(getTeacherRole(undefined, mockViT)).toBe('Giáo viên');
+    expect(getTeacherRole(null, mockViT)).toBe('Giáo viên');
 
     expect(getTeacherHonorific('male', mockViT)).toBe('Thầy');
     expect(getTeacherHonorific('female', mockViT)).toBe('Cô');
     expect(getTeacherHonorific('other', mockViT)).toBe('');
     expect(getTeacherHonorific(undefined, mockViT)).toBe('');
+    expect(getTeacherHonorific(null, mockViT)).toBe('');
 
     expect(getTeacherRole('male', mockEnT)).toBe('Teacher (Mr.)');
     expect(getTeacherHonorific('male', mockEnT)).toBe('Mr.');
+    expect(getTeacherRole(null, mockEnT)).toBe('profile.roles.other');
+    expect(getTeacherHonorific(null, mockEnT)).toBe('profile.honorifics.other');
   });
 
   it('formats teacher display name with honorific', () => {
@@ -53,10 +57,14 @@ describe('user selectors', () => {
     expect(formatTeacherDisplayName('Cô Linh', 'female', mockViT)).toBe('Cô Linh');
     expect(formatTeacherDisplayName('Công', 'female', mockViT)).toBe('Cô Công');
 
+    // Gender null preserves name without prefix
+    expect(formatTeacherDisplayName('Nam', null, mockViT)).toBe('Nam');
+
     // Empty or whitespace display name returns role
     expect(formatTeacherDisplayName('', 'male', mockViT)).toBe('Thầy giáo');
     expect(formatTeacherDisplayName('   ', 'female', mockViT)).toBe('Cô giáo');
     expect(formatTeacherDisplayName(undefined, 'other', mockViT)).toBe('Giáo viên');
+    expect(formatTeacherDisplayName('', null, mockViT)).toBe('Giáo viên');
 
     // English locale
     expect(formatTeacherDisplayName('John', 'male', mockEnT)).toBe('Mr. John');
@@ -65,6 +73,8 @@ describe('user selectors', () => {
     expect(formatTeacherDisplayName({ displayName: 'Nam', gender: 'male' }, mockViT)).toBe('Thầy Nam');
     expect(formatTeacherDisplayName({ fullName: 'Nguyễn Văn Nam', gender: 'male' }, mockViT)).toBe('Thầy Nguyễn Văn Nam');
     expect(formatTeacherDisplayName({ displayName: '', fullName: '', gender: 'female' }, mockViT)).toBe('Cô giáo');
+    expect(formatTeacherDisplayName({ displayName: 'Nam', gender: null }, mockViT)).toBe('Nam');
+    expect(formatTeacherDisplayName({ displayName: '', gender: null }, mockViT)).toBe('Giáo viên');
     expect(formatTeacherDisplayName(null, mockViT)).toBe('Giáo viên');
   });
 
@@ -105,6 +115,7 @@ describe('user selectors', () => {
     expect(getTeacherAvatarLabel({ displayName: 'Nam', gender: 'male' }, mockViT)).toBe('Ảnh đại diện của Nam');
     expect(getTeacherAvatarLabel({ displayName: '', fullName: '', gender: 'female' }, mockViT)).toBe('Ảnh đại diện của Cô giáo');
     expect(getTeacherAvatarLabel({ displayName: '   ', fullName: '', gender: 'male' }, mockViT)).toBe('Ảnh đại diện của Thầy giáo');
+    expect(getTeacherAvatarLabel({ displayName: '', fullName: '', gender: null }, mockViT)).toBe('Ảnh đại diện của Giáo viên');
     expect(getTeacherAvatarLabel(null, mockViT)).toBe('Ảnh đại diện của Giáo viên');
     expect(getTeacherAvatarLabel({ displayName: 'John', gender: 'male' }, mockEnT)).toBe('Profile picture of John');
   });

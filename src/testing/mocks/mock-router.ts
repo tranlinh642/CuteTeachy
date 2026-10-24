@@ -68,7 +68,26 @@ export const badRequest = (message = 'Invalid payload'): MockResponse => ({
   status: 400,
   data: { code: 'validation', message },
 });
-export const unauthorized = (code = 'unauthorized'): MockResponse => ({
+export const unauthorized = (code = 'unauthorized', message = 'Unauthorized'): MockResponse => ({
   status: 401,
-  data: { code, message: 'Unauthorized' },
+  data: { code, message },
+});
+export const forbidden = (code = 'onboarding_required', message = 'Forbidden'): MockResponse => ({
+  status: 403,
+  data: { code, message },
+});
+export const conflict = (code = 'email_taken', message = 'Conflict'): MockResponse => ({
+  status: 409,
+  data: { code, message },
+});
+export const payloadTooLarge = (code = 'file_too_large', message = 'Payload too large'): MockResponse => ({
+  status: 413,
+  data: { code, message },
+});
+export const unsupportedMediaType = (
+  code = 'unsupported_file_type',
+  message = 'Unsupported media type',
+): MockResponse => ({
+  status: 415,
+  data: { code, message },
 });

@@ -2,7 +2,14 @@ import type { Locale } from '@/types';
 import { AxiosError, AxiosHeaders, type AxiosAdapter, type AxiosResponse } from 'axios';
 import { mockRoutes } from './handlers';
 import { createMockDb, type MockDb } from './mock-db';
-import { matchRoute, notFound, unauthorized, type HttpMethod, type MockResponse } from './mock-router';
+import {
+  forbidden,
+  matchRoute,
+  notFound,
+  unauthorized,
+  type HttpMethod,
+  type MockResponse,
+} from './mock-router';
 
 export interface MockAdapterOptions {
   readonly latencyMs?: number;
@@ -45,6 +52,12 @@ export const createMockAdapter = ({ latencyMs = 350, db = createMockDb() }: Mock
       result = notFound();
     } else if (!match.route.isPublic && !headers.get('Authorization')) {
       result = unauthorized();
+    } else if (
+      !match.route.isPublic &&
+      !path.startsWith('/auth/') &&
+      db.user.onboardingCompletedAt === null
+    ) {
+      result = forbidden('onboarding_required', 'Onboarding required');
     } else {
       result = match.route.handler(
         {

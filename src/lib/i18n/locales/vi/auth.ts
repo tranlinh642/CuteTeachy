@@ -18,5 +18,9 @@ export const auth = {
   errors: {
     invalidCredentials: 'Email hoặc mật khẩu không đúng',
     sessionExpired: 'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại',
+    emailTaken: 'Email này đã được sử dụng',
+    onboardingRequired: 'Vui lòng hoàn tất thông tin hồ sơ ban đầu',
+    emailNotVerified: 'Email chưa được xác thực',
+    invalidCode: 'Mã xác thực không hợp lệ hoặc đã hết hạn',
   },
 };
