@@ -51,17 +51,38 @@ export function LoginForm() {
           />
         }
       />
-      <Checkbox
-        checked={form.values.remember}
-        onChange={(checked) => form.setField('remember', checked)}
-        label={t('auth.login.remember')}
-      />
+      <div className="flex items-center justify-between">
+        <Checkbox
+          checked={form.values.remember}
+          onChange={(checked) => form.setField('remember', checked)}
+          label={t('auth.login.remember')}
+        />
+        <Link
+          href="/forgot-password"
+          className="text-primary hover:underline text-body-sm font-medium"
+        >
+          {t('auth.login.forgotPassword')}
+        </Link>
+      </div>
 
       {form.serverErrorKey && (
-        <p role="alert" className="bg-error-container text-on-error-container text-body-sm flex items-center gap-2 rounded-md px-4 py-3">
-          <Icon name="flag" size={18} />
-          {t(form.serverErrorKey)}
-        </p>
+        <div
+          role="alert"
+          className="bg-error-container text-on-error-container text-body-sm flex flex-col gap-2 rounded-md px-4 py-3"
+        >
+          <div className="flex items-center gap-2">
+            <Icon name="flag" size={18} />
+            <span>{t(form.serverErrorKey)}</span>
+          </div>
+          {form.serverErrorCode === 'email_not_verified' && (
+            <Link
+              href={`/verify-email?email=${encodeURIComponent(form.values.email)}`}
+              className="text-primary hover:underline min-h-touch inline-flex items-center font-medium self-start"
+            >
+              {t('auth.verify.title')} &rarr;
+            </Link>
+          )}
+        </div>
       )}
 
       <Button type="submit" size="lg" fullWidth loading={form.isSubmitting}>

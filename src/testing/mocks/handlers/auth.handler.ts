@@ -1,18 +1,28 @@
 import { EMAIL_PATTERN, LIMITS, profileSchema } from '@/utils';
-import type { AuthSession, LoginCredentials, RegisterCredentials } from '@/types';
+import type {
+  AuthSession,
+  LoginCredentials,
+  RegisterCredentials,
+  ResetPasswordInput,
+  VerifyEmailInput,
+} from '@/types';
 import { ENDPOINTS } from '@/lib/api/endpoints';
 import { MOCK_DEMO_CREDENTIALS } from '../seed/user.seed';
 import {
   badRequest,
   conflict,
   created,
+  forbidden,
   noContent,
   ok,
   payloadTooLarge,
   route,
+  tooManyRequests,
   unauthorized,
   unsupportedMediaType,
 } from '../mock-router';
+
+export const MOCK_VERIFY_CODE = '123456';
 
 const ACCESS_TOKEN_TTL_MS = 15 * 60 * 1000;
 const REFRESH_TOKEN_TTL_REMEMBER_MS = 30 * 24 * 60 * 60 * 1000;
@@ -80,6 +90,11 @@ export const authRoutes = [
 
       if (!matchesDemo && !matchesDb) {
         return unauthorized('invalid_credentials', 'Email hoặc mật khẩu không đúng');
+      }
+
+      // Check email verification for password users (FE-06 requirement)
+      if (matchesDb && !db.user.emailVerified && db.user.loginProviders?.includes('password')) {
+        return forbidden('email_not_verified', 'Email chưa được xác thực');
       }
 
       const rememberFlag = remember !== false;
@@ -211,4 +226,100 @@ export const authRoutes = [
     };
     return ok(db.user);
   }),
+
+  route(
+    'POST',
+    ENDPOINTS.auth.verifyEmail,
+    (request, db) => {
+      const { email, code } = (request.body ?? {}) as Partial<VerifyEmailInput>;
+      const trimmedEmail = email?.trim().toLowerCase();
+      const trimmedCode = code?.trim();
+
+      if (trimmedEmail?.includes('rate-limited') || trimmedCode === 'rate-limited') {
+        return tooManyRequests();
+      }
+
+      if (!trimmedCode || trimmedCode !== MOCK_VERIFY_CODE) {
+        return badRequest('Mã xác thực không hợp lệ hoặc đã hết hạn', 'invalid_code');
+      }
+
+      db.user = {
+        ...db.user,
+        email: trimmedEmail || db.user.email,
+        emailVerified: true,
+      };
+
+      const session: AuthSession = {
+        user: db.user,
+        accessToken: `mock-access-token-${Date.now()}`,
+        expiresAt: new Date(Date.now() + ACCESS_TOKEN_TTL_MS).toISOString(),
+        refreshToken: `mock-refresh-token-${Date.now()}`,
+        refreshExpiresAt: new Date(Date.now() + REFRESH_TOKEN_TTL_REMEMBER_MS).toISOString(),
+      };
+      return ok(session);
+    },
+    { isPublic: true },
+  ),
+
+  route(
+    'POST',
+    ENDPOINTS.auth.resendEmailCode,
+    (request) => {
+      const { email } = (request.body ?? {}) as { email?: string };
+      const trimmedEmail = email?.trim().toLowerCase();
+
+      if (trimmedEmail?.includes('rate-limited')) {
+        return tooManyRequests();
+      }
+
+      return noContent();
+    },
+    { isPublic: true },
+  ),
+
+  route(
+    'POST',
+    ENDPOINTS.auth.forgotPassword,
+    (request) => {
+      const { email } = (request.body ?? {}) as { email?: string };
+      const trimmedEmail = email?.trim().toLowerCase();
+
+      if (trimmedEmail?.includes('rate-limited')) {
+        return tooManyRequests();
+      }
+
+      // Per SPEC-002: always returns 204
+      return noContent();
+    },
+    { isPublic: true },
+  ),
+
+  route(
+    'POST',
+    ENDPOINTS.auth.resetPassword,
+    (request) => {
+      const { email, code, newPassword } = (request.body ?? {}) as Partial<ResetPasswordInput>;
+      const trimmedEmail = email?.trim().toLowerCase();
+      const trimmedCode = code?.trim();
+
+      if (trimmedEmail?.includes('rate-limited') || trimmedCode === 'rate-limited') {
+        return tooManyRequests();
+      }
+
+      if (!trimmedCode || trimmedCode !== MOCK_VERIFY_CODE) {
+        return badRequest('Mã xác thực không hợp lệ hoặc đã hết hạn', 'invalid_code');
+      }
+
+      if (
+        !newPassword ||
+        newPassword.length < LIMITS.passwordMin ||
+        newPassword.length > LIMITS.passwordMax
+      ) {
+        return badRequest('Password length must be between 8 and 72 characters');
+      }
+
+      return noContent();
+    },
+    { isPublic: true },
+  ),
 ];
