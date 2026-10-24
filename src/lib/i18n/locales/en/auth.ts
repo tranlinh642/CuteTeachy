@@ -37,6 +37,17 @@ export const auth: typeof Schema = {
     signInNow: 'Sign in now',
     passwordMismatch: 'Passwords do not match',
   },
+  google: {
+    button: 'Continue with Google',
+    or: 'or',
+    callbackLoading: 'Signing in with Google...',
+    errors: {
+      googleFailed: 'Google sign-in failed. Please try again.',
+      invalidCode: 'Google authorization code is invalid or has expired.',
+      network: 'Unable to connect to server. Please check your network and try again.',
+      missingCode: 'Google authorization code is missing.',
+    },
+  },
   errors: {
     invalidCredentials: 'Incorrect email or password',
     sessionExpired: 'Your session has expired, please sign in again',

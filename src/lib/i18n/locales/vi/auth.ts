@@ -35,6 +35,17 @@ export const auth = {
     signInNow: 'Đăng nhập ngay',
     passwordMismatch: 'Mật khẩu nhập lại không khớp',
   },
+  google: {
+    button: 'Tiếp tục với Google',
+    or: 'hoặc',
+    callbackLoading: 'Đang xử lý đăng nhập Google...',
+    errors: {
+      googleFailed: 'Đăng nhập bằng Google không thành công. Vui lòng thử lại.',
+      invalidCode: 'Mã xác thực Google không hợp lệ hoặc đã hết hạn.',
+      network: 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra mạng và thử lại.',
+      missingCode: 'Không tìm thấy mã xác thực Google.',
+    },
+  },
   errors: {
     invalidCredentials: 'Email hoặc mật khẩu không đúng',
     sessionExpired: 'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại',

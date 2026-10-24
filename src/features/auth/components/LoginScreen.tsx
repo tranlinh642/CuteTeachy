@@ -1,12 +1,32 @@
 'use client';
 
 import { useTranslation } from '@/lib/i18n';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense, useEffect } from 'react';
 import { Card, Icon } from '@/components/ui';
 import { useAuthStatus } from '../hooks/use-auth-status';
+import { resolveOAuthErrorMessage } from '../hooks/use-auth-callback';
 import { FullPageLoader } from './FullPageLoader';
 import { LoginForm } from './LoginForm';
+
+function OAuthErrorMessage() {
+  const { t } = useTranslation();
+  const searchParams = useSearchParams();
+  const errorParam = searchParams.get('error');
+  const message = resolveOAuthErrorMessage(errorParam, t);
+
+  if (!message) return null;
+
+  return (
+    <div
+      role="alert"
+      className="bg-error-container text-on-error-container text-body-sm mb-5 flex items-center gap-2 rounded-md px-4 py-3"
+    >
+      <Icon name="flag" size={18} />
+      <span>{message}</span>
+    </div>
+  );
+}
 
 /** Trang đăng nhập: panel thương hiệu (desktop) + thẻ form. */
 export function LoginScreen() {
@@ -44,6 +64,9 @@ export function LoginScreen() {
             <p className="text-body-lg text-on-surface-variant">{t('auth.login.subtitle')}</p>
           </header>
           <Card variant="filled" padding="lg" className="bg-tertiary-container/40">
+            <Suspense fallback={null}>
+              <OAuthErrorMessage />
+            </Suspense>
             <LoginForm />
           </Card>
         </div>
