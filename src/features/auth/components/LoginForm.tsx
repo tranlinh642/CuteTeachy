@@ -7,6 +7,7 @@ import { Button, Checkbox, Icon, IconButton, TextField } from '@/components/ui';
 import { isMockApi } from '@/config';
 import { useFieldErrorText } from '@/hooks';
 import { useLoginForm } from '../hooks/use-login-form';
+import { GoogleLoginButton } from './GoogleLoginButton';
 
 /** Form đăng nhập (email + mật khẩu) – lỗi gắn với từng trường. */
 export function LoginForm() {
@@ -66,6 +67,17 @@ export function LoginForm() {
       <Button type="submit" size="lg" fullWidth loading={form.isSubmitting}>
         {t('auth.login.submit')}
       </Button>
+
+      <div className="relative my-1 flex items-center justify-center">
+        <div className="border-outline-variant/60 absolute inset-0 flex items-center">
+          <span className="w-full border-t" />
+        </div>
+        <span className="bg-tertiary-container/40 text-on-surface-variant text-body-sm relative px-3">
+          {t('auth.google.or')}
+        </span>
+      </div>
+
+      <GoogleLoginButton remember={form.values.remember} />
 
       <div className="flex items-center justify-center gap-1 text-body-sm text-on-surface-variant">
         <span>{t('auth.login.noAccount')}</span>
