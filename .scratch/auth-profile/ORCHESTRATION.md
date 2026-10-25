@@ -121,7 +121,7 @@ Vòng đời: `ready-for-agent → in-progress → in-review → done`, hoặc `
 | FE-04 | done | ticket/fe-04-google-login-callback | Đã merge a983984 |
 | FE-05 | done | ticket/fe-05-avatar-display-upload | Đã merge 46253af |
 | FE-06 | done | ticket/fe-06-email-verification-forgot-password | Đã merge e5bc633 |
-| FE-07 | in-progress | ticket/fe-07-e2e-integration-cross-repo | Wave 6 (tích hợp) |
+| FE-07 | done | ticket/fe-07-e2e-integration-cross-repo | Đã merge 572f03e |
 
 ## 7. Mẫu prompt
 
