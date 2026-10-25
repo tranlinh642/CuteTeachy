@@ -141,12 +141,9 @@ export function ProfileView() {
       {avatarError && (
         <div
           role="alert"
-          className="flex items-center justify-between rounded-xl bg-error-container/80 px-4 py-2 text-body-md font-medium text-on-error-container shadow-sm"
+          className="flex items-center justify-between rounded-xl bg-error-container px-4 py-2 text-body-md font-medium text-on-error-container shadow-sm"
         >
-          <div className="flex items-center gap-2">
-            <Icon name="close" size={20} />
-            <span>{avatarError}</span>
-          </div>
+          <span>{avatarError}</span>
           <IconButton
             icon="close"
             size="sm"
@@ -192,7 +189,7 @@ export function ProfileView() {
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploadAvatar.isPending || deleteAvatar.isPending}
-                className="text-label-sm text-primary hover:text-primary-fixed-dim hover:underline font-bold disabled:opacity-50 cursor-pointer"
+                className="text-label-sm text-primary hover:text-primary-fixed-dim hover:underline font-bold disabled:opacity-50 cursor-pointer min-h-touch inline-flex items-center px-1"
               >
                 {user?.avatarUrl ? t('profile.avatar.change') : t('profile.avatar.upload')}
               </button>
@@ -203,7 +200,7 @@ export function ProfileView() {
                     type="button"
                     onClick={() => setConfirmDeleteAvatarOpen(true)}
                     disabled={uploadAvatar.isPending || deleteAvatar.isPending}
-                    className="text-label-sm text-error hover:underline font-medium disabled:opacity-50 cursor-pointer"
+                    className="text-label-sm text-error hover:underline font-medium disabled:opacity-50 cursor-pointer min-h-touch inline-flex items-center px-1"
                   >
                     {t('profile.avatar.delete')}
                   </button>

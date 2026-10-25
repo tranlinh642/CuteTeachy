@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { toApiError } from '@/lib/api';
 import { useUpdateProfile } from '@/features/profile';
@@ -31,17 +31,16 @@ export function useOnboardingForm({ onSuccess }: UseOnboardingFormProps = {}) {
   const [errors, setErrors] = useState<OnboardingFieldErrors>({});
   const [serverError, setServerError] = useState<string | null>(null);
 
+  const hasSyncedRef = useRef(Boolean(user));
+
   useEffect(() => {
-    if (user?.fullName && !fullName) {
-      setFullName(user.fullName);
+    if (!hasSyncedRef.current && user) {
+      hasSyncedRef.current = true;
+      if (user.fullName) setFullName(user.fullName);
+      if (user.displayName) setDisplayName(user.displayName);
+      if (user.title) setTitle(user.title);
     }
-    if (user?.displayName && !displayName) {
-      setDisplayName(user.displayName);
-    }
-    if (user?.title && !title) {
-      setTitle(user.title);
-    }
-  }, [user, fullName, displayName, title]);
+  }, [user]);
 
   const handleFullNameChange = (value: string) => {
     setFullName(value);

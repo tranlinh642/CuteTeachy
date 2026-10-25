@@ -18,7 +18,7 @@ export function useRegister() {
 
   return useMutation<AuthSession, ApiError, RegisterCredentials>({
     mutationFn: (credentials) => auth.register(credentials),
-    onSuccess: (session) => setSession(session),
+    onSuccess: (session, variables) => setSession(session, variables?.remember ?? true),
   });
 }
 
@@ -28,7 +28,7 @@ export function useLogin() {
 
   return useMutation<AuthSession, ApiError, LoginCredentials>({
     mutationFn: (credentials) => auth.login(credentials),
-    onSuccess: (session) => setSession(session),
+    onSuccess: (session, variables) => setSession(session, variables?.remember ?? true),
   });
 }
 
@@ -56,7 +56,7 @@ export function useVerifyEmail() {
 
   return useMutation<AuthSession, ApiError, VerifyEmailInput>({
     mutationFn: (input) => auth.verifyEmail(input),
-    onSuccess: (session) => setSession(session),
+    onSuccess: (session, variables) => setSession(session, variables?.remember ?? true),
   });
 }
 

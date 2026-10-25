@@ -59,7 +59,7 @@ export function LoginForm() {
         />
         <Link
           href="/forgot-password"
-          className="text-primary hover:underline text-body-sm font-medium"
+          className="text-primary hover:underline text-body-sm min-h-touch inline-flex items-center font-medium"
         >
           {t('auth.login.forgotPassword')}
         </Link>
