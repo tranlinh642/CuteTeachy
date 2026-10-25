@@ -110,7 +110,7 @@ Vòng đời: `ready-for-agent → in-progress → in-review → done`, hoặc `
 | --- | --- | --- | --- |
 | BE-01 | done | ticket/be-01-docker-dev-infra | Đã merge 778b90e |
 | BE-02 | done | ticket/be-02-scaffold-nestjs-clean-architecture | Đã merge 0a451a4 |
-| BE-03 | ready-for-agent | | |
+| BE-03 | in-progress | ticket/be-03-account-password-login-tokens | Wave 3 |
 | BE-04 | ready-for-agent | | |
 | BE-05 | ready-for-agent | | |
 | BE-06 | ready-for-agent | | |
