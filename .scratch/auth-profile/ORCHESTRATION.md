@@ -111,9 +111,9 @@ Vòng đời: `ready-for-agent → in-progress → in-review → done`, hoặc `
 | BE-01 | done | ticket/be-01-docker-dev-infra | Đã merge 778b90e |
 | BE-02 | done | ticket/be-02-scaffold-nestjs-clean-architecture | Đã merge 0a451a4 |
 | BE-03 | done | ticket/be-03-account-password-login-tokens | Đã merge dc54371 |
-| BE-04 | in-progress | ticket/be-04-onboarding-profile-update | Wave 4 |
-| BE-05 | in-progress | ticket/be-05-google-oauth-account-linking | Wave 4 |
-| BE-06 | in-progress | ticket/be-06-avatar-upload-minio | Wave 4 |
+| BE-04 | done | ticket/be-04-onboarding-profile-update | Đã merge 29ec2d0 |
+| BE-05 | done | ticket/be-05-google-oauth-account-linking | Đã merge 0921aed |
+| BE-06 | done | ticket/be-06-avatar-upload-minio | Đã merge 7f42b9c |
 | BE-07 | ready-for-agent | | giai đoạn cuối |
 | FE-01 | done | ticket/fe-01-contract-session-refresh-mock | Đã merge 6984868 |
 | FE-02 | done | ticket/fe-02-register-screen | Đã merge 91e78d0 |
