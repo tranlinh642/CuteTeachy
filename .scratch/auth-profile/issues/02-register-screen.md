@@ -4,7 +4,7 @@
 
 **Blocked by:** FE-01
 
-**Status:** ready-for-agent
+**Status:** done
 
 **Đọc:** SPEC-002 mục *Account & Login Provider*, *API Contract* (`register`); thiết kế Stitch màn login (`docs/design/stitch/interactive-login-screen--*.html`) để giữ cùng phong cách.
 

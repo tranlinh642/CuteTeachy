@@ -4,7 +4,7 @@
 
 **Blocked by:** FE-01, FE-03 (thêm avatar vào form Onboarding)
 
-**Status:** ready-for-agent
+**Status:** done
 
 **Đọc:** SPEC-002 mục *Avatar*, *API Contract* (`/auth/profile/avatar`).
 

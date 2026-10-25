@@ -4,7 +4,7 @@
 
 **Blocked by:** None (can start immediately — bám contract trong spec, không chờ BE)
 
-**Status:** ready-for-agent
+**Status:** done
 
 **Đọc:** SPEC-002 mục *Token*, *API Contract*, *Mã lỗi FE cần map thêm*, *Account & Login Provider* (mật khẩu 8–72).
 
