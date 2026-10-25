@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { spawn, type ChildProcess } from 'child_process';
 import { execSync } from 'child_process';
+import fs from 'fs';
 import path from 'path';
 import { createHttpClient } from '@/lib/api/create-http-client';
 import { createServices } from '@/lib/api/services';
@@ -13,7 +14,11 @@ import type { AuthSession, User } from '@/types';
 // MinIO + Mailpit infrastructure.
 // =============================================================================
 
-const BE_DIR = path.resolve(__dirname, '../../../../CuteTeachy-BE');
+const candidates = [
+  path.resolve(__dirname, '../../../CuteTeachy-BE'),
+  path.resolve(__dirname, '../../../../CuteTeachy-BE'),
+];
+const BE_DIR = candidates.find((c) => fs.existsSync(c)) || candidates[0];
 const BE_URL_DEFAULT = 'http://localhost:4000';
 const BE_URL_VERIFY_REQUIRED = 'http://localhost:4001';
 const MAILPIT_API_URL = 'http://localhost:8025/api/v1';
@@ -146,10 +151,13 @@ describe('CuteTeachy Cross-Repo Integration E2E (FE ↔ BE)', () => {
       beAvailable = true;
     } else {
       try {
-        spawnedBe4000 = spawn('node', [path.join(BE_DIR, 'dist', 'src', 'main.js')], {
+        spawnedBe4000 = spawn(process.execPath, [path.join(BE_DIR, 'dist', 'src', 'main.js')], {
           cwd: BE_DIR,
           env: { ...process.env, PORT: '4000', EMAIL_VERIFICATION_REQUIRED: 'false' },
           stdio: 'ignore',
+        });
+        spawnedBe4000.on('error', () => {
+          beAvailable = false;
         });
         beAvailable = await waitForHttpHealthy(BE_URL_DEFAULT, 8000);
       } catch {
@@ -644,11 +652,12 @@ describe('CuteTeachy Cross-Repo Integration E2E (FE ↔ BE)', () => {
 
       // Khởi động instance BE có EMAIL_VERIFICATION_REQUIRED=true trên port 4001
       if (!(await isHttpHealthy(BE_URL_VERIFY_REQUIRED))) {
-        spawnedBe4001 = spawn('node', [path.join(BE_DIR, 'dist', 'src', 'main.js')], {
+        spawnedBe4001 = spawn(process.execPath, [path.join(BE_DIR, 'dist', 'src', 'main.js')], {
           cwd: BE_DIR,
           env: { ...process.env, PORT: '4001', EMAIL_VERIFICATION_REQUIRED: 'true' },
           stdio: 'ignore',
         });
+        spawnedBe4001.on('error', () => {});
         const ready = await waitForHttpHealthy(BE_URL_VERIFY_REQUIRED, 8000);
         if (!ready) return;
       }
