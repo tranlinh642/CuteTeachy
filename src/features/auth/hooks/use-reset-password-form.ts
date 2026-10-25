@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
-import { useResendVerificationCode, useResetPassword } from '../api';
+import { useForgotPassword, useResetPassword } from '../api';
 import { useResendCountdown } from './use-resend-countdown';
 import { resetPasswordSchema, validate, type FieldErrors, type ResetPasswordFormValues } from '@/utils';
 import type { TranslationKey } from '@/lib/i18n';
@@ -33,7 +33,7 @@ export function useResetPasswordForm({ initialEmail = '' }: UseResetPasswordForm
   const [resendSuccess, setResendSuccess] = useState(false);
 
   const resetMutation = useResetPassword();
-  const resendMutation = useResendVerificationCode();
+  const resendMutation = useForgotPassword();
   const countdown = useResendCountdown({ initialSeconds: 60, autoStart: false });
 
   const setField = <K extends keyof ResetPasswordFormState>(key: K, value: ResetPasswordFormState[K]) => {

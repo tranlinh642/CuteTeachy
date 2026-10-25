@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react';
 import { useTranslation } from '@/lib/i18n';
-import { Avatar, Button, Spinner, TextField } from '@/components/ui';
+import { Avatar, Button, ConfirmDialog, Spinner, TextField } from '@/components/ui';
 import { useFieldErrorText } from '@/hooks';
 import { selectCurrentUser, useSessionStore } from '@/stores';
 import { getTeacherAvatarLabel } from '@/utils';
@@ -24,6 +24,7 @@ export function OnboardingForm({ onSuccess }: OnboardingFormProps) {
   const deleteAvatar = useDeleteAvatar();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [avatarError, setAvatarError] = useState<string | null>(null);
+  const [confirmDeleteAvatarOpen, setConfirmDeleteAvatarOpen] = useState(false);
 
   const {
     fullName,
@@ -62,11 +63,13 @@ export function OnboardingForm({ onSuccess }: OnboardingFormProps) {
     }
   };
 
-  const handleDeleteAvatar = async () => {
+  const handleConfirmDeleteAvatar = async () => {
     setAvatarError(null);
     try {
       await deleteAvatar.mutateAsync();
+      setConfirmDeleteAvatarOpen(false);
     } catch (err) {
+      setConfirmDeleteAvatarOpen(false);
       const apiErr = toApiError(err);
       setAvatarError(t(apiErr.messageKey));
     }
@@ -79,128 +82,141 @@ export function OnboardingForm({ onSuccess }: OnboardingFormProps) {
   ];
 
   return (
-    <form onSubmit={submit} className="flex flex-col gap-5">
-      {serverError && (
-        <div
-          role="alert"
-          className="rounded-lg bg-error-container/60 p-3 text-body-sm text-on-error-container"
-        >
-          {serverError}
-        </div>
-      )}
+    <>
+      <form onSubmit={submit} className="flex flex-col gap-5">
+        {serverError && (
+          <div
+            role="alert"
+            className="rounded-lg bg-error-container/60 p-3 text-body-sm text-on-error-container"
+          >
+            {serverError}
+          </div>
+        )}
 
-      {/* Avatar (Tùy chọn) */}
-      <div className="flex items-center gap-4 rounded-xl border border-outline-variant/60 p-3 bg-surface-container-low/40">
-        <div className="relative shrink-0">
-          <Avatar
-            name={displayName || fullName || 'CT'}
-            src={user?.avatarUrl}
-            size="md"
-            label={getTeacherAvatarLabel(user, t)}
-          />
-          {uploadAvatar.isPending && (
-            <div
-              role="status"
-              aria-label={t('profile.avatar.uploading')}
-              className="bg-surface/70 absolute inset-0 flex items-center justify-center rounded-full backdrop-blur-xs"
-            >
-              <Spinner size="sm" />
-            </div>
-          )}
-        </div>
-        <div className="flex flex-1 flex-col gap-0.5 min-w-0">
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-body-sm font-bold text-on-surface">
-              {t('onboarding.avatarLabel')}
-            </span>
-            <div className="flex items-center gap-2">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                className="sr-only"
-                onChange={handleAvatarFileChange}
-                disabled={uploadAvatar.isPending || deleteAvatar.isPending}
-              />
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={uploadAvatar.isPending || deleteAvatar.isPending}
-                className="text-label-sm font-bold text-primary hover:underline disabled:opacity-50 cursor-pointer"
+        {/* Avatar (Tùy chọn) */}
+        <div className="flex items-center gap-4 rounded-xl border border-outline-variant/60 p-3 bg-surface-container-low/40">
+          <div className="relative shrink-0">
+            <Avatar
+              name={displayName || fullName || 'CT'}
+              src={user?.avatarUrl}
+              size="md"
+              label={getTeacherAvatarLabel(user, t)}
+            />
+            {uploadAvatar.isPending && (
+              <div
+                role="status"
+                aria-label={t('profile.avatar.uploading')}
+                className="bg-surface/70 absolute inset-0 flex items-center justify-center rounded-full backdrop-blur-xs"
               >
-                {user?.avatarUrl ? t('onboarding.changeAvatar') : t('onboarding.uploadAvatar')}
-              </button>
-              {user?.avatarUrl && (
+                <Spinner size="sm" />
+              </div>
+            )}
+          </div>
+          <div className="flex flex-1 flex-col gap-0.5 min-w-0">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-body-sm font-bold text-on-surface">
+                {t('onboarding.avatarLabel')}
+              </span>
+              <div className="flex items-center gap-2">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="sr-only"
+                  onChange={handleAvatarFileChange}
+                  disabled={uploadAvatar.isPending || deleteAvatar.isPending}
+                />
                 <button
                   type="button"
-                  onClick={handleDeleteAvatar}
+                  onClick={() => fileInputRef.current?.click()}
                   disabled={uploadAvatar.isPending || deleteAvatar.isPending}
-                  className="text-label-sm font-medium text-error hover:underline disabled:opacity-50 cursor-pointer"
+                  className="text-label-sm font-bold text-primary hover:underline disabled:opacity-50 cursor-pointer min-h-touch inline-flex items-center px-1"
                 >
-                  {t('onboarding.removeAvatar')}
+                  {user?.avatarUrl ? t('onboarding.changeAvatar') : t('onboarding.uploadAvatar')}
                 </button>
-              )}
+                {user?.avatarUrl && (
+                  <button
+                    type="button"
+                    onClick={() => setConfirmDeleteAvatarOpen(true)}
+                    disabled={uploadAvatar.isPending || deleteAvatar.isPending}
+                    className="text-label-sm font-medium text-error hover:underline disabled:opacity-50 cursor-pointer min-h-touch inline-flex items-center px-1"
+                  >
+                    {t('onboarding.removeAvatar')}
+                  </button>
+                )}
+              </div>
             </div>
+            <p className="text-label-sm text-on-surface-variant">
+              {avatarError ? (
+                <span className="text-error font-medium">{avatarError}</span>
+              ) : (
+                t('onboarding.avatarHint')
+              )}
+            </p>
           </div>
-          <p className="text-label-sm text-on-surface-variant">
-            {avatarError ? (
-              <span className="text-error font-medium">{avatarError}</span>
-            ) : (
-              t('onboarding.avatarHint')
-            )}
-          </p>
         </div>
-      </div>
 
-      <TextField
-        label={t('onboarding.fullNameLabel')}
-        placeholder={t('onboarding.fullNamePlaceholder')}
-        value={fullName}
-        onChange={(e) => setFullName(e.target.value)}
-        error={formatError(errors.fullName, t('onboarding.fullNameLabel'))}
-        icon="person"
-        autoFocus
+        <TextField
+          label={t('onboarding.fullNameLabel')}
+          placeholder={t('onboarding.fullNamePlaceholder')}
+          value={fullName}
+          onChange={(e) => setFullName(e.target.value)}
+          error={formatError(errors.fullName, t('onboarding.fullNameLabel'))}
+          icon="person"
+          autoFocus
+        />
+
+        <TextField
+          label={t('onboarding.displayNameLabel')}
+          placeholder={t('onboarding.displayNamePlaceholder')}
+          value={displayName}
+          onChange={(e) => setDisplayName(e.target.value)}
+          error={formatError(errors.displayName, t('onboarding.displayNameLabel'))}
+          hint={t('onboarding.displayNameHint')}
+          icon="person"
+        />
+
+        <TextField
+          label={t('onboarding.titleLabel')}
+          placeholder={t('onboarding.titlePlaceholder')}
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          error={formatError(errors.title, t('onboarding.titleLabel'))}
+          icon="school"
+        />
+
+        <GenderSelector
+          label={t('onboarding.genderLabel')}
+          hint={t('onboarding.genderHint')}
+          options={genderOptions}
+          value={gender}
+          onChange={setGender}
+          error={formatError(errors.gender, t('onboarding.genderLabel'))}
+        />
+
+        <div className="pt-2">
+          <Button
+            type="submit"
+            variant="primary"
+            size="lg"
+            fullWidth
+            loading={isSubmitting}
+          >
+            {t('onboarding.submit')}
+          </Button>
+        </div>
+      </form>
+
+      <ConfirmDialog
+        open={confirmDeleteAvatarOpen}
+        onClose={() => setConfirmDeleteAvatarOpen(false)}
+        onConfirm={handleConfirmDeleteAvatar}
+        title={t('profile.avatar.deleteConfirmTitle')}
+        message={t('profile.avatar.deleteConfirmMessage')}
+        confirmLabel={t('common.actions.delete')}
+        loading={deleteAvatar.isPending}
+        destructive
       />
-
-      <TextField
-        label={t('onboarding.displayNameLabel')}
-        placeholder={t('onboarding.displayNamePlaceholder')}
-        value={displayName}
-        onChange={(e) => setDisplayName(e.target.value)}
-        error={formatError(errors.displayName, t('onboarding.displayNameLabel'))}
-        hint={t('onboarding.displayNameHint')}
-        icon="person"
-      />
-
-      <TextField
-        label={t('onboarding.titleLabel')}
-        placeholder={t('onboarding.titlePlaceholder')}
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        error={formatError(errors.title, t('onboarding.titleLabel'))}
-        icon="school"
-      />
-
-      <GenderSelector
-        label={t('onboarding.genderLabel')}
-        hint={t('onboarding.genderHint')}
-        options={genderOptions}
-        value={gender}
-        onChange={setGender}
-        error={formatError(errors.gender, t('onboarding.genderLabel'))}
-      />
-
-      <div className="pt-2">
-        <Button
-          type="submit"
-          variant="primary"
-          size="lg"
-          fullWidth
-          loading={isSubmitting}
-        >
-          {t('onboarding.submit')}
-        </Button>
-      </div>
-    </form>
+    </>
   );
 }

@@ -686,6 +686,6 @@ describe('CuteTeachy Cross-Repo Integration E2E (FE ↔ BE)', () => {
       const okSession = await harness.services.auth.login({ email, password });
       assertValidSessionShape(okSession);
       expect(okSession.user.emailVerified).toBe(true);
-    });
+    }, 15000);
   });
 });

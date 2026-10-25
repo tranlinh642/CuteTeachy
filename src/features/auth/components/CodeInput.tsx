@@ -57,7 +57,7 @@ export function CodeInput({
       )}
 
       <div
-        className="relative flex items-center justify-between gap-2 sm:gap-3"
+        className="relative"
         onClick={() => inputRef.current?.focus()}
       >
         {/* Hidden but accessible input spanning the entire container */}
@@ -80,28 +80,30 @@ export function CodeInput({
         />
 
         {/* 6 Digit display boxes */}
-        {digits.map((digit, index) => {
-          const isCurrent = index === cleanDigits.length && !disabled;
-          return (
-            <div
-              key={index}
-              className={cn(
-                'flex h-14 flex-1 items-center justify-center rounded-lg border-2 text-center text-title-lg font-semibold transition-all',
-                'bg-surface-container-lowest',
-                error
-                  ? 'border-error text-error'
-                  : isCurrent
-                    ? 'border-primary ring-2 ring-primary/20'
-                    : digit
-                      ? 'border-outline text-on-surface'
-                      : 'border-outline-variant text-on-surface-variant',
-                disabled && 'opacity-50 cursor-not-allowed',
-              )}
-            >
-              {digit}
-            </div>
-          );
-        })}
+        <div aria-hidden="true" className="flex items-center justify-between gap-2 sm:gap-3">
+          {digits.map((digit, index) => {
+            const isCurrent = index === cleanDigits.length && !disabled;
+            return (
+              <div
+                key={index}
+                className={cn(
+                  'flex h-14 flex-1 items-center justify-center rounded-lg border-2 text-center text-title-lg font-semibold transition-all',
+                  'bg-surface-container-lowest',
+                  error
+                    ? 'border-error text-error'
+                    : isCurrent
+                      ? 'border-primary ring-2 ring-primary/20'
+                      : digit
+                        ? 'border-outline text-on-surface'
+                        : 'border-outline-variant text-on-surface-variant',
+                  disabled && 'opacity-50 cursor-not-allowed',
+                )}
+              >
+                {digit}
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {error && (

@@ -255,6 +255,7 @@ describe('Email verification and Forgot password contracts (FE-06)', () => {
       expect(html).toContain('pattern="[0-9]*"');
       expect(html).toContain('autoComplete="one-time-code"');
       expect(html).toContain('maxLength="6"');
+      expect(html).toContain('aria-hidden="true"');
       // 6 boxes rendered
       expect(html).toContain('>1<');
       expect(html).toContain('>2<');

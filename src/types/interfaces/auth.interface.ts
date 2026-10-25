@@ -16,6 +16,7 @@ export interface RegisterCredentials {
 export interface VerifyEmailInput {
   readonly email: string;
   readonly code: string;
+  readonly remember?: boolean;
 }
 
 export interface ResetPasswordInput {

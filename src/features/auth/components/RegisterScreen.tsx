@@ -12,12 +12,14 @@ import { RegisterForm } from './RegisterForm';
 export function RegisterScreen() {
   const { t } = useTranslation();
   const router = useRouter();
-  const { hydrated, isAuthenticated } = useAuthStatus();
+  const { hydrated, isAuthenticated, isOnboarded } = useAuthStatus();
 
-  // Đã đăng nhập (hoặc vừa đăng ký xong) → về trang chủ (hoặc Onboarding nếu có guard).
+  // Đã đăng nhập (hoặc vừa đăng ký xong) → nếu đã hoàn tất hồ sơ về '/', chưa thì về '/onboarding'.
   useEffect(() => {
-    if (hydrated && isAuthenticated) router.replace('/');
-  }, [hydrated, isAuthenticated, router]);
+    if (hydrated && isAuthenticated) {
+      router.replace(isOnboarded ? '/' : '/onboarding');
+    }
+  }, [hydrated, isAuthenticated, isOnboarded, router]);
 
   if (!hydrated || isAuthenticated) return <FullPageLoader />;
 
