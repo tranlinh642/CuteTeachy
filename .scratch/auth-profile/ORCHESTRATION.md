@@ -114,7 +114,7 @@ Vòng đời: `ready-for-agent → in-progress → in-review → done`, hoặc `
 | BE-04 | done | ticket/be-04-onboarding-profile-update | Đã merge 29ec2d0 |
 | BE-05 | done | ticket/be-05-google-oauth-account-linking | Đã merge 0921aed |
 | BE-06 | done | ticket/be-06-avatar-upload-minio | Đã merge 7f42b9c |
-| BE-07 | ready-for-agent | | giai đoạn cuối |
+| BE-07 | in-progress | ticket/be-07-email-verification-password-reset | Wave 5 (giai đoạn cuối BE) |
 | FE-01 | done | ticket/fe-01-contract-session-refresh-mock | Đã merge 6984868 |
 | FE-02 | done | ticket/fe-02-register-screen | Đã merge 91e78d0 |
 | FE-03 | done | ticket/fe-03-onboarding-screen-guard | Đã merge eb42f66 |
