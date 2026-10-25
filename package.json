@@ -10,7 +10,8 @@
     "lint": "eslint --max-warnings 0",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "next typegen && tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:integration": "vitest run test/integration/e2e-cross-repo.spec.ts"
   },
   "dependencies": {
     "@serwist/next": "^9.5.13",
