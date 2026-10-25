@@ -114,14 +114,14 @@ Vòng đời: `ready-for-agent → in-progress → in-review → done`, hoặc `
 | BE-04 | done | ticket/be-04-onboarding-profile-update | Đã merge 29ec2d0 |
 | BE-05 | done | ticket/be-05-google-oauth-account-linking | Đã merge 0921aed |
 | BE-06 | done | ticket/be-06-avatar-upload-minio | Đã merge 7f42b9c |
-| BE-07 | in-progress | ticket/be-07-email-verification-password-reset | Wave 5 (giai đoạn cuối BE) |
+| BE-07 | done | ticket/be-07-email-verification-password-reset | Đã merge e0dad46 |
 | FE-01 | done | ticket/fe-01-contract-session-refresh-mock | Đã merge 6984868 |
 | FE-02 | done | ticket/fe-02-register-screen | Đã merge 91e78d0 |
 | FE-03 | done | ticket/fe-03-onboarding-screen-guard | Đã merge eb42f66 |
 | FE-04 | done | ticket/fe-04-google-login-callback | Đã merge a983984 |
 | FE-05 | done | ticket/fe-05-avatar-display-upload | Đã merge 46253af |
 | FE-06 | done | ticket/fe-06-email-verification-forgot-password | Đã merge e5bc633 |
-| FE-07 | ready-for-agent | | tích hợp |
+| FE-07 | in-progress | ticket/fe-07-e2e-integration-cross-repo | Wave 6 (tích hợp) |
 
 ## 7. Mẫu prompt
 
