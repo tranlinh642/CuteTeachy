@@ -44,7 +44,7 @@ flowchart LR
 | S3-BE-01 | done | ticket/s3-be-01-tags-sync-foundation | Đã merge c6a1e69 |
 | S3-BE-02 | done | ticket/s3-be-02-settings | Đã merge 75f5401 |
 | S3-BE-03 | done | ticket/s3-be-03-tasks | Đã merge 91d1679 |
-| S3-BE-04 | in-progress | ticket/s3-be-04-notes | |
+| S3-BE-04 | done | ticket/s3-be-04-notes | Đã merge 46df3f2 |
 | S3-BE-05 | ready-for-agent | | |
 | S3-BE-06 | ready-for-agent | | |
 | S3-FE-01 | done | ticket/s3-fe-01-client-sync-layer | Đã merge eb7ad38 |
