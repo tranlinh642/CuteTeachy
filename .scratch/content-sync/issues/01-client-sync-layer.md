@@ -4,7 +4,7 @@
 
 **Blocked by:** auth-profile FE-01
 
-**Status:** ready-for-agent
+**Status:** in-progress
 
 **Đọc:** SPEC-003 mục *Quy tắc đồng bộ chung*, *Thay đổi FE*; ADR BE 0003.
 

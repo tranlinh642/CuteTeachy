@@ -41,13 +41,13 @@ flowchart LR
 
 | Ticket | Status | Branch | Ghi chú |
 | --- | --- | --- | --- |
-| S3-BE-01 | ready-for-agent | | |
-| S3-BE-02 | ready-for-agent | | |
+| S3-BE-01 | in-progress | ticket/s3-be-01-tags-sync-foundation | |
+| S3-BE-02 | in-progress | ticket/s3-be-02-settings | |
 | S3-BE-03 | ready-for-agent | | |
 | S3-BE-04 | ready-for-agent | | |
 | S3-BE-05 | ready-for-agent | | |
 | S3-BE-06 | ready-for-agent | | |
-| S3-FE-01 | ready-for-agent | | |
+| S3-FE-01 | in-progress | ticket/s3-fe-01-client-sync-layer | |
 | S3-FE-02 | ready-for-agent | | |
 | S3-FE-03 | ready-for-agent | | |
 | S3-FE-04 | ready-for-agent | | |
