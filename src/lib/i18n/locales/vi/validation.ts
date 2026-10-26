@@ -19,4 +19,5 @@ export const errors = {
   rateLimited: 'Bạn thao tác quá nhanh, vui lòng thử lại sau',
   gone: 'Dữ liệu đã bị xóa trước đó',
   idConflict: 'Mã định danh bị trùng lặp',
+  tagNameTaken: 'Tên thẻ đã được sử dụng',
 };
