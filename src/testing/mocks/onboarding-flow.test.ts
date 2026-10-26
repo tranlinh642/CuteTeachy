@@ -105,7 +105,7 @@ describe('FE-03: Full Onboarding Flow on Mock Backend', () => {
     expect(resolveAuthRedirect({ isAuthenticated: true, isOnboarded: isOnboardedAfter, pathname: '/calendar' })).toBeNull();
 
     // 9. Business routes are now unlocked and return normal data
-    const tasks = await services.tasks.list();
-    expect(Array.isArray(tasks)).toBe(true);
+    const tasks = await services.tasks.list({ from: '2026-10-01', to: '2026-10-31' });
+    expect(Array.isArray(tasks.items)).toBe(true);
   });
 });
