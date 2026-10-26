@@ -6,12 +6,34 @@ import type { ApiError } from '@/lib/api';
 import { useServices } from '@/lib/api';
 import { queryKeys } from '@/lib/query';
 import type { DateRange } from '@/lib/api';
+import { createSyncQueryFn, isGoneError, removeEntityFromCache, withClientId } from '@/lib/sync';
+import { addDays, startOfWeek, toISODate } from '@/utils';
+
+const getDefaultDateRange = (): DateRange => {
+  const today = new Date();
+  const start = startOfWeek(today);
+  const end = addDays(start, 41); // 42 days total (<= 42 days)
+  return {
+    from: toISODate(start),
+    to: toISODate(end),
+  };
+};
 
 export function useTasks(range?: DateRange) {
   const { tasks } = useServices();
+  const queryClient = useQueryClient();
+  const effectiveRange = range ?? getDefaultDateRange();
+  const queryKey = queryKeys.tasks.list(range ?? effectiveRange);
+
   return useQuery<Task[], ApiError>({
-    queryKey: queryKeys.tasks.list(range),
-    queryFn: () => tasks.list(range),
+    queryKey,
+    queryFn: createSyncQueryFn(queryClient, queryKey, (updatedSince) =>
+      tasks.list({
+        from: effectiveRange.from,
+        to: effectiveRange.to,
+        updatedSince,
+      }),
+    ),
   });
 }
 
@@ -19,7 +41,10 @@ export function useCreateTask() {
   const { tasks } = useServices();
   const queryClient = useQueryClient();
   return useMutation<Task, ApiError, CreateTaskInput>({
-    mutationFn: (input) => tasks.create(input),
+    mutationFn: (input) => {
+      const payload = withClientId(input);
+      return tasks.create(payload);
+    },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.tasks.all }),
   });
 }
@@ -44,7 +69,11 @@ export function useUpdateTask() {
       );
       return { snapshot };
     },
-    onError: (_error, _variables, context) => {
+    onError: (error, { id }, context) => {
+      if (isGoneError(error)) {
+        removeEntityFromCache(queryClient, queryKeys.tasks.all, id);
+        return;
+      }
       context?.snapshot.forEach(([key, data]) => queryClient.setQueryData(key, data));
     },
     onSettled: () => queryClient.invalidateQueries({ queryKey: queryKeys.tasks.all }),
@@ -63,8 +92,17 @@ export function useToggleTask() {
 export function useDeleteTask() {
   const { tasks } = useServices();
   const queryClient = useQueryClient();
-  return useMutation<void, ApiError, ID>({
+  return useMutation<void, ApiError, ID, { snapshot: [readonly unknown[], Task[] | undefined][] }>({
     mutationFn: (id) => tasks.remove(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.tasks.all }),
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.tasks.all });
+      const snapshot = queryClient.getQueriesData<Task[]>({ queryKey: queryKeys.tasks.all });
+      removeEntityFromCache(queryClient, queryKeys.tasks.all, id);
+      return { snapshot };
+    },
+    onError: (_error, _id, context) => {
+      context?.snapshot.forEach(([key, data]) => queryClient.setQueryData(key, data));
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: queryKeys.tasks.all }),
   });
 }

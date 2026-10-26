@@ -142,8 +142,8 @@ describe('mock backend', () => {
     expect(updated.onboardingCompletedAt).not.toBeNull();
 
     // Now business routes are unlocked!
-    const tasks = await services.tasks.list();
-    expect(Array.isArray(tasks)).toBe(true);
+    const tasks = await services.tasks.list({ from: '2026-10-01', to: '2026-10-31' });
+    expect(Array.isArray(tasks.items)).toBe(true);
   });
 
   it('handles avatar upload and deletion with size and type constraints', async () => {
@@ -187,7 +187,7 @@ describe('mock backend', () => {
     expect(updated.completed).toBe(true);
 
     const range = await services.tasks.list({ from: '2026-10-09', to: '2026-10-09' });
-    expect(range.some((task) => task.id === created.id)).toBe(true);
+    expect(range.items.some((task) => task.id === created.id)).toBe(true);
 
     await services.tasks.remove(created.id);
     await expect(services.tasks.update(created.id, { completed: false })).rejects.toMatchObject({ code: 'not_found' });
