@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { LIMITS } from '@/utils';
 import { useTranslation } from '@/lib/i18n';
@@ -36,13 +36,15 @@ export function TagCreatorDialog({ open, onClose, onCreated }: TagCreatorDialogP
         </>
       }
     >
-      <TagCreatorForm
-        formId={formId}
-        onCreated={(tag) => {
-          onCreated?.(tag);
-          onClose();
-        }}
-      />
+      {open ? (
+        <TagCreatorForm
+          formId={formId}
+          onCreated={(tag) => {
+            onCreated?.(tag);
+            onClose();
+          }}
+        />
+      ) : null}
     </Dialog>
   );
 }
@@ -75,7 +77,7 @@ function TagCreatorForm({ formId, onCreated }: TagCreatorFormProps) {
         </span>
         <TonePicker value={form.tone} onChange={form.setTone} labelledBy={colorLabelId} />
       </div>
-      {form.errorKey && (
+      {form.errorKey && form.errorKey !== 'errors.tagNameTaken' && (
         <p role="alert" className="text-body-sm text-error">
           {t(form.errorKey)}
         </p>

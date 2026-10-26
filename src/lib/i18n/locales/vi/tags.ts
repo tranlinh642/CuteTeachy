@@ -1,11 +1,16 @@
 export const tags = {
   editor: {
     title: 'Tạo thẻ mới',
+    editTitle: 'Chỉnh sửa thẻ',
     nameLabel: 'Tên thẻ',
     namePlaceholder: 'VD: Ôn thi…',
     colorLabel: 'Chọn màu',
     submit: 'Tạo',
+    save: 'Lưu',
+    delete: 'Xóa thẻ',
   },
+  deleteConfirmTitle: 'Xoá thẻ này?',
+  deleteConfirmMessage: 'Thẻ này sẽ bị gỡ khỏi mọi công việc và ghi chú đang gắn.',
   tones: {
     pink: 'Hồng phấn',
     blue: 'Xanh baby',
@@ -16,4 +21,5 @@ export const tags = {
   },
   selectTone: 'Chọn màu {{tone}}',
   addTag: 'Thêm thẻ',
+  editTag: 'Chỉnh sửa thẻ {{name}}',
 };

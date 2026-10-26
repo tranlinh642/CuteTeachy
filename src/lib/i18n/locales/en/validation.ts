@@ -21,4 +21,5 @@ export const errors: typeof ErrorsSchema = {
   rateLimited: 'Too many requests, please try again later',
   gone: 'This item has already been deleted',
   idConflict: 'Identifier conflict detected',
+  tagNameTaken: 'Tag name is already taken',
 };

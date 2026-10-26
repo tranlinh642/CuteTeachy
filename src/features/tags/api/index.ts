@@ -1,1 +1,1 @@
-export { useTags, useCreateTag, useDeleteTag } from './use-tags';
+export { useTags, useCreateTag, useUpdateTag, useDeleteTag } from './use-tags';

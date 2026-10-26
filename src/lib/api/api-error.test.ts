@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ApiError, toApiError, type ApiErrorCode } from './api-error';
+import { ApiError, isTagNameTakenError, toApiError, type ApiErrorCode } from './api-error';
 import { AxiosError, AxiosHeaders } from 'axios';
 
 describe('ApiError and toApiError', () => {
@@ -12,6 +12,7 @@ describe('ApiError and toApiError', () => {
   const testCases: Array<{ status: number; serverCode?: string; expectedCode: ApiErrorCode; expectedKey: string }> = [
     { status: 409, serverCode: 'email_taken', expectedCode: 'email_taken', expectedKey: 'auth.errors.emailTaken' },
     { status: 409, serverCode: 'id_conflict', expectedCode: 'id_conflict', expectedKey: 'errors.idConflict' },
+    { status: 409, serverCode: 'tag_name_taken', expectedCode: 'tag_name_taken', expectedKey: 'errors.tagNameTaken' },
     { status: 410, expectedCode: 'gone', expectedKey: 'errors.gone' },
     { status: 410, serverCode: 'gone', expectedCode: 'gone', expectedKey: 'errors.gone' },
     { status: 403, serverCode: 'onboarding_required', expectedCode: 'onboarding_required', expectedKey: 'auth.errors.onboardingRequired' },
@@ -46,6 +47,36 @@ describe('ApiError and toApiError', () => {
       expect(apiError.code).toBe(expectedCode);
       expect(apiError.messageKey).toBe(expectedKey);
       expect(apiError.status).toBe(status);
+    });
+  });
+
+  describe('isTagNameTakenError', () => {
+    it('detects tag_name_taken in ApiError', () => {
+      const error = new ApiError('tag_name_taken', 'Tag name is taken', 409);
+      expect(isTagNameTakenError(error)).toBe(true);
+    });
+
+    it('detects tag_name_taken in AxiosError', () => {
+      const axiosError = new AxiosError(
+        'Conflict',
+        'ERR_BAD_REQUEST',
+        undefined,
+        {},
+        {
+          data: { code: 'tag_name_taken' },
+          status: 409,
+          statusText: 'Conflict',
+          headers: {},
+          config: { headers: new AxiosHeaders() },
+        },
+      );
+      expect(isTagNameTakenError(axiosError)).toBe(true);
+    });
+
+    it('returns false for other errors', () => {
+      const otherError = new ApiError('validation', 'Invalid input', 400);
+      expect(isTagNameTakenError(otherError)).toBe(false);
+      expect(isTagNameTakenError(new Error('general error'))).toBe(false);
     });
   });
 });

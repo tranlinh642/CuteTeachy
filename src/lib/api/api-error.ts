@@ -16,6 +16,7 @@ export type ApiErrorCode =
   | 'rate_limited'
   | 'gone'
   | 'id_conflict'
+  | 'tag_name_taken'
   | 'unknown';
 
 const CODE_TO_KEY: Readonly<Record<ApiErrorCode, TranslationKey>> = {
@@ -33,6 +34,7 @@ const CODE_TO_KEY: Readonly<Record<ApiErrorCode, TranslationKey>> = {
   rate_limited: 'errors.rateLimited',
   gone: 'errors.gone',
   id_conflict: 'errors.idConflict',
+  tag_name_taken: 'errors.tagNameTaken',
   unknown: 'errors.generic',
 };
 
@@ -51,6 +53,7 @@ const KNOWN_CODES = new Set<ApiErrorCode>([
   'rate_limited',
   'gone',
   'id_conflict',
+  'tag_name_taken',
 ]);
 
 /** Normalised error thrown by every service call. */
@@ -71,13 +74,23 @@ export class ApiError extends Error {
   }
 }
 
+export const isTagNameTakenError = (error: unknown): boolean => {
+  if (error instanceof ApiError) {
+    return error.code === 'tag_name_taken';
+  }
+  if (isAxiosError<{ code?: string }>(error)) {
+    return error.response?.data?.code === 'tag_name_taken';
+  }
+  return false;
+};
+
 const statusToCode = (status: number, serverCode?: string): ApiErrorCode => {
   if (serverCode && KNOWN_CODES.has(serverCode as ApiErrorCode)) {
     return serverCode as ApiErrorCode;
   }
   if (status === 401) return 'unauthorized';
   if (status === 404) return 'not_found';
-  if (status === 409) return 'email_taken';
+  if (status === 409) return serverCode === 'id_conflict' ? 'id_conflict' : 'email_taken';
   if (status === 410) return 'gone';
   if (status === 413) return 'file_too_large';
   if (status === 415) return 'unsupported_file_type';
