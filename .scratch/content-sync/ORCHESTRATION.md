@@ -52,4 +52,4 @@ flowchart LR
 | S3-FE-03 | done | ticket/s3-fe-03-tasks | Đã merge 1173f97 |
 | S3-FE-04 | done | ticket/s3-fe-04-notes | Đã merge 4a2ea16 |
 | S3-FE-05 | done | ticket/s3-fe-05-settings | Đã merge 113ed67 |
-| S3-INT | in-progress | ticket/s3-int-e2e-integration | |
+| S3-INT | done | ticket/s3-int-e2e-integration | Đã merge 02aa6f0 |
