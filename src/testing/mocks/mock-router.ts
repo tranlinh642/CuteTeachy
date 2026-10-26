@@ -63,7 +63,10 @@ export const matchRoute = (
 export const ok = (data: unknown): MockResponse => ({ status: 200, data });
 export const created = (data: unknown): MockResponse => ({ status: 201, data });
 export const noContent = (): MockResponse => ({ status: 204 });
-export const notFound = (): MockResponse => ({ status: 404, data: { code: 'not_found', message: 'Not found' } });
+export const notFound = (code = 'not_found', message = 'Not found'): MockResponse => ({
+  status: 404,
+  data: { code, message },
+});
 export const badRequest = (message = 'Invalid payload', code = 'validation'): MockResponse => ({
   status: 400,
   data: { code, message },
@@ -78,6 +81,10 @@ export const forbidden = (code = 'onboarding_required', message = 'Forbidden'): 
 });
 export const conflict = (code = 'email_taken', message = 'Conflict'): MockResponse => ({
   status: 409,
+  data: { code, message },
+});
+export const gone = (code = 'gone', message = 'Resource gone'): MockResponse => ({
+  status: 410,
   data: { code, message },
 });
 export const payloadTooLarge = (code = 'file_too_large', message = 'Payload too large'): MockResponse => ({

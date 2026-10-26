@@ -19,4 +19,6 @@ export const errors: typeof ErrorsSchema = {
   fileTooLarge: 'File is too large (max 2MB)',
   unsupportedFileType: 'Unsupported file type',
   rateLimited: 'Too many requests, please try again later',
+  gone: 'This item has already been deleted',
+  idConflict: 'Identifier conflict detected',
 };

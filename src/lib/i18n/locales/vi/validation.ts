@@ -17,4 +17,6 @@ export const errors = {
   fileTooLarge: 'Kích thước tệp quá lớn (tối đa 2MB)',
   unsupportedFileType: 'Định dạng tệp không được hỗ trợ',
   rateLimited: 'Bạn thao tác quá nhanh, vui lòng thử lại sau',
+  gone: 'Dữ liệu đã bị xóa trước đó',
+  idConflict: 'Mã định danh bị trùng lặp',
 };

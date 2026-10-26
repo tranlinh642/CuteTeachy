@@ -1,4 +1,5 @@
 import type { ClassSession, Inspiration, Note, Tag, Task, User } from '@/types';
+import type { SoftDeletedRecord } from './mock-sync';
 import { seedClasses } from './seed/class.seed';
 import { seedInspirations } from './seed/inspiration.seed';
 import { seedNotes } from './seed/note.seed';
@@ -14,6 +15,11 @@ export interface MockDb {
   notes: Note[];
   classes: ClassSession[];
   inspirations: Inspiration[];
+  tombstones?: {
+    tags: SoftDeletedRecord[];
+    tasks: SoftDeletedRecord[];
+    notes: SoftDeletedRecord[];
+  };
 }
 
 export const createMockDb = (today: Date = new Date()): MockDb => {
@@ -25,5 +31,10 @@ export const createMockDb = (today: Date = new Date()): MockDb => {
     notes: seedNotes(context),
     classes: seedClasses(context),
     inspirations: seedInspirations(),
+    tombstones: {
+      tags: [],
+      tasks: [],
+      notes: [],
+    },
   };
 };
