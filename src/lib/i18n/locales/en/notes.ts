@@ -30,6 +30,7 @@ export const notes: typeof Schema = {
     tagsLabel: 'Tags',
     addTag: 'Add tag',
     dueDateLabel: 'Due date (optional)',
+    completedLabel: 'Completed',
     save: 'Save Note',
   },
 };

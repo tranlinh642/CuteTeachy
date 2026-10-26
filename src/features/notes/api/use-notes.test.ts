@@ -116,6 +116,68 @@ describe('Note Hooks & Sync Contract (S3-FE-04)', () => {
       expect(cached!.pages[1]!.items).toHaveLength(0);
     });
 
+    it('does not insert new notes into filtered queries (q or tagId) during delta sync', async () => {
+      const storage = createMemoryStorage();
+      const filteredKey = queryKeys.notes.infinite({ q: 'toan' });
+
+      // Seed filtered query cache with note1
+      queryClient.setQueryData(filteredKey, {
+        pages: [
+          {
+            items: [note1],
+            deletedIds: [],
+            serverTime: '2026-10-26T10:00:00Z',
+            nextCursor: null,
+          },
+        ],
+        pageParams: [undefined],
+      });
+
+      // Updated note1 and a brand new note3 from delta sync
+      const updatedNote1: Note = {
+        ...note1,
+        title: 'Note 1 (Updated)',
+        updatedAt: '2026-10-26T11:00:00Z',
+      };
+
+      const note3: Note = {
+        id: '33333333-3333-4333-8333-333333333333',
+        title: 'Note 3 (Unrelated)',
+        checklist: [],
+        tagIds: [],
+        completed: false,
+        createdAt: '2026-10-26T11:00:00Z',
+        updatedAt: '2026-10-26T11:00:00Z',
+      };
+
+      const mockEnvelope: SyncEnvelope<Note> = {
+        items: [updatedNote1, note3],
+        deletedIds: [],
+        serverTime: '2026-10-26T11:00:00Z',
+        nextCursor: null,
+      };
+
+      const mockNoteService = {
+        list: vi.fn().mockResolvedValue(mockEnvelope),
+        create: vi.fn(),
+        update: vi.fn(),
+        remove: vi.fn(),
+      };
+
+      await syncNotes(queryClient, mockNoteService as unknown as Parameters<typeof syncNotes>[1], storage);
+
+      const cached = queryClient.getQueryData<{
+        pages: Array<{ items: Note[]; serverTime: string }>;
+      }>(filteredKey);
+
+      expect(cached).toBeDefined();
+      // Should update note1
+      expect(cached!.pages[0]!.items).toHaveLength(1);
+      expect(cached!.pages[0]!.items[0]!.title).toBe('Note 1 (Updated)');
+      // Should NOT insert note3
+      expect(cached!.pages[0]!.items.some((item) => item.id === note3.id)).toBe(false);
+    });
+
     it('recovers from stale updatedSince by resetting checkpoint and invalidating all note queries', async () => {
       const storage = createMemoryStorage();
       const checkpointKey = queryKeys.notes.syncCheckpoint;

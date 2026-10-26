@@ -51,7 +51,7 @@ export function TagPicker({ label, selectedIds, onChange }: TagPickerProps) {
                 type="button"
                 aria-pressed={selected}
                 onClick={() => toggle(tag.id)}
-                className="inline-flex min-h-touch items-center gap-1 pl-3.5 pr-1.5 py-1 font-bold focus:outline-none"
+                className="inline-flex min-h-touch items-center gap-1 pl-3.5 pr-1.5 py-1 font-bold focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded-l-full"
               >
                 {selected && <span aria-hidden>✓</span>}
                 {tag.name}
@@ -63,7 +63,7 @@ export function TagPicker({ label, selectedIds, onChange }: TagPickerProps) {
                   event.stopPropagation();
                   setEditingTag(tag);
                 }}
-                className="inline-flex min-h-touch min-w-[28px] items-center justify-center pr-2.5 pl-1 py-1 opacity-70 hover:opacity-100 focus:opacity-100 transition-opacity"
+                className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center p-2.5 rounded-r-full opacity-70 hover:opacity-100 focus:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 transition-all"
               >
                 <Icon name="edit" size={16} />
               </button>

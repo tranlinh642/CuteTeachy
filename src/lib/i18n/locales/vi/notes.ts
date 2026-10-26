@@ -28,6 +28,7 @@ export const notes = {
     tagsLabel: 'Thẻ',
     addTag: 'Thêm thẻ',
     dueDateLabel: 'Hạn chót (không bắt buộc)',
+    completedLabel: 'Đã hoàn thành',
     save: 'Lưu ghi chú',
   },
 };

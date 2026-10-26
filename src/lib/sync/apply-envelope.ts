@@ -1,17 +1,23 @@
-import type { QueryClient, QueryKey } from '@tanstack/react-query';
-import type { SyncEnvelope } from '@/types';
-import type { KeyValueStorage } from '@/stores';
-import { setStoredServerTime } from './server-time-storage';
+import type { QueryClient, QueryKey } from "@tanstack/react-query";
+import type { SyncEnvelope } from "@/types";
+import type { KeyValueStorage } from "@/stores";
+import { setStoredServerTime } from "./server-time-storage";
+
+export interface ApplyEnvelopeOptions {
+  /** When true, do not insert new items that are not already present in the list/cache. */
+  readonly updateOnly?: boolean;
+}
 
 /**
  * Pure function that applies a SyncEnvelope to an existing array of items:
  * 1. Removes any item whose `id` is present in `envelope.deletedIds`.
  * 2. Updates existing items that match `id` in `envelope.items`.
- * 3. Appends new items that do not yet exist.
+ * 3. Appends new items that do not yet exist (unless `options.updateOnly` is true).
  */
 export const applyEnvelopeToItems = <T extends { id: string }>(
   currentItems: readonly T[] | undefined | null,
   envelope: SyncEnvelope<T>,
+  options?: ApplyEnvelopeOptions,
 ): T[] => {
   const baseItems = currentItems ?? [];
   const deletedSet = new Set(envelope.deletedIds);
@@ -32,6 +38,9 @@ export const applyEnvelopeToItems = <T extends { id: string }>(
     if (deletedSet.has(newItem.id)) continue;
 
     if (!itemMap.has(newItem.id)) {
+      if (options?.updateOnly) {
+        continue;
+      }
       idOrder.push(newItem.id);
     }
     itemMap.set(newItem.id, newItem);
@@ -49,28 +58,45 @@ export const applySyncEnvelopeToCache = async <T extends { id: string }>(
   queryKey: QueryKey | string,
   envelope: SyncEnvelope<T>,
   storage?: KeyValueStorage,
+  options?: ApplyEnvelopeOptions,
 ): Promise<T[]> => {
   const key = (Array.isArray(queryKey) ? queryKey : [queryKey]) as QueryKey;
 
   queryClient.setQueryData(key, (old: unknown) => {
     if (Array.isArray(old)) {
-      return applyEnvelopeToItems(old as T[], envelope);
+      return applyEnvelopeToItems(old as T[], envelope, options);
     }
-    if (old && typeof old === 'object' && 'items' in old && Array.isArray((old as { items: unknown }).items)) {
+    if (
+      old &&
+      typeof old === "object" &&
+      "items" in old &&
+      Array.isArray((old as { items: unknown }).items)
+    ) {
       return {
         ...old,
-        items: applyEnvelopeToItems((old as { items: T[] }).items, envelope),
+        items: applyEnvelopeToItems(
+          (old as { items: T[] }).items,
+          envelope,
+          options,
+        ),
         serverTime: envelope.serverTime,
       };
     }
-    if (old && typeof old === 'object' && 'pages' in old && Array.isArray((old as { pages: unknown[] }).pages)) {
+    if (
+      old &&
+      typeof old === "object" &&
+      "pages" in old &&
+      Array.isArray((old as { pages: unknown[] }).pages)
+    ) {
       const infiniteOld = old as {
         pages: Array<SyncEnvelope<T> | { items: T[]; [key: string]: unknown }>;
         pageParams: unknown[];
       };
       const deletedSet = new Set(envelope.deletedIds);
       const updatedMap = new Map(envelope.items.map((i) => [i.id, i]));
-      const existingIds = new Set(infiniteOld.pages.flatMap((p) => p.items.map((i) => i.id)));
+      const existingIds = new Set(
+        infiniteOld.pages.flatMap((p) => p.items.map((i) => i.id)),
+      );
 
       const updatedPages = infiniteOld.pages.map((page, index) => {
         const remainingItems = page.items
@@ -78,9 +104,11 @@ export const applySyncEnvelopeToCache = async <T extends { id: string }>(
           .map((item) => updatedMap.get(item.id) ?? item);
 
         if (index === 0) {
-          const newItems = envelope.items.filter(
-            (item) => !deletedSet.has(item.id) && !existingIds.has(item.id),
-          );
+          const newItems = options?.updateOnly
+            ? []
+            : envelope.items.filter(
+                (item) => !deletedSet.has(item.id) && !existingIds.has(item.id),
+              );
           return {
             ...page,
             items: [...newItems, ...remainingItems],
@@ -100,7 +128,9 @@ export const applySyncEnvelopeToCache = async <T extends { id: string }>(
         pages: updatedPages,
       };
     }
-    return applyEnvelopeToItems([], envelope);
+    return options?.updateOnly
+      ? []
+      : applyEnvelopeToItems([], envelope, options);
   });
 
   if (envelope.serverTime) {
@@ -111,8 +141,9 @@ export const applySyncEnvelopeToCache = async <T extends { id: string }>(
     T[] | { items: T[] } | { pages: Array<{ items: T[] }> }
   >(key);
   if (Array.isArray(updated)) return updated;
-  if (updated && 'items' in updated && Array.isArray(updated.items)) return updated.items;
-  if (updated && 'pages' in updated && Array.isArray(updated.pages)) {
+  if (updated && "items" in updated && Array.isArray(updated.items))
+    return updated.items;
+  if (updated && "pages" in updated && Array.isArray(updated.pages)) {
     return updated.pages.flatMap((p) => p.items);
   }
   return envelope.items;

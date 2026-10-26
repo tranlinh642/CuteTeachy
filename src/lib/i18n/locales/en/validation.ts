@@ -7,6 +7,7 @@ export const validation: typeof ValidationSchema = {
   maxLength: '{{field}} must be at most {{count}} characters',
   invalidDate: 'Invalid date',
   invalidTime: 'Invalid time',
+  maxTags: 'At most {{count}} tags allowed',
 };
 
 export const errors: typeof ErrorsSchema = {

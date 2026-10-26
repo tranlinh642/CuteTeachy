@@ -17,7 +17,8 @@ export const noteSchema = z.object({
     .optional()
     .transform((value) => (value ? value : undefined)),
   checklist: z.array(checklistItemSchema).default([]),
-  tagIds: z.array(z.string()).default([]),
+  tagIds: z.array(z.string()).max(10, 'validation.maxTags').default([]),
+  completed: z.boolean().optional(),
   dueDate: z
     .string()
     .optional()

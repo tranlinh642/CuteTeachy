@@ -1,6 +1,7 @@
 'use client';
 
 import { useCreateTag, useUpdateTag } from '../api';
+import { isTagNameTakenError } from '@/lib/api';
 import { tagSchema, validate, type FieldErrors, type TagFormValues } from '@/utils';
 import type { Tone } from '@/lib/theme';
 import type { Tag } from '@/types';
@@ -56,7 +57,7 @@ export function useTagForm(optionsOrOnSuccess?: ((tag: Tag) => void) | UseTagFor
             onSuccess?.(updated);
           },
           onError: (error) => {
-            if (error.code === 'tag_name_taken' || error.status === 409) {
+            if (isTagNameTakenError(error)) {
               setErrors((current) => ({
                 ...current,
                 name: { key: 'errors.tagNameTaken' },
@@ -74,7 +75,7 @@ export function useTagForm(optionsOrOnSuccess?: ((tag: Tag) => void) | UseTagFor
           onSuccess?.(created);
         },
         onError: (error) => {
-          if (error.code === 'tag_name_taken' || error.status === 409) {
+          if (isTagNameTakenError(error)) {
             setErrors((current) => ({
               ...current,
               name: { key: 'errors.tagNameTaken' },

@@ -139,5 +139,37 @@ describe('apply-envelope', () => {
         { id: 'b', name: 'Item B (Updated)', updatedAt: '2026-10-26T14:00:00Z' },
       ]);
     });
+
+    it('does not insert new items into infinite query cache when updateOnly is true', async () => {
+      const queryClient = new QueryClient();
+      const storage = createMemoryStorage();
+      const queryKey = ['test-filtered-infinite-items'];
+
+      queryClient.setQueryData(queryKey, {
+        pages: [
+          { items: [itemA], deletedIds: [], serverTime: '2026-10-26T10:00:00Z', nextCursor: null },
+        ],
+        pageParams: [undefined],
+      });
+
+      const envelope: SyncEnvelope<TestItem> = {
+        items: [
+          { id: 'a', name: 'Item A (Modified)', updatedAt: '2026-10-26T15:00:00Z' },
+          itemB,
+        ],
+        deletedIds: [],
+        serverTime: '2026-10-26T15:00:00Z',
+      };
+
+      await applySyncEnvelopeToCache(queryClient, queryKey, envelope, storage, { updateOnly: true });
+
+      const cached = queryClient.getQueryData<{
+        pages: Array<{ items: TestItem[]; serverTime: string }>;
+      }>(queryKey);
+
+      expect(cached?.pages[0]!.items).toEqual([
+        { id: 'a', name: 'Item A (Modified)', updatedAt: '2026-10-26T15:00:00Z' },
+      ]);
+    });
   });
 });
