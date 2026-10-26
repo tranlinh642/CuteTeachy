@@ -4,7 +4,7 @@
 
 **Blocked by:** S3-BE-01..06, S3-FE-01..05
 
-**Status:** ready-for-agent
+**Status:** in-progress
 
 **Đọc:** SPEC-003 toàn bộ; hướng dẫn chạy tích hợp đã có từ auth-profile FE-07; ORCHESTRATION §8 (lệch contract).
 
