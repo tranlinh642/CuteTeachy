@@ -1,6 +1,15 @@
 export const profile = {
   title: 'Cá nhân & Cài đặt',
+  notificationsTitle: 'Thông báo',
   pushNotifications: 'Thông báo đẩy',
+  reminderLeadMinutes: 'Nhắc trước giờ hẹn',
+  reminderLeadOptions: {
+    min5: '5 phút',
+    min10: '10 phút',
+    min15: '15 phút',
+    min30: '30 phút',
+    min60: '60 phút',
+  },
   themePreferences: 'Giao diện',
   accountDetails: 'Thông tin tài khoản',
   language: 'Ngôn ngữ',

@@ -12,8 +12,9 @@ import { selectCurrentUser, usePreferencesStore, useSessionStore } from '@/store
 import { APP_VERSION } from '@/config';
 import type { ThemePreference } from '@/lib/theme';
 import { useTranslation } from '@/lib/i18n';
-import type { Locale } from '@/types';
+import type { Locale, ReminderLeadMinutes } from '@/types';
 import { toApiError } from '@/lib/api';
+import { useSettings, useUpdateSettings } from '@/features/settings';
 import {
   Avatar,
   Button,
@@ -32,14 +33,17 @@ import { useUploadAvatar, useDeleteAvatar } from '../api';
 import { validateAvatarFile } from '../utils/avatar-file';
 
 export function ProfileView() {
-  const { t } = useTranslation();
+  const { t, locale: currentLocale } = useTranslation();
   const user = useSessionStore(selectCurrentUser);
-  const locale = usePreferencesStore((s) => s.locale);
-  const setLocale = usePreferencesStore((s) => s.setLocale);
-  const pushNotifications = usePreferencesStore((s) => s.pushNotifications);
-  const setPushNotifications = usePreferencesStore((s) => s.setPushNotifications);
   const themePreference = usePreferencesStore((s) => s.themePreference);
   const setThemePreference = usePreferencesStore((s) => s.setThemePreference);
+
+  const { data: settings } = useSettings();
+  const updateSettings = useUpdateSettings();
+
+  const locale = settings?.locale ?? currentLocale;
+  const pushEnabled = settings?.pushEnabled ?? true;
+  const reminderLeadMinutes = settings?.reminderLeadMinutes ?? 15;
 
   const uploadAvatar = useUploadAvatar();
   const deleteAvatar = useDeleteAvatar();
@@ -48,6 +52,7 @@ export function ProfileView() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [avatarError, setAvatarError] = useState<string | null>(null);
+  const [settingsError, setSettingsError] = useState<string | null>(null);
   const [confirmDeleteAvatarOpen, setConfirmDeleteAvatarOpen] = useState(false);
 
   // Tự động ẩn thông báo thành công sau 4 giây, có dọn dẹp khi unmount
@@ -97,6 +102,45 @@ export function ProfileView() {
     }
   };
 
+  const handleLocaleChange = (newLocale: Locale) => {
+    setSettingsError(null);
+    updateSettings.mutate(
+      { locale: newLocale },
+      {
+        onError: (err) => {
+          const apiErr = toApiError(err);
+          setSettingsError(t(apiErr.messageKey));
+        },
+      },
+    );
+  };
+
+  const handlePushNotificationsChange = (enabled: boolean) => {
+    setSettingsError(null);
+    updateSettings.mutate(
+      { pushEnabled: enabled },
+      {
+        onError: (err) => {
+          const apiErr = toApiError(err);
+          setSettingsError(t(apiErr.messageKey));
+        },
+      },
+    );
+  };
+
+  const handleReminderLeadChange = (val: string) => {
+    setSettingsError(null);
+    updateSettings.mutate(
+      { reminderLeadMinutes: Number(val) as ReminderLeadMinutes },
+      {
+        onError: (err) => {
+          const apiErr = toApiError(err);
+          setSettingsError(t(apiErr.messageKey));
+        },
+      },
+    );
+  };
+
   const languageOptions: readonly { value: Locale; label: string }[] = [
     { value: 'vi', label: t('profile.languages.vi') },
     { value: 'en', label: t('profile.languages.en') },
@@ -106,6 +150,14 @@ export function ProfileView() {
     { value: 'auto', label: t('profile.themes.auto') },
     { value: 'pink', label: t('profile.themes.pink') },
     { value: 'blue', label: t('profile.themes.blue') },
+  ];
+
+  const reminderLeadOptions: readonly { value: string; label: string }[] = [
+    { value: '5', label: t('profile.reminderLeadOptions.min5') },
+    { value: '10', label: t('profile.reminderLeadOptions.min10') },
+    { value: '15', label: t('profile.reminderLeadOptions.min15') },
+    { value: '30', label: t('profile.reminderLeadOptions.min30') },
+    { value: '60', label: t('profile.reminderLeadOptions.min60') },
   ];
 
   const showFullNameSubtitle = shouldShowFullNameSubtitle(user);
@@ -149,6 +201,23 @@ export function ProfileView() {
             size="sm"
             variant="ghost"
             onClick={() => setAvatarError(null)}
+            aria-label={t('common.actions.close')}
+          />
+        </div>
+      )}
+
+      {/* Thông báo lỗi cài đặt */}
+      {settingsError && (
+        <div
+          role="alert"
+          className="flex items-center justify-between rounded-xl bg-error-container px-4 py-2 text-body-md font-medium text-on-error-container shadow-sm"
+        >
+          <span>{settingsError}</span>
+          <IconButton
+            icon="close"
+            size="sm"
+            variant="ghost"
+            onClick={() => setSettingsError(null)}
             aria-label={t('common.actions.close')}
           />
         </div>
@@ -271,7 +340,7 @@ export function ProfileView() {
               label={t('profile.language')}
               options={languageOptions}
               value={locale}
-              onChange={setLocale}
+              onChange={handleLocaleChange}
             />
           </div>
         </Card>
@@ -279,18 +348,36 @@ export function ProfileView() {
 
       {/* Cài đặt: Thông báo */}
       <section className="flex flex-col gap-3">
-        <Card padding="md" className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Icon name="bell" size={24} className="text-primary" />
-            <div>
-              <p className="text-title-md font-medium text-on-surface">{t('profile.pushNotifications')}</p>
+        <SectionHeader title={t('profile.notificationsTitle')} />
+        <Card padding="md" className="flex flex-col gap-5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Icon name="bell" size={24} className="text-primary" />
+              <div>
+                <p className="text-title-md font-medium text-on-surface">{t('profile.pushNotifications')}</p>
+              </div>
             </div>
+            <Switch
+              checked={pushEnabled}
+              onChange={handlePushNotificationsChange}
+              label={t('profile.pushNotifications')}
+            />
           </div>
-          <Switch
-            checked={pushNotifications}
-            onChange={setPushNotifications}
-            label={t('profile.pushNotifications')}
-          />
+
+          <div className="border-t border-outline-variant/40 pt-4 flex flex-col gap-3">
+            <div className="flex items-center gap-3">
+              <Icon name="clock" size={24} className="text-primary" />
+              <div>
+                <p className="text-title-md font-medium text-on-surface">{t('profile.reminderLeadMinutes')}</p>
+              </div>
+            </div>
+            <SegmentedControl
+              label={t('profile.reminderLeadMinutes')}
+              options={reminderLeadOptions}
+              value={String(reminderLeadMinutes)}
+              onChange={handleReminderLeadChange}
+            />
+          </div>
         </Card>
       </section>
 

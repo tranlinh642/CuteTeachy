@@ -1,6 +1,7 @@
 'use client';
 
-import { useSessionStore } from '@/stores';
+import { useI18nStore, useSessionStore } from '@/stores';
+import { DEFAULT_LOCALE } from '@/lib/i18n';
 import type {
   AuthSession,
   LoginCredentials,
@@ -46,6 +47,7 @@ export function useLogout() {
     onSettled: () => {
       clearSession();
       queryClient.clear();
+      useI18nStore.getState().setLocale(DEFAULT_LOCALE);
     },
   });
 }

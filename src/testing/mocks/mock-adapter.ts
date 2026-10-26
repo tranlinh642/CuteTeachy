@@ -55,6 +55,7 @@ export const createMockAdapter = ({ latencyMs = 350, db = createMockDb() }: Mock
     } else if (
       !match.route.isPublic &&
       !path.startsWith('/auth/') &&
+      path !== '/me/settings' &&
       db.user.onboardingCompletedAt === null
     ) {
       result = forbidden('onboarding_required', 'Onboarding required');

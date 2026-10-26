@@ -1,4 +1,5 @@
-import type { ID, ISODateTime, Locale } from './common.interface';
+import type { ID, ISODateTime } from './common.interface';
+import type { Settings } from './settings.interface';
 
 export type Gender = 'female' | 'male' | 'other';
 export type LoginProviderKind = 'password' | 'google';
@@ -24,7 +25,4 @@ export interface UpdateProfileInput {
   readonly gender?: Gender;
 }
 
-export interface UserSettings {
-  readonly locale: Locale;
-  readonly pushNotifications: boolean;
-}
+export type UserSettings = Settings;
