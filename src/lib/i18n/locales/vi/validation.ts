@@ -5,6 +5,7 @@ export const validation = {
   maxLength: '{{field}} tối đa {{count}} ký tự',
   invalidDate: 'Ngày không hợp lệ',
   invalidTime: 'Giờ không hợp lệ',
+  maxTags: 'Tối đa {{count}} thẻ',
 };
 
 export const errors = {

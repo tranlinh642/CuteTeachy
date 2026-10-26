@@ -90,7 +90,7 @@ const statusToCode = (status: number, serverCode?: string): ApiErrorCode => {
   }
   if (status === 401) return 'unauthorized';
   if (status === 404) return 'not_found';
-  if (status === 409) return serverCode === 'id_conflict' ? 'id_conflict' : 'email_taken';
+  if (status === 409) return 'email_taken';
   if (status === 410) return 'gone';
   if (status === 413) return 'file_too_large';
   if (status === 415) return 'unsupported_file_type';

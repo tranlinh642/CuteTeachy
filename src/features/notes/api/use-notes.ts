@@ -1,26 +1,33 @@
-'use client';
+"use client";
 
-import type { CreateNoteInput, ID, Note, SyncEnvelope, UpdateNoteInput } from '@/types';
+import type {
+  CreateNoteInput,
+  ID,
+  Note,
+  SyncEnvelope,
+  UpdateNoteInput,
+} from "@/types";
 import {
   type InfiniteData,
   useInfiniteQuery,
   useMutation,
   useQueryClient,
   type QueryClient,
-} from '@tanstack/react-query';
-import type { ApiError } from '@/lib/api';
-import { useServices } from '@/lib/api';
-import type { NoteService } from '@/lib/api/services/note.service';
-import { queryKeys } from '@/lib/query';
+} from "@tanstack/react-query";
+import type { ApiError } from "@/lib/api";
+import { useServices } from "@/lib/api";
+import type { NoteService } from "@/lib/api/services/note.service";
+import { queryKeys } from "@/lib/query";
 import {
   applySyncEnvelopeToCache,
   getStoredServerTime,
+  handleGoneError,
   isGoneError,
   removeEntityFromCache,
   removeStoredServerTime,
   setStoredServerTime,
-} from '@/lib/sync';
-import type { KeyValueStorage } from '@/stores';
+} from "@/lib/sync";
+import type { KeyValueStorage } from "@/stores";
 
 export interface UseNotesOptions {
   readonly q?: string;
@@ -56,7 +63,17 @@ export function useCreateNote() {
   const queryClient = useQueryClient();
   return useMutation<Note, ApiError, CreateNoteInput>({
     mutationFn: (input) => notes.create(input),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.notes.all }),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: queryKeys.notes.all }),
+    onError: (error, variables) => {
+      if (variables.id) {
+        handleGoneError(error, {
+          queryClient,
+          queryKey: queryKeys.notes.all,
+          entityId: variables.id,
+        });
+      }
+    },
   });
 }
 
@@ -89,7 +106,8 @@ export function useUpdateNote() {
         removeEntityFromCache(queryClient, queryKeys.notes.all, id);
       }
     },
-    onSettled: () => queryClient.invalidateQueries({ queryKey: queryKeys.notes.all }),
+    onSettled: () =>
+      queryClient.invalidateQueries({ queryKey: queryKeys.notes.all }),
   });
 }
 
@@ -102,7 +120,8 @@ export function useDeleteNote() {
       await queryClient.cancelQueries({ queryKey: queryKeys.notes.all });
       removeEntityFromCache(queryClient, queryKeys.notes.all, id);
     },
-    onSettled: () => queryClient.invalidateQueries({ queryKey: queryKeys.notes.all }),
+    onSettled: () =>
+      queryClient.invalidateQueries({ queryKey: queryKeys.notes.all }),
   });
 }
 
@@ -122,10 +141,21 @@ export const syncNotes = async (
     const envelope = await noteService.list({ updatedSince });
 
     // Apply envelope to all cached infinite queries under notes
-    const queries = queryClient.getQueryCache().findAll({ queryKey: queryKeys.notes.all });
+    const queries = queryClient
+      .getQueryCache()
+      .findAll({ queryKey: queryKeys.notes.all });
     for (const query of queries) {
-      if (query.queryKey[1] === 'infinite') {
-        await applySyncEnvelopeToCache(queryClient, query.queryKey, envelope, storage);
+      if (query.queryKey[1] === "infinite") {
+        const filters = query.queryKey[2] as
+          { q?: string; tagId?: string } | undefined;
+        const isFiltered = Boolean(filters?.q?.trim() || filters?.tagId);
+        await applySyncEnvelopeToCache(
+          queryClient,
+          query.queryKey,
+          envelope,
+          storage,
+          { updateOnly: isFiltered },
+        );
       }
     }
 
@@ -138,8 +168,8 @@ export const syncNotes = async (
     if (
       updatedSince &&
       error &&
-      typeof error === 'object' &&
-      'status' in error &&
+      typeof error === "object" &&
+      "status" in error &&
       (error as ApiError).status === 400
     ) {
       await removeStoredServerTime(checkpointKey, storage);

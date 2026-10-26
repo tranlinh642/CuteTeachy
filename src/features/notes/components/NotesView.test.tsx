@@ -6,6 +6,7 @@ import { I18nProvider } from '@/lib/i18n';
 import { ServicesContext } from '@/lib/api/services-context';
 import type { Note, Tag } from '@/types';
 import { NotesView } from './NotesView';
+import { NoteCard } from './NoteCard';
 
 const mockNotes: Note[] = [
   {
@@ -73,5 +74,21 @@ describe('NotesView Component (S3-FE-04)', () => {
   it('renders tag filter chip for all notes and tag options', () => {
     const html = renderWithProviders(<NotesView />);
     expect(html).toContain('Tất cả');
+  });
+
+  it('renders circular completed checkbox on NoteCard when checklist is empty', () => {
+    const noteWithoutChecklist: Note = {
+      id: 'note-empty-check',
+      title: 'Đọc sách tham khảo',
+      checklist: [],
+      tagIds: [],
+      completed: false,
+      createdAt: '2026-10-26T10:00:00Z',
+      updatedAt: '2026-10-26T10:00:00Z',
+    };
+
+    const html = renderWithProviders(<NoteCard note={noteWithoutChecklist} />);
+    expect(html).toContain('rounded-full');
+    expect(html).toContain('type="checkbox"');
   });
 });

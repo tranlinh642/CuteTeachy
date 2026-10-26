@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useId, type ReactNode } from 'react';
 import { cn } from '@/utils/cn';
@@ -16,6 +16,7 @@ export interface CheckboxProps {
   readonly disabled?: boolean;
   readonly id?: string;
   readonly className?: string;
+  readonly shape?: 'square' | 'circle';
 }
 
 /** Checkbox gốc (input) với giao diện bo tròn; cả hàng là vùng bấm. */
@@ -29,6 +30,7 @@ export function Checkbox({
   disabled = false,
   id,
   className,
+  shape = 'square',
 }: CheckboxProps) {
   const autoId = useId();
   const inputId = id ?? autoId;
@@ -52,7 +54,8 @@ export function Checkbox({
           aria-describedby={descriptionId}
           onChange={(event) => onChange(event.target.checked)}
           className={cn(
-            'peer size-6 appearance-none rounded-sm border-2 border-outline bg-surface-container-lowest transition-colors',
+            'peer size-6 appearance-none border-2 border-outline bg-surface-container-lowest transition-colors',
+            shape === 'circle' ? 'rounded-full' : 'rounded-sm',
             'checked:border-secondary checked:bg-secondary',
           )}
         />
