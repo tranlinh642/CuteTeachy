@@ -51,5 +51,5 @@ flowchart LR
 | S3-FE-02 | done | ticket/s3-fe-02-tags | Đã merge d80cd60 |
 | S3-FE-03 | done | ticket/s3-fe-03-tasks | Đã merge 1173f97 |
 | S3-FE-04 | done | ticket/s3-fe-04-notes | Đã merge 4a2ea16 |
-| S3-FE-05 | ready-for-agent | | |
+| S3-FE-05 | done | ticket/s3-fe-05-settings | Đã merge 113ed67 |
 | S3-INT | ready-for-agent | | |
