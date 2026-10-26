@@ -45,7 +45,7 @@ flowchart LR
 | S3-BE-02 | done | ticket/s3-be-02-settings | Đã merge 75f5401 |
 | S3-BE-03 | done | ticket/s3-be-03-tasks | Đã merge 91d1679 |
 | S3-BE-04 | done | ticket/s3-be-04-notes | Đã merge 46df3f2 |
-| S3-BE-05 | ready-for-agent | | |
+| S3-BE-05 | in-progress | ticket/s3-be-05-tag-delete-unlink | |
 | S3-BE-06 | ready-for-agent | | |
 | S3-FE-01 | done | ticket/s3-fe-01-client-sync-layer | Đã merge eb7ad38 |
 | S3-FE-02 | done | ticket/s3-fe-02-tags | Đã merge d80cd60 |
