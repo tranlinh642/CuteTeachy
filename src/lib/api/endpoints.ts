@@ -18,6 +18,9 @@ export const ENDPOINTS = {
     forgotPassword: '/auth/password/forgot',
     resetPassword: '/auth/password/reset',
   },
+  settings: {
+    me: '/me/settings',
+  },
   tasks: {
     root: '/tasks',
     byId: (id: string) => `/tasks/${id}`,

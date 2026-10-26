@@ -1,4 +1,4 @@
-import { getAccessToken, getRefreshToken, usePreferencesStore, useSessionStore } from '@/stores';
+import { getAccessToken, getRefreshToken, useI18nStore, useSessionStore } from '@/stores';
 import axios, { isAxiosError, type AxiosInstance, type InternalAxiosRequestConfig } from 'axios';
 import { DEFAULT_API_URL, type ApiConfig } from '@/config';
 import type { AuthSession } from '@/types';
@@ -24,7 +24,7 @@ export const createHttpClient = (config: ApiConfig = {}): AxiosInstance => {
       const remember = useSessionStore.getState().remember;
       useSessionStore.getState().setSession(session, remember);
     },
-    getLocale = () => usePreferencesStore.getState().locale,
+    getLocale = () => useI18nStore.getState().locale,
     onUnauthorized = () => useSessionStore.getState().clearSession(),
     onOnboardingRequired,
   } = config;

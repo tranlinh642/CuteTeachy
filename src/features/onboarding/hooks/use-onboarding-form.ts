@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { toApiError } from '@/lib/api';
 import { useUpdateProfile } from '@/features/profile';
+import { useUpdateSettings } from '@/features/settings';
 import { selectCurrentUser, useSessionStore } from '@/stores';
 import { useTranslation } from '@/lib/i18n';
 import type { Gender } from '@/types';
@@ -12,6 +13,7 @@ import {
   validateOnboardingValues,
   type OnboardingFieldErrors,
 } from '../utils/onboarding-helpers';
+import { getDeviceTimeZone } from '../utils/timezone';
 
 export interface UseOnboardingFormProps {
   readonly onSuccess?: () => void;
@@ -22,6 +24,7 @@ export function useOnboardingForm({ onSuccess }: UseOnboardingFormProps = {}) {
   const { t } = useTranslation();
   const user = useSessionStore(selectCurrentUser);
   const updateProfile = useUpdateProfile();
+  const updateSettings = useUpdateSettings();
 
   const initial = getInitialOnboardingValues(user);
   const [fullName, setFullName] = useState(initial.fullName);
@@ -79,7 +82,11 @@ export function useOnboardingForm({ onSuccess }: UseOnboardingFormProps = {}) {
     }
 
     try {
-      await updateProfile.mutateAsync(result.data);
+      const timeZone = getDeviceTimeZone();
+      await Promise.all([
+        updateProfile.mutateAsync(result.data),
+        updateSettings.mutateAsync({ timeZone }),
+      ]);
       onSuccess?.();
       router.replace('/');
     } catch (err) {
@@ -95,7 +102,7 @@ export function useOnboardingForm({ onSuccess }: UseOnboardingFormProps = {}) {
     gender,
     errors,
     serverError,
-    isSubmitting: updateProfile.isPending,
+    isSubmitting: updateProfile.isPending || updateSettings.isPending,
     setFullName: handleFullNameChange,
     setDisplayName: handleDisplayNameChange,
     setTitle: handleTitleChange,

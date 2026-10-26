@@ -9,6 +9,9 @@ export const queryKeys = {
     all: ['auth'] as const,
     me: ['auth', 'me'] as const,
   },
+  settings: {
+    all: ['settings'] as const,
+  },
   tasks: {
     all: ['tasks'] as const,
     list: (range?: DateRange) => ['tasks', 'list', range ?? 'all'] as const,

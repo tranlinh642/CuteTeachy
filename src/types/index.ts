@@ -6,6 +6,7 @@
  */
 export * from './interfaces/common.interface';
 export * from './interfaces/user.interface';
+export * from './interfaces/settings.interface';
 export * from './interfaces/auth.interface';
 export * from './interfaces/tag.interface';
 export * from './interfaces/task.interface';

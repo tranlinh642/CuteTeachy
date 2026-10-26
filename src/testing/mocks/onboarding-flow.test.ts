@@ -4,10 +4,10 @@ import { createHttpClient } from '@/lib/api/create-http-client';
 import { ApiError } from '@/lib/api';
 import { resolveActiveTheme, shouldResetThemeOnGenderChange } from '@/lib/theme';
 import { resolveAuthRedirect } from '@/features/auth';
-import { getInitialOnboardingValues, validateOnboardingValues } from '@/features/onboarding';
+import { getInitialOnboardingValues, validateOnboardingValues, getDeviceTimeZone } from '@/features/onboarding';
 
-describe('FE-03: Full Onboarding Flow on Mock Backend', () => {
-  it('runs complete flow for newly registered user: guard -> 403 -> form validation -> update profile -> theme switch -> unlocked app', async () => {
+describe('FE-03 & S3-FE-05: Full Onboarding Flow on Mock Backend', () => {
+  it('runs complete flow for newly registered user: guard -> 403 -> form validation -> update profile + send timeZone -> theme switch -> unlocked app', async () => {
     let currentToken: string | null = null;
     const onOnboardingRequired = vi.fn();
 
@@ -52,6 +52,10 @@ describe('FE-03: Full Onboarding Flow on Mock Backend', () => {
     expect(meBefore.id).toBe(session.user.id);
     expect(meBefore.onboardingCompletedAt).toBeNull();
 
+    // /me/settings is also exempt from onboarding guard (SPEC-003)
+    const settingsBefore = await services.settings.get();
+    expect(settingsBefore.timeZone).toBe('Asia/Ho_Chi_Minh');
+
     // 4. Form prefill verification: prefilled from User (displayName = 'thaygiaomoi'), gender must NOT be defaulted
     const initialForm = getInitialOnboardingValues(session.user);
     expect(initialForm.fullName).toBe('');
@@ -70,7 +74,7 @@ describe('FE-03: Full Onboarding Flow on Mock Backend', () => {
       expect(invalidSubmission.errors.gender?.key).toBe('validation.required');
     }
 
-    // 6. Complete onboarding by submitting valid profile with gender = 'male'
+    // 6. Complete onboarding by submitting valid profile + device timeZone (S3-FE-05)
     const validSubmission = validateOnboardingValues({
       fullName: '  Thầy Nguyễn Văn Minh  ',
       displayName: '  Minh  ',
@@ -80,11 +84,17 @@ describe('FE-03: Full Onboarding Flow on Mock Backend', () => {
     expect(validSubmission.success).toBe(true);
     if (!validSubmission.success) return;
 
-    const updatedUser = await services.auth.updateProfile(validSubmission.data);
+    const deviceTz = getDeviceTimeZone();
+    const [updatedUser, updatedSettings] = await Promise.all([
+      services.auth.updateProfile(validSubmission.data),
+      services.settings.update({ timeZone: deviceTz }),
+    ]);
+
     expect(updatedUser.fullName).toBe('Thầy Nguyễn Văn Minh');
     expect(updatedUser.displayName).toBe('Minh');
     expect(updatedUser.gender).toBe('male');
     expect(updatedUser.onboardingCompletedAt).not.toBeNull();
+    expect(updatedSettings.timeZone).toBe(deviceTz);
 
     // 7. Verify Smart Default Theme according to ADR 0001
     // Gender transitioned from null to 'male' -> reset to 'auto'
