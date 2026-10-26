@@ -11,6 +11,9 @@ describe('ApiError and toApiError', () => {
 
   const testCases: Array<{ status: number; serverCode?: string; expectedCode: ApiErrorCode; expectedKey: string }> = [
     { status: 409, serverCode: 'email_taken', expectedCode: 'email_taken', expectedKey: 'auth.errors.emailTaken' },
+    { status: 409, serverCode: 'id_conflict', expectedCode: 'id_conflict', expectedKey: 'errors.idConflict' },
+    { status: 410, expectedCode: 'gone', expectedKey: 'errors.gone' },
+    { status: 410, serverCode: 'gone', expectedCode: 'gone', expectedKey: 'errors.gone' },
     { status: 403, serverCode: 'onboarding_required', expectedCode: 'onboarding_required', expectedKey: 'auth.errors.onboardingRequired' },
     { status: 403, serverCode: 'email_not_verified', expectedCode: 'email_not_verified', expectedKey: 'auth.errors.emailNotVerified' },
     { status: 401, serverCode: 'invalid_code', expectedCode: 'invalid_code', expectedKey: 'auth.errors.invalidCode' },

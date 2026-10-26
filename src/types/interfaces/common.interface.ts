@@ -23,3 +23,16 @@ export interface Timestamps {
   readonly createdAt: ISODateTime;
   readonly updatedAt: ISODateTime;
 }
+
+/**
+ * Shared sync envelope returned by list endpoints supporting mobile-first sync.
+ * SPEC-003: Quy tắc đồng bộ chung
+ */
+export interface SyncEnvelope<T> {
+  readonly items: T[];
+  readonly deletedIds: string[];
+  readonly serverTime: string;
+  readonly nextCursor?: string | null;
+}
+
+export type Envelope<T> = SyncEnvelope<T>;

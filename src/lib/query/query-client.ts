@@ -1,7 +1,14 @@
 import { QueryClient } from '@tanstack/react-query';
 import { ApiError } from '@/lib/api/api-error';
 
-const NO_RETRY_CODES = new Set(['unauthorized', 'not_found', 'validation', 'invalid_credentials']);
+const NO_RETRY_CODES = new Set([
+  'unauthorized',
+  'not_found',
+  'validation',
+  'invalid_credentials',
+  'gone',
+  'id_conflict',
+]);
 
 export const createQueryClient = (): QueryClient =>
   new QueryClient({
