@@ -19,6 +19,8 @@ export interface Note extends Timestamps {
 }
 
 export type CreateNoteInput = Pick<Note, 'title'> &
-  Partial<Pick<Note, 'content' | 'checklist' | 'imageUrl' | 'tagIds' | 'dueDate'>>;
+  Partial<Pick<Note, 'content' | 'checklist' | 'imageUrl' | 'tagIds' | 'dueDate' | 'completed'>> & {
+    id?: ID;
+  };
 
 export type UpdateNoteInput = Partial<Omit<Note, 'id' | keyof Timestamps>>;

@@ -42,6 +42,7 @@ export const applyEnvelopeToItems = <T extends { id: string }>(
 
 /**
  * Applies a SyncEnvelope to the TanStack Query cache and persists the `serverTime` checkpoint.
+ * Supports flat array cache, single envelope cache (`{ items: [] }`), and infinite queries (`{ pages: [] }`).
  */
 export const applySyncEnvelopeToCache = async <T extends { id: string }>(
   queryClient: QueryClient,
@@ -62,6 +63,43 @@ export const applySyncEnvelopeToCache = async <T extends { id: string }>(
         serverTime: envelope.serverTime,
       };
     }
+    if (old && typeof old === 'object' && 'pages' in old && Array.isArray((old as { pages: unknown[] }).pages)) {
+      const infiniteOld = old as {
+        pages: Array<SyncEnvelope<T> | { items: T[]; [key: string]: unknown }>;
+        pageParams: unknown[];
+      };
+      const deletedSet = new Set(envelope.deletedIds);
+      const updatedMap = new Map(envelope.items.map((i) => [i.id, i]));
+      const existingIds = new Set(infiniteOld.pages.flatMap((p) => p.items.map((i) => i.id)));
+
+      const updatedPages = infiniteOld.pages.map((page, index) => {
+        const remainingItems = page.items
+          .filter((item) => !deletedSet.has(item.id))
+          .map((item) => updatedMap.get(item.id) ?? item);
+
+        if (index === 0) {
+          const newItems = envelope.items.filter(
+            (item) => !deletedSet.has(item.id) && !existingIds.has(item.id),
+          );
+          return {
+            ...page,
+            items: [...newItems, ...remainingItems],
+            serverTime: envelope.serverTime,
+          };
+        }
+
+        return {
+          ...page,
+          items: remainingItems,
+          serverTime: envelope.serverTime,
+        };
+      });
+
+      return {
+        ...infiniteOld,
+        pages: updatedPages,
+      };
+    }
     return applyEnvelopeToItems([], envelope);
   });
 
@@ -69,8 +107,13 @@ export const applySyncEnvelopeToCache = async <T extends { id: string }>(
     await setStoredServerTime(key, envelope.serverTime, storage);
   }
 
-  const updated = queryClient.getQueryData<T[] | { items: T[] }>(key);
+  const updated = queryClient.getQueryData<
+    T[] | { items: T[] } | { pages: Array<{ items: T[] }> }
+  >(key);
   if (Array.isArray(updated)) return updated;
-  if (updated && 'items' in updated) return updated.items;
+  if (updated && 'items' in updated && Array.isArray(updated.items)) return updated.items;
+  if (updated && 'pages' in updated && Array.isArray(updated.pages)) {
+    return updated.pages.flatMap((p) => p.items);
+  }
   return envelope.items;
 };

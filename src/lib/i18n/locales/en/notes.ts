@@ -10,6 +10,7 @@ export const notes: typeof Schema = {
   captureThought: 'Capture a thought',
   captureThoughtHint: 'Jot down something gently.',
   empty: 'No notes yet. Write your first one!',
+  loadMore: 'Load more notes',
   dueTomorrow: 'Tomorrow',
   dueOn: 'Due {{date}}',
   deleteConfirm: 'Delete note “{{title}}”?',

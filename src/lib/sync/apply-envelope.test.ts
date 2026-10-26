@@ -100,5 +100,44 @@ describe('apply-envelope', () => {
       const storedTime = await getStoredServerTime(queryKey, storage);
       expect(storedTime).toBe('2026-10-26T13:00:00Z');
     });
+
+    it('updates infinite query cache across multiple pages', async () => {
+      const queryClient = new QueryClient();
+      const storage = createMemoryStorage();
+      const queryKey = ['test-infinite-items'];
+
+      queryClient.setQueryData(queryKey, {
+        pages: [
+          { items: [itemA], deletedIds: [], serverTime: '2026-10-26T10:00:00Z', nextCursor: 'c1' },
+          { items: [itemB], deletedIds: [], serverTime: '2026-10-26T10:00:00Z', nextCursor: null },
+        ],
+        pageParams: [undefined, 'c1'],
+      });
+
+      const envelope: SyncEnvelope<TestItem> = {
+        items: [
+          { id: 'b', name: 'Item B (Updated)', updatedAt: '2026-10-26T14:00:00Z' },
+          itemC,
+        ],
+        deletedIds: ['a'],
+        serverTime: '2026-10-26T14:00:00Z',
+      };
+
+      const updated = await applySyncEnvelopeToCache(queryClient, queryKey, envelope, storage);
+
+      expect(updated).toEqual([
+        itemC,
+        { id: 'b', name: 'Item B (Updated)', updatedAt: '2026-10-26T14:00:00Z' },
+      ]);
+
+      const cached = queryClient.getQueryData<{
+        pages: Array<{ items: TestItem[]; serverTime: string }>;
+      }>(queryKey);
+
+      expect(cached?.pages[0]!.items).toEqual([itemC]);
+      expect(cached?.pages[1]!.items).toEqual([
+        { id: 'b', name: 'Item B (Updated)', updatedAt: '2026-10-26T14:00:00Z' },
+      ]);
+    });
   });
 });

@@ -15,7 +15,13 @@ export const queryKeys = {
   },
   notes: {
     all: ['notes'] as const,
-    list: () => ['notes', 'list'] as const,
+    list: (filters?: { q?: string; tagId?: string }) =>
+      filters?.q || filters?.tagId
+        ? (['notes', 'list', { q: filters.q ?? '', tagId: filters.tagId ?? '' }] as const)
+        : (['notes', 'list'] as const),
+    infinite: (filters?: { q?: string; tagId?: string }) =>
+      ['notes', 'infinite', { q: filters?.q ?? '', tagId: filters?.tagId ?? '' }] as const,
+    syncCheckpoint: ['notes', 'sync-checkpoint'] as const,
   },
   tags: {
     all: ['tags'] as const,
