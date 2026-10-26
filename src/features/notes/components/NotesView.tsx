@@ -20,6 +20,9 @@ export function NotesView() {
     tagsFor,
     toggleChecklistItem,
     deleteNote,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
   } = useNotesView();
 
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -87,20 +90,34 @@ export function NotesView() {
       {notes.length === 0 ? (
         <EmptyState
           icon="notes"
-          title={t('notes.empty')}
+          title={query || selectedTagId ? t('notes.noResults') : t('notes.empty')}
         />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
-          {notes.map((note) => (
-            <NoteCard
-              key={note.id}
-              note={note}
-              tags={tagsFor(note.tagIds)}
-              onToggleItem={toggleChecklistItem}
-              onEdit={openEdit}
-              onDelete={(n) => deleteNote(n.id)}
-            />
-          ))}
+        <div className="flex flex-col gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
+            {notes.map((note) => (
+              <NoteCard
+                key={note.id}
+                note={note}
+                tags={tagsFor(note.tagIds)}
+                onToggleItem={toggleChecklistItem}
+                onEdit={openEdit}
+                onDelete={(n) => deleteNote(n.id)}
+              />
+            ))}
+          </div>
+
+          {hasNextPage && (
+            <div className="flex justify-center pt-2">
+              <Button
+                variant="secondary"
+                onClick={fetchNextPage}
+                loading={isFetchingNextPage}
+              >
+                {t('notes.loadMore')}
+              </Button>
+            </div>
+          )}
         </div>
       )}
 
