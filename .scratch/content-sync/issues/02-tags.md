@@ -4,7 +4,7 @@
 
 **Blocked by:** S3-FE-01
 
-**Status:** ready-for-agent
+**Status:** done
 
 **Đọc:** SPEC-003 mục *API* (tags), *Thay đổi FE*; User Stories 11–14.
 

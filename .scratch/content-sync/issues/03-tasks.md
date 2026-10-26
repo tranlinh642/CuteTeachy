@@ -4,7 +4,7 @@
 
 **Blocked by:** S3-FE-01
 
-**Status:** ready-for-agent
+**Status:** in-review
 
 **Đọc:** SPEC-003 mục *Kiểu dữ liệu* (Task), *API* (tasks), *Thay đổi FE*; User Stories 1–10.
 
