@@ -4,7 +4,7 @@
 
 **Blocked by:** S3-FE-01
 
-**Status:** ready-for-review
+**Status:** done
 
 **Đọc:** SPEC-003 mục *Kiểu dữ liệu* (Note), *API* (notes), *Quy tắc domain*, *Thay đổi FE*; User Stories 15–23.
 
