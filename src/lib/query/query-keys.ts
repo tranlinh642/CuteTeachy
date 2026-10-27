@@ -33,6 +33,14 @@ export const queryKeys = {
     all: ['classes'] as const,
     list: (range: DateRange) => ['classes', 'list', range] as const,
   },
+  timetableSlots: {
+    all: ['timetable-slots'] as const,
+    list: () => ['timetable-slots', 'list'] as const,
+  },
+  classSessions: {
+    all: ['class-sessions'] as const,
+    list: (range: DateRange) => ['class-sessions', 'list', range] as const,
+  },
   inspirations: {
     today: ['inspirations', 'today'] as const,
   },
