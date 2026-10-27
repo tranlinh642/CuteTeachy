@@ -4,6 +4,12 @@ import { describe, expect, it, vi } from 'vitest';
 import { I18nProvider } from '@/lib/i18n';
 import { CalendarView } from './CalendarView';
 
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+  }),
+}));
+
 // Mock dialogs
 vi.mock('@/components/ui/Dialog', () => ({
   Dialog: ({
