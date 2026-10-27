@@ -4,7 +4,7 @@
 
 **Blocked by:** S4-FE-01
 
-**Status:** ready-for-agent
+**Status:** in-progress
 
 **Đọc:** SPEC-004 mục *Timetable Slot*, *API*, *Thay đổi FE*; User Stories 1–9.
 

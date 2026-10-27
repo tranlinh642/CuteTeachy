@@ -39,6 +39,6 @@ Chuỗi BE tuần tự vì cùng chạm logic sinh buổi; FE chạy song song v
 | S4-BE-03 | ready-for-agent | | |
 | S4-BE-04 | ready-for-agent | | |
 | S4-FE-01 | done | ticket/s4-fe-01-types-mock-calendar | Đã merge 28c1810 |
-| S4-FE-02 | ready-for-agent | | |
-| S4-FE-03 | ready-for-agent | | |
+| S4-FE-02 | in-progress | ticket/s4-fe-02-timetable-management | Đang thực hiện wave 2 FE |
+| S4-FE-03 | in-progress | ticket/s4-fe-03-session-detail-adhoc | Đang thực hiện wave 2 FE |
 | S4-INT | ready-for-agent | | |
