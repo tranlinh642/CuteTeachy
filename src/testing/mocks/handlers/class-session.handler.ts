@@ -145,6 +145,7 @@ export const classSessionRoutes = [
         ...body,
         grade: body.grade !== undefined ? (body.grade?.trim() || undefined) : current.grade,
         room: body.room !== undefined ? (body.room?.trim() || null) : current.room,
+        topic: body.topic !== undefined ? (body.topic?.trim() || undefined) : current.topic,
         updatedAt: nowISO(),
       };
       db.adhocSessions[adhocIndex] = updated;
@@ -170,11 +171,13 @@ export const classSessionRoutes = [
     );
 
     const now = nowISO();
+    const resolvedTopic = body.topic !== undefined ? (body.topic?.trim() || undefined) : undefined;
+
     if (override) {
       const overrideIndex = db.sessionOverrides.indexOf(override);
       const updatedOverride = {
         ...override,
-        topic: body.topic !== undefined ? body.topic : override.topic,
+        topic: body.topic !== undefined ? resolvedTopic : override.topic,
         prepItems: body.prepItems !== undefined ? body.prepItems : override.prepItems,
         cancelled: body.cancelled !== undefined ? body.cancelled : override.cancelled,
         updatedAt: now,
@@ -185,7 +188,7 @@ export const classSessionRoutes = [
       override = {
         timetableSlotId: slotId,
         date: sessionDate,
-        topic: body.topic,
+        topic: resolvedTopic,
         prepItems: body.prepItems ?? [],
         cancelled: body.cancelled ?? false,
         updatedAt: now,

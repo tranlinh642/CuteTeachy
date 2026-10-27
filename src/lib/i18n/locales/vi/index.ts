@@ -1,5 +1,6 @@
 import { auth } from './auth';
 import { calendar } from './calendar';
+import { classSession } from './classSession';
 import { common } from './common';
 import { home } from './home';
 import { navigation } from './navigation';
@@ -25,6 +26,7 @@ export const vi = {
   home,
   weekly,
   calendar,
+  classSession,
   notes,
   tasks,
   tags,

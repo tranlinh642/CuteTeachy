@@ -115,6 +115,13 @@ describe('class-session mock routes (SPEC-004)', () => {
       const updated = patchRes.data as { topic: string; cancelled: boolean };
       expect(updated.topic).toBe('Chủ đề mới được cập nhật');
       expect(updated.cancelled).toBe(true);
+
+      // Clearing topic sets it to undefined
+      const clearRes = callRoute('PATCH', `/class-sessions/${firstSession.id}`, {
+        topic: '   ',
+      });
+      expect(clearRes.status).toBe(200);
+      expect((clearRes.data as { topic?: string }).topic).toBeUndefined();
     });
 
     it('rejects DELETE for generated sessions with 400 cannot_delete_generated_session', () => {
@@ -145,12 +152,17 @@ describe('class-session mock routes (SPEC-004)', () => {
       expect(createdSession.timetableSlotId).toBeNull();
       expect(createdSession.subject).toBe('Dạy bù Tin học');
 
-      // PATCH
+      // PATCH with topic and prepItems
       const patchRes = callRoute('PATCH', `/class-sessions/${createdSession.id}`, {
         subject: 'Dạy bù Tin học - Lập trình Python',
+        topic: 'Vòng lặp for và while',
+        prepItems: [{ id: 'p1', label: 'Cài đặt Python 3.12', done: true }],
       });
       expect(patchRes.status).toBe(200);
-      expect((patchRes.data as { subject: string }).subject).toBe('Dạy bù Tin học - Lập trình Python');
+      const patched = patchRes.data as { subject: string; topic: string; prepItems: Array<{ done: boolean }> };
+      expect(patched.subject).toBe('Dạy bù Tin học - Lập trình Python');
+      expect(patched.topic).toBe('Vòng lặp for và while');
+      expect(patched.prepItems[0]?.done).toBe(true);
 
       // DELETE
       const delRes = callRoute('DELETE', `/class-sessions/${createdSession.id}`);

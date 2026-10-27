@@ -5,7 +5,7 @@ import type { ClassSession } from '@/types';
 import { I18nProvider } from '@/lib/i18n';
 import { ClassCard } from './ClassCard';
 
-describe('ClassCard Component (S4-FE-01)', () => {
+describe('ClassCard Component (S4-FE-01 & S4-FE-03)', () => {
   const baseSession: ClassSession = {
     id: 'cs_1_2026-10-26',
     timetableSlotId: 'slot-1',
@@ -83,5 +83,17 @@ describe('ClassCard Component (S4-FE-01)', () => {
 
     expect(html).not.toContain('Phòng 302');
     expect(html).not.toContain('school');
+  });
+
+  it('renders interactive attributes when onClick is provided', () => {
+    const html = renderToStaticMarkup(
+      <I18nProvider defaultLocale="vi">
+        <ClassCard session={baseSession} onClick={() => {}} />
+      </I18nProvider>,
+    );
+
+    expect(html).toContain('role="button"');
+    expect(html).toContain('tabindex="0"');
+    expect(html).toContain('cursor-pointer');
   });
 });
