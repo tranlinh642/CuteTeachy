@@ -1,4 +1,14 @@
-import type { ClassSession, Inspiration, Note, Settings, Tag, Task, TimetableSlot, User } from '@/types';
+import type {
+  ClassSession,
+  CreatePushSubscriptionInput,
+  Inspiration,
+  Note,
+  Settings,
+  Tag,
+  Task,
+  TimetableSlot,
+  User,
+} from '@/types';
 import type { SessionOverride } from '@/utils';
 import type { SoftDeletedRecord } from './mock-sync';
 import { seedClasses } from './seed/class.seed';
@@ -28,6 +38,7 @@ export interface MockDb {
   adhocSessions: ClassSession[];
   classes: ClassSession[];
   inspirations: Inspiration[];
+  pushSubscriptions?: CreatePushSubscriptionInput[];
   tombstones?: {
     tags: SoftDeletedRecord[];
     tasks: SoftDeletedRecord[];
@@ -55,6 +66,7 @@ export const createMockDb = (today: Date = new Date()): MockDb => {
     adhocSessions,
     classes,
     inspirations: seedInspirations(),
+    pushSubscriptions: [],
     tombstones: {
       tags: [],
       tasks: [],
