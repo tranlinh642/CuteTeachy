@@ -7,6 +7,7 @@ import {
   Button,
   Checkbox,
   Dialog,
+  Icon,
   IconButton,
   TextField,
 } from '@/components/ui';
@@ -23,6 +24,7 @@ import {
 } from '@/utils';
 import { useFieldErrorText } from '@/hooks';
 import { useCreateAdHocSession } from '../api';
+import { ApiError } from '@/lib/api';
 
 export interface AdHocSessionDialogProps {
   readonly open: boolean;
@@ -71,6 +73,7 @@ function AdHocSessionDialogContent({
   const [prepItems, setPrepItems] = useState<PrepItem[]>([]);
   const [newPrepLabel, setNewPrepLabel] = useState('');
   const [errors, setErrors] = useState<FieldErrors<AdhocSessionFormValues>>({});
+  const [apiError, setApiError] = useState<string | null>(null);
 
   const handleTogglePrepItem = (itemId: string, checked: boolean) => {
     setPrepItems((prev) =>
@@ -98,6 +101,7 @@ function AdHocSessionDialogContent({
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    setApiError(null);
 
     const validationResult = validate(adhocSessionSchema, {
       subject,
@@ -117,11 +121,19 @@ function AdHocSessionDialogContent({
     }
 
     setErrors({});
-    await createMutation.mutateAsync({
-      id: generateClientUuid(),
-      ...validationResult.data,
-    });
-    onClose();
+    try {
+      await createMutation.mutateAsync({
+        id: generateClientUuid(),
+        ...validationResult.data,
+      });
+      onClose();
+    } catch (err: unknown) {
+      if (err instanceof ApiError && err.messageKey) {
+        setApiError(t(err.messageKey));
+      } else {
+        setApiError(t('errors.generic'));
+      }
+    }
   };
 
   const isSubmitting = createMutation.isPending;
@@ -144,6 +156,16 @@ function AdHocSessionDialogContent({
       }
     >
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+        {apiError && (
+          <div
+            role="alert"
+            data-testid="api-error"
+            className="flex items-start gap-3 rounded-xl border border-error/40 bg-error-container/20 p-3.5 text-error"
+          >
+            <Icon name="flag" className="size-5 shrink-0 text-error mt-0.5" />
+            <p className="text-body-sm font-semibold">{apiError}</p>
+          </div>
+        )}
         <TextField
           label={t('classSession.subject')}
           value={subject}
@@ -232,7 +254,7 @@ function AdHocSessionDialogContent({
                   />
                   <IconButton
                     icon="delete"
-                    aria-label="Xoá việc này"
+                    aria-label={t('common.actions.delete')}
                     size="sm"
                     onClick={() => handleDeletePrepItem(item.id)}
                     className="text-on-surface-variant hover:text-error"

@@ -14,6 +14,15 @@ export const timetable = {
     sat: 'Thứ Bảy',
     sun: 'Chủ Nhật',
   },
+  weekdaysShort: {
+    1: 'T2',
+    2: 'T3',
+    3: 'T4',
+    4: 'T5',
+    5: 'T6',
+    6: 'T7',
+    7: 'CN',
+  },
   fields: {
     weekday: 'Thứ trong tuần',
     startTime: 'Giờ bắt đầu',

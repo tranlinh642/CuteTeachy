@@ -83,6 +83,10 @@ export class ApiError extends Error {
   }
 }
 
+export function isTimetableConflictError(error: unknown): boolean {
+  return error instanceof ApiError && error.code === 'timetable_conflict';
+}
+
 export const isTagNameTakenError = (error: unknown): boolean => {
   if (error instanceof ApiError) {
     return error.code === 'tag_name_taken';

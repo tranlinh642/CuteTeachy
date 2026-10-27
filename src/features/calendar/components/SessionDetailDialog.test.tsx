@@ -135,6 +135,8 @@ describe('SessionDetailDialog (S4-FE-03)', () => {
       expect(html).toContain('Cấu tạo tế bào');
       expect(html).toContain('Chuẩn bị kính hiển vi');
       expect(html).toContain('In phiếu thực hành');
+      expect(html).toContain('aria-label="Xóa"');
+      expect(html).not.toContain('Xoá việc này');
     });
 
     it('shows cancel button for active generated session', () => {
