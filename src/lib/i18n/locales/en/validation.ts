@@ -8,6 +8,9 @@ export const validation: typeof ValidationSchema = {
   invalidDate: 'Invalid date',
   invalidTime: 'Invalid time',
   maxTags: 'At most {{count}} tags allowed',
+  startTimeBeforeEndTime: 'Start time must be before end time',
+  effectiveToAfterFrom: 'End date must be on or after start date',
+  invalidWeekday: 'Invalid weekday (Monday – Sunday)',
 };
 
 export const errors: typeof ErrorsSchema = {
@@ -23,4 +26,5 @@ export const errors: typeof ErrorsSchema = {
   gone: 'This item has already been deleted',
   idConflict: 'Identifier conflict detected',
   tagNameTaken: 'Tag name is already taken',
+  timetableConflict: 'Schedule conflict with another timetable slot',
 };

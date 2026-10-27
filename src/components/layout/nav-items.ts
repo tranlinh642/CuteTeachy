@@ -7,10 +7,11 @@ export interface NavItem {
   readonly icon: IconName;
 }
 
-/** Điều hướng chính của ứng dụng web (sidebar). */
+/** Điều hướng chính của ứng dụng web (sidebar & mobile bottom nav). */
 export const NAV_ITEMS: readonly NavItem[] = [
   { href: '/', labelKey: 'navigation.home', icon: 'home' },
   { href: '/calendar', labelKey: 'navigation.calendar', icon: 'calendar' },
+  { href: '/timetable', labelKey: 'navigation.timetable', icon: 'clock' },
   { href: '/notes', labelKey: 'navigation.notes', icon: 'notes' },
   { href: '/profile', labelKey: 'navigation.profile', icon: 'person' },
 ];

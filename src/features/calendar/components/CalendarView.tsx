@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   formatShortDate,
   formatWeekdayNarrow,
@@ -21,6 +22,7 @@ import { useCalendarView } from '../hooks/use-calendar-view';
 
 export function CalendarView() {
   const { t, localeTag } = useTranslation();
+  const router = useRouter();
   const {
     year,
     monthIndex,
@@ -54,6 +56,14 @@ export function CalendarView() {
           <p className="text-body-lg text-on-surface-variant mt-1">{monthTitle}</p>
         </div>
         <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            icon="clock"
+            onClick={() => router.push('/timetable')}
+          >
+            {t('timetable.title')}
+          </Button>
           <IconButton
             icon="chevronLeft"
             aria-label={t('calendar.previousMonth')}
