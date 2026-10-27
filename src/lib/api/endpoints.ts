@@ -36,6 +36,14 @@ export const ENDPOINTS = {
   classes: {
     root: '/classes',
   },
+  timetableSlots: {
+    root: '/timetable-slots',
+    byId: (id: string) => `/timetable-slots/${id}`,
+  },
+  classSessions: {
+    root: '/class-sessions',
+    byId: (id: string) => `/class-sessions/${id}`,
+  },
   inspirations: {
     today: '/inspirations/today',
   },

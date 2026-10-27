@@ -17,4 +17,7 @@ export const weekly = {
   mindfulMoment: 'Khoảnh khắc tĩnh lặng',
   mindfulMomentHint: 'Dành 5 phút hít thở trước giờ lên lớp.',
   dayTodos: 'Việc cần làm trong ngày',
+  cancelled: 'Đã huỷ',
+  sessionCancelled: 'Buổi học đã huỷ',
+  adHocBadge: 'Dạy bù/thay',
 };

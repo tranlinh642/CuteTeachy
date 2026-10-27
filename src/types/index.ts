@@ -12,5 +12,6 @@ export * from './interfaces/tag.interface';
 export * from './interfaces/task.interface';
 export * from './interfaces/note.interface';
 export * from './interfaces/class-session.interface';
+export * from './interfaces/timetable-slot.interface';
 export * from './interfaces/inspiration.interface';
 export * from './interfaces/agenda.interface';
