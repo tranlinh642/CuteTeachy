@@ -41,4 +41,4 @@ Chuỗi BE tuần tự vì cùng chạm logic sinh buổi; FE chạy song song v
 | S4-FE-01 | done | ticket/s4-fe-01-types-mock-calendar | Đã merge 28c1810 |
 | S4-FE-02 | done | ticket/s4-fe-02-timetable-management | Đã merge f0cc492 |
 | S4-FE-03 | done | ticket/s4-fe-03-session-detail-adhoc | Đã merge cf25993 |
-| S4-INT | ready-for-agent | | |
+| S4-INT | in-progress | ticket/s4-int-e2e-integration | Đang chạy tích hợp E2E FE ↔ BE |

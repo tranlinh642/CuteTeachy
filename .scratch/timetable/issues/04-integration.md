@@ -4,7 +4,7 @@
 
 **Blocked by:** S4-BE-01..04, S4-FE-01..03
 
-**Status:** ready-for-agent
+**Status:** in-progress
 
 **Đọc:** SPEC-004 toàn bộ; ORCHESTRATION §8.
 
