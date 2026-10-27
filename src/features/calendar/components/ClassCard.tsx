@@ -9,9 +9,10 @@ import { cn } from '@/utils/cn';
 export interface ClassCardProps {
   readonly session: ClassSession;
   readonly className?: string;
+  readonly onClick?: (session: ClassSession) => void;
 }
 
-export function ClassCard({ session, className }: ClassCardProps) {
+export function ClassCard({ session, className, onClick }: ClassCardProps) {
   const { t, localeTag } = useTranslation();
   const title = session.grade ? `${session.subject} – ${session.grade}` : session.subject;
   const tone = toneClasses[session.tone];
@@ -21,10 +22,24 @@ export function ClassCard({ session, className }: ClassCardProps) {
 
   return (
     <article
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onClick={onClick ? () => onClick(session) : undefined}
+      onKeyDown={
+        onClick
+          ? (event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                onClick(session);
+              }
+            }
+          : undefined
+      }
       className={cn(
-        'flex flex-col gap-2 rounded-xl p-4 transition-all shadow-xs',
+        'flex min-h-touch flex-col gap-2 rounded-xl p-4 transition-all shadow-xs',
         tone.bg,
         isCancelled && 'opacity-60 grayscale-[25%]',
+        onClick && 'cursor-pointer hover:shadow-md active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-offset-2',
         className,
       )}
     >

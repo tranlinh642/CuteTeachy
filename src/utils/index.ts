@@ -8,6 +8,7 @@ export * from './reset-password.schema';
 export * from './task.schema';
 export * from './note.schema';
 export * from './tag.schema';
+export * from './class-session.schema';
 export * from './profile.schema';
 export * from './timetable-slot.schema';
 export * from './date-math';

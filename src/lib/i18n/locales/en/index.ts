@@ -1,6 +1,7 @@
 import type { TranslationSchema } from '../../translation.types';
 import { auth } from './auth';
 import { calendar } from './calendar';
+import { classSession } from './classSession';
 import { common } from './common';
 import { home } from './home';
 import { navigation } from './navigation';
@@ -23,6 +24,7 @@ export const en: TranslationSchema = {
   home,
   weekly,
   calendar,
+  classSession,
   timetable,
   notes,
   tasks,

@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   formatShortDate,
@@ -10,9 +11,12 @@ import {
   toISODate,
 } from '@/utils';
 import { useTranslation } from '@/lib/i18n';
+import type { ClassSession } from '@/types';
 import { Button, Card, EmptyState, IconButton, SectionHeader } from '@/components/ui';
 import { TaskDialog, TaskItem, useTaskDialog } from '@/features/tasks';
 import { ClassCard } from './ClassCard';
+import { SessionDetailDialog } from './SessionDetailDialog';
+import { AdHocSessionDialog } from './AdHocSessionDialog';
 import { cn } from '@/utils/cn';
 import { useCalendarView } from '../hooks/use-calendar-view';
 
@@ -37,6 +41,9 @@ export function CalendarView() {
   } = useCalendarView();
 
   const taskDialog = useTaskDialog();
+  const [selectedSession, setSelectedSession] = useState<ClassSession | null>(null);
+  const [isAdHocDialogOpen, setIsAdHocDialogOpen] = useState(false);
+
   const weeks = getMonthGrid(year, monthIndex);
   const weekdays = getWeekDays(new Date(year, monthIndex, 1));
 
@@ -147,14 +154,24 @@ export function CalendarView() {
           <SectionHeader
             title={selectedDateLabel}
             action={
-              <Button
-                variant="primary"
-                size="sm"
-                icon="add"
-                onClick={() => taskDialog.openCreate(selectedDate)}
-              >
-                {t('tasks.editor.createTitle')}
-              </Button>
+              <div className="flex flex-wrap items-center gap-2">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  icon="add"
+                  onClick={() => setIsAdHocDialogOpen(true)}
+                >
+                  {t('classSession.addAdHocButton')}
+                </Button>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  icon="add"
+                  onClick={() => taskDialog.openCreate(selectedDate)}
+                >
+                  {t('tasks.editor.createTitle')}
+                </Button>
+              </div>
             }
           />
 
@@ -167,7 +184,13 @@ export function CalendarView() {
             <div className="flex flex-col gap-3">
               {agenda.map((entry) => {
                 if (entry.kind === 'class') {
-                  return <ClassCard key={`class-${entry.id}`} session={entry.item} />;
+                  return (
+                    <ClassCard
+                      key={`class-${entry.id}`}
+                      session={entry.item}
+                      onClick={(session) => setSelectedSession(session)}
+                    />
+                  );
                 }
                 return (
                   <TaskItem
@@ -191,6 +214,20 @@ export function CalendarView() {
         onClose={taskDialog.close}
         task={taskDialog.task}
         defaultDate={taskDialog.defaultDate}
+      />
+
+      {/* SessionDetailDialog xem và sửa chi tiết buổi học */}
+      <SessionDetailDialog
+        session={selectedSession}
+        open={Boolean(selectedSession)}
+        onClose={() => setSelectedSession(null)}
+      />
+
+      {/* AdHocSessionDialog thêm buổi lẻ */}
+      <AdHocSessionDialog
+        open={isAdHocDialogOpen}
+        onClose={() => setIsAdHocDialogOpen(false)}
+        defaultDate={selectedDate}
       />
     </div>
   );
