@@ -35,10 +35,10 @@ Chuỗi BE tuần tự vì cùng chạm logic sinh buổi; FE chạy song song v
 | Ticket | Status | Branch | Ghi chú |
 | --- | --- | --- | --- |
 | S4-BE-01 | done | ticket/s4-be-01-slots-generated-sessions | Đã merge baab158 |
-| S4-BE-02 | in-progress | ticket/s4-be-02-session-overrides-adhoc | Đang thực hiện wave 2 BE |
-| S4-BE-03 | ready-for-agent | | |
+| S4-BE-02 | done | ticket/s4-be-02-session-overrides-adhoc | Đã merge 684e90d |
+| S4-BE-03 | in-progress | ticket/s4-be-03-edit-delete-slot-split | Đang thực hiện wave 3 BE |
 | S4-BE-04 | ready-for-agent | | |
 | S4-FE-01 | done | ticket/s4-fe-01-types-mock-calendar | Đã merge 28c1810 |
-| S4-FE-02 | in-progress | ticket/s4-fe-02-timetable-management | Đang thực hiện wave 2 FE |
-| S4-FE-03 | in-progress | ticket/s4-fe-03-session-detail-adhoc | Đang thực hiện wave 2 FE |
+| S4-FE-02 | done | ticket/s4-fe-02-timetable-management | Đã merge f0cc492 |
+| S4-FE-03 | in-review | ticket/s4-fe-03-session-detail-adhoc | Đã implement xong, đang merge |
 | S4-INT | ready-for-agent | | |
