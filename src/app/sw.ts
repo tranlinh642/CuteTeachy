@@ -1,4 +1,5 @@
 import { APP_VERSION } from '@/config';
+import { handleNotificationClickEvent, handlePushEvent } from '@/lib/push';
 import { defaultCache } from '@serwist/next/worker';
 import type { PrecacheEntry, SerwistGlobalConfig } from 'serwist';
 import { Serwist } from 'serwist';
@@ -45,4 +46,14 @@ self.addEventListener('sync', (event: Event) => {
       }),
     );
   }
+});
+
+// Push Notification: nhận và hiển thị thông báo Reminder
+self.addEventListener('push', (event: PushEvent) => {
+  handlePushEvent(event, self.registration);
+});
+
+// Notification Click: đóng thông báo, focus hoặc điều hướng tab app đúng ngày
+self.addEventListener('notificationclick', (event: NotificationEvent) => {
+  handleNotificationClickEvent(event, self.clients, self.location.origin);
 });
