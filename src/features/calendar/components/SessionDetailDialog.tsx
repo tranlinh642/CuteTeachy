@@ -19,6 +19,8 @@ import { generateClientUuid } from '@/lib/sync';
 import { formatShortDate, formatTimeRange, LIMITS, isValidISODate, isValidTime } from '@/utils';
 import { cn } from '@/utils/cn';
 import { useDeleteClassSession, useUpdateClassSession } from '../api';
+import { ApiError } from '@/lib/api';
+import { parseISODate } from '@/utils/date-parse';
 
 export interface SessionDetailDialogProps {
   readonly session: ClassSession | null;
@@ -77,6 +79,7 @@ function SessionDetailDialogContent({
   // Validation errors
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
 
   useEffect(() => {
     setTopic(session.topic ?? '');
@@ -123,16 +126,25 @@ function SessionDetailDialogContent({
   };
 
   const handleSave = async () => {
+    setApiError(null);
     if (isGenerated) {
-      await updateMutation.mutateAsync({
-        id: session.id,
-        input: {
-          topic: topic.trim() || undefined,
-          prepItems,
-          cancelled,
-        },
-      });
-      onClose();
+      try {
+        await updateMutation.mutateAsync({
+          id: session.id,
+          input: {
+            topic: topic.trim() || undefined,
+            prepItems,
+            cancelled,
+          },
+        });
+        onClose();
+      } catch (err: unknown) {
+        if (err instanceof ApiError && err.messageKey) {
+          setApiError(t(err.messageKey));
+        } else {
+          setApiError(t('errors.generic'));
+        }
+      }
       return;
     }
 
@@ -158,28 +170,46 @@ function SessionDetailDialogContent({
       return;
     }
 
-    await updateMutation.mutateAsync({
-      id: session.id,
-      input: {
-        subject: subject.trim(),
-        grade: grade.trim() || undefined,
-        room: room.trim() || null,
-        date,
-        startTime,
-        endTime,
-        tone,
-        topic: topic.trim() || undefined,
-        prepItems,
-        cancelled,
-      },
-    });
-    onClose();
+    try {
+      await updateMutation.mutateAsync({
+        id: session.id,
+        input: {
+          subject: subject.trim(),
+          grade: grade.trim() || undefined,
+          room: room.trim() || null,
+          date,
+          startTime,
+          endTime,
+          tone,
+          topic: topic.trim() || undefined,
+          prepItems,
+          cancelled,
+        },
+      });
+      onClose();
+    } catch (err: unknown) {
+      if (err instanceof ApiError && err.messageKey) {
+        setApiError(t(err.messageKey));
+      } else {
+        setApiError(t('errors.generic'));
+      }
+    }
   };
 
   const handleConfirmDelete = async () => {
-    await deleteMutation.mutateAsync(session.id);
-    setConfirmDeleteOpen(false);
-    onClose();
+    setApiError(null);
+    try {
+      await deleteMutation.mutateAsync(session.id);
+      setConfirmDeleteOpen(false);
+      onClose();
+    } catch (err: unknown) {
+      setConfirmDeleteOpen(false);
+      if (err instanceof ApiError && err.messageKey) {
+        setApiError(t(err.messageKey));
+      } else {
+        setApiError(t('errors.generic'));
+      }
+    }
   };
 
   const isSubmitting = updateMutation.isPending || deleteMutation.isPending;
@@ -218,6 +248,16 @@ function SessionDetailDialogContent({
         }
       >
         <div className="flex flex-col gap-6">
+          {apiError && (
+            <div
+              role="alert"
+              data-testid="api-error"
+              className="flex items-start gap-3 rounded-xl border border-error/40 bg-error-container/20 p-3.5 text-error"
+            >
+              <Icon name="flag" className="size-5 shrink-0 text-error mt-0.5" />
+              <p className="text-body-sm font-semibold">{apiError}</p>
+            </div>
+          )}
           {/* Badge & Trạng thái huỷ */}
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-outline-variant/30 pb-4">
             <div className="flex flex-wrap items-center gap-2">
@@ -264,7 +304,7 @@ function SessionDetailDialogContent({
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-body-md text-on-surface-variant">
                 <span className="inline-flex items-center gap-1.5 font-medium text-on-surface">
                   <Icon name="calendar" size={16} />
-                  {formatShortDate(new Date(session.date), localeTag)}
+                  {formatShortDate(parseISODate(session.date), localeTag)}
                 </span>
                 <span className="inline-flex items-center gap-1.5 font-medium text-on-surface">
                   <Icon name="clock" size={16} />
@@ -380,7 +420,7 @@ function SessionDetailDialogContent({
                     />
                     <IconButton
                       icon="delete"
-                      aria-label="Xoá việc này"
+                      aria-label={t('common.actions.delete')}
                       size="sm"
                       onClick={() => handleDeletePrepItem(item.id)}
                       className="text-on-surface-variant hover:text-error"

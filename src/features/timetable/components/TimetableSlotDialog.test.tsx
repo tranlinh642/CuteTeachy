@@ -118,5 +118,7 @@ describe('TimetableSlotDialog Component (S4-FE-02)', () => {
     expect(html).toContain('Teaching history notice');
     expect(html).toContain('Save slot');
     expect(html).toContain('Cancel');
+    expect(html).toContain('Mon');
+    expect(html).toContain('Sun');
   });
 });

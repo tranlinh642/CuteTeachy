@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ApiError, isTagNameTakenError, toApiError, type ApiErrorCode } from './api-error';
+import { ApiError, isTagNameTakenError, isTimetableConflictError, toApiError, type ApiErrorCode } from './api-error';
 import { AxiosError, AxiosHeaders } from 'axios';
 
 describe('ApiError and toApiError', () => {
@@ -80,6 +80,24 @@ describe('ApiError and toApiError', () => {
       const otherError = new ApiError('validation', 'Invalid input', 400);
       expect(isTagNameTakenError(otherError)).toBe(false);
       expect(isTagNameTakenError(new Error('general error'))).toBe(false);
+    });
+  });
+
+  describe('isTimetableConflictError', () => {
+    it('detects timetable_conflict in ApiError', () => {
+      const error = new ApiError('timetable_conflict', 'Timetable slot conflict', 409);
+      expect(isTimetableConflictError(error)).toBe(true);
+    });
+
+    it('returns false for ApiError with other code', () => {
+      const error = new ApiError('tag_name_taken', 'Tag name is taken', 409);
+      expect(isTimetableConflictError(error)).toBe(false);
+    });
+
+    it('returns false for non-ApiError', () => {
+      expect(isTimetableConflictError(new Error('general error'))).toBe(false);
+      expect(isTimetableConflictError(null)).toBe(false);
+      expect(isTimetableConflictError(undefined)).toBe(false);
     });
   });
 });

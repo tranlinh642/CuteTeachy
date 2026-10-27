@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useId, useState } from 'react';
-import { useTranslation } from '@/lib/i18n';
+import { useTranslation, type TranslationKey } from '@/lib/i18n';
 import { useFieldErrorText } from '@/hooks';
 import { Button, Dialog, FormField, Icon, TextField } from '@/components/ui';
 import { DateField, TimeField } from '@/components/pickers';
@@ -15,6 +15,7 @@ import {
   type TimetableSlotFormValues,
 } from '@/utils';
 import { useCreateTimetableSlot, useUpdateTimetableSlot } from '../api';
+import { isTimetableConflictError } from '@/lib/api';
 import { cn } from '@/utils/cn';
 
 export interface TimetableSlotDialogProps {
@@ -24,15 +25,7 @@ export interface TimetableSlotDialogProps {
   readonly defaultWeekday?: number;
 }
 
-const WEEKDAYS = [
-  { value: 1, labelKey: 'timetable.weekdays.mon', short: 'T2' },
-  { value: 2, labelKey: 'timetable.weekdays.tue', short: 'T3' },
-  { value: 3, labelKey: 'timetable.weekdays.wed', short: 'T4' },
-  { value: 4, labelKey: 'timetable.weekdays.thu', short: 'T5' },
-  { value: 5, labelKey: 'timetable.weekdays.fri', short: 'T6' },
-  { value: 6, labelKey: 'timetable.weekdays.sat', short: 'T7' },
-  { value: 7, labelKey: 'timetable.weekdays.sun', short: 'CN' },
-] as const;
+const WEEKDAYS = [1, 2, 3, 4, 5, 6, 7] as const;
 
 export function TimetableSlotDialog({
   open,
@@ -124,11 +117,7 @@ export function TimetableSlotDialog({
       }
       onClose();
     } catch (err: unknown) {
-      const errorObj = err as { code?: string; status?: number; response?: { status?: number; data?: { code?: string } } };
-      const code = errorObj?.code ?? errorObj?.response?.data?.code;
-      const status = errorObj?.status ?? errorObj?.response?.status;
-
-      if (code === 'timetable_conflict' || status === 409) {
+      if (isTimetableConflictError(err)) {
         setApiError(t('timetable.conflictError'));
       } else {
         setApiError(t('errors.generic'));
@@ -189,14 +178,14 @@ export function TimetableSlotDialog({
         >
           <div id={weekdayControlId} role="radiogroup" aria-label={t('timetable.fields.weekday')} className="grid grid-cols-7 gap-1.5">
             {WEEKDAYS.map((day) => {
-              const selected = weekday === day.value;
+              const selected = weekday === day;
               return (
                 <button
-                  key={day.value}
+                  key={day}
                   type="button"
                   role="radio"
                   aria-checked={selected}
-                  onClick={() => setWeekday(day.value)}
+                  onClick={() => setWeekday(day)}
                   className={cn(
                     'flex min-h-11 min-w-11 flex-col items-center justify-center rounded-xl p-1 text-center transition-all cursor-pointer',
                     selected
@@ -204,7 +193,9 @@ export function TimetableSlotDialog({
                       : 'bg-surface-container text-on-surface hover:bg-surface-container-high',
                   )}
                 >
-                  <span className="text-body-sm font-bold">{day.short}</span>
+                  <span className="text-body-sm font-bold">
+                    {t(`timetable.weekdaysShort.${day}` as TranslationKey)}
+                  </span>
                 </button>
               );
             })}
