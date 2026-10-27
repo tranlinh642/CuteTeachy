@@ -6,6 +6,9 @@ export const validation = {
   invalidDate: 'Ngày không hợp lệ',
   invalidTime: 'Giờ không hợp lệ',
   maxTags: 'Tối đa {{count}} thẻ',
+  startTimeBeforeEndTime: 'Giờ bắt đầu phải trước giờ kết thúc',
+  effectiveToAfterFrom: 'Ngày kết thúc hiệu lực phải sau hoặc bằng ngày bắt đầu',
+  invalidWeekday: 'Thứ trong tuần không hợp lệ (Thứ Hai – Chủ Nhật)',
 };
 
 export const errors = {
@@ -21,4 +24,5 @@ export const errors = {
   gone: 'Dữ liệu đã bị xóa trước đó',
   idConflict: 'Mã định danh bị trùng lặp',
   tagNameTaken: 'Tên thẻ đã được sử dụng',
+  timetableConflict: 'Trùng lịch với tiết dạy khác trong thời khoá biểu',
 };

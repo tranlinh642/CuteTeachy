@@ -11,6 +11,7 @@ import { profile } from './profile';
 import { pwa } from './pwa';
 import { tags } from './tags';
 import { tasks } from './tasks';
+import { timetable } from './timetable';
 import { errors, validation } from './validation';
 import { weekly } from './weekly';
 
@@ -22,6 +23,7 @@ export const en: TranslationSchema = {
   home,
   weekly,
   calendar,
+  timetable,
   notes,
   tasks,
   tags,
