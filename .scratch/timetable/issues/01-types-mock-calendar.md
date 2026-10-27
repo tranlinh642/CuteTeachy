@@ -4,7 +4,7 @@
 
 **Blocked by:** S3-FE-01
 
-**Status:** ready-for-agent
+**Status:** in-progress
 
 **Đọc:** SPEC-004 mục *Class Session*, *API*, *Thay đổi FE*; `GLOSSARY.md`.
 

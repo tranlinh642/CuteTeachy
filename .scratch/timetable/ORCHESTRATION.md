@@ -34,11 +34,11 @@ Chuỗi BE tuần tự vì cùng chạm logic sinh buổi; FE chạy song song v
 
 | Ticket | Status | Branch | Ghi chú |
 | --- | --- | --- | --- |
-| S4-BE-01 | ready-for-agent | | |
+| S4-BE-01 | in-progress | ticket/s4-be-01-slots-generated-sessions | Đang thực hiện wave 1 |
 | S4-BE-02 | ready-for-agent | | |
 | S4-BE-03 | ready-for-agent | | |
 | S4-BE-04 | ready-for-agent | | |
-| S4-FE-01 | ready-for-agent | | |
+| S4-FE-01 | in-progress | ticket/s4-fe-01-types-mock-calendar | Đang thực hiện wave 1 |
 | S4-FE-02 | ready-for-agent | | |
 | S4-FE-03 | ready-for-agent | | |
 | S4-INT | ready-for-agent | | |
