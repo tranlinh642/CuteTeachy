@@ -36,8 +36,8 @@ flowchart LR
 | Ticket | Status | Branch | Ghi chú |
 | --- | --- | --- | --- |
 | S5-BE-01 | done | ticket/s5-be-01-push-subscriptions | Đã merge 3516d2d |
-| S5-BE-02 | in-progress | ticket/s5-be-02-task-reminders-dispatch | Wave 2 |
-| S5-BE-03 | ready-for-agent | | |
+| S5-BE-02 | done | ticket/s5-be-02-task-reminders-dispatch | Đã merge 5494acf |
+| S5-BE-03 | in-progress | ticket/s5-be-03-class-session-reminders | Wave 3 |
 | S5-FE-01 | done | ticket/s5-fe-01-permission-subscription | Đã merge 44bc7f8 |
 | S5-FE-02 | done | ticket/s5-fe-02-service-worker-push | Đã merge 5d69521 |
 | S5-INT | ready-for-agent | | |
