@@ -35,6 +35,7 @@ export interface CreateClassSessionInput {
   readonly tone: Tone;
   readonly topic?: string;
   readonly prepItems?: readonly PrepItem[];
+  readonly cancelled?: boolean;
 }
 
 export interface UpdateClassSessionInput {

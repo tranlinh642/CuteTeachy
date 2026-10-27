@@ -15,3 +15,12 @@ export interface CreatePushSubscriptionInput {
 export interface DeletePushSubscriptionInput {
   readonly endpoint: string;
 }
+
+export interface PushSubscriptionDto {
+  readonly id?: string;
+  readonly accountId?: string;
+  readonly endpoint: string;
+  readonly keys: PushSubscriptionKeys;
+  readonly createdAt?: string;
+  readonly updatedAt?: string;
+}

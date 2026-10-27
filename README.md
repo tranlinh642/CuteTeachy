@@ -152,6 +152,24 @@ pnpm test:integration
 
 ---
 
+## Tích hợp Web Push & Nhắc việc (SPEC-005)
+
+Hệ thống hỗ trợ thông báo đẩy Web Push chuẩn VAPID cho Task có giờ và tiết dạy (Timetable Slot / Class Session):
+
+1. **Kiểm thử tự động tích hợp xuyên repo (Cross-Repo Integration):**
+   ```sh
+   # Chạy suite kiểm thử tích hợp Web Push kết nối trực tiếp live Backend
+   npx vitest run test/integration/push-reminders-cross-repo.spec.ts
+   ```
+   Suite kiểm thử tự động xác thực toàn bộ 17 User Stories của SPEC-005: xác thực Cron Secret (`X-Cron-Secret`), cấp phát VAPID public key, upsert subscription thiết bị, chuyển giao endpoint giữa các tài khoản, nhắc việc đúng phút, chống lặp idempotent, đổi giờ / lead minutes / timezone tính lại mốc nhắc, bỏ qua việc hoàn thành/xoá/tiết huỷ/quá muộn, công tắc tổng tắt push, đăng xuất huỷ đăng ký và tự động dọn dẹp subscription hết hạn (410 Gone).
+
+2. **Kiểm thử thủ công trên thiết bị thật (Android Chrome & iOS Safari PWA Standalone):**
+   - Xem hướng dẫn chi tiết từng bước tại: [`docs/testing/push-reminders-manual-testing.md`](docs/testing/push-reminders-manual-testing.md).
+   - **Android Chrome:** Hỗ trợ trực tiếp thông qua Chrome Remote Debugging USB port forwarding (`adb forward tcp:3000 tcp:3000`) hoặc HTTPS tunnel.
+   - **iOS Safari:** Yêu cầu cài đặt ứng dụng vào màn hình chính dưới dạng **PWA Độc lập (Standalone PWA)** theo tiêu chuẩn của Apple iOS 16.4+ trước khi cấp quyền thông báo.
+
+---
+
 ## Quy ước code (Architecture Rules)
 
 1. **Feature Encapsulation:** Mỗi feature trong `src/features/<tên>/` chứa đầy đủ `api/`, `components/`, `hooks/` và một public barrel `index.ts`. Các component ngoài feature chỉ được import thông qua public barrel `index.ts`.
