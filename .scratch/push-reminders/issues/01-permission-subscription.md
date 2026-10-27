@@ -4,7 +4,7 @@
 
 **Blocked by:** S3-FE-05 (Settings — công tắc thông báo, số phút nhắc)
 
-**Status:** ready-for-agent
+**Status:** in-progress
 
 **Đọc:** SPEC-005 mục *Thay đổi FE*, *API*; User Stories 1–2, 6, 13–14.
 

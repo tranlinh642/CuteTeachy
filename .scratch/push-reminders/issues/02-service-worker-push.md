@@ -4,7 +4,7 @@
 
 **Blocked by:** None (can start immediately — chỉ phụ thuộc payload trong SPEC-005)
 
-**Status:** ready-for-agent
+**Status:** in-progress
 
 **Đọc:** SPEC-005 mục *Reminder* (nội dung, URL), *Thay đổi FE*; User Stories 11–12.
 

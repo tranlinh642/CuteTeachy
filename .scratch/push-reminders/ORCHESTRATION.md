@@ -35,9 +35,9 @@ flowchart LR
 
 | Ticket | Status | Branch | Ghi chú |
 | --- | --- | --- | --- |
-| S5-BE-01 | ready-for-agent | | |
+| S5-BE-01 | in-progress | ticket/s5-be-01-push-subscriptions | Wave 1 |
 | S5-BE-02 | ready-for-agent | | |
 | S5-BE-03 | ready-for-agent | | |
-| S5-FE-01 | ready-for-agent | | |
-| S5-FE-02 | ready-for-agent | | không bị chặn |
+| S5-FE-01 | in-progress | ticket/s5-fe-01-permission-subscription | Wave 1 |
+| S5-FE-02 | in-progress | ticket/s5-fe-02-service-worker-push | Wave 1 (không bị chặn) |
 | S5-INT | ready-for-agent | | |
