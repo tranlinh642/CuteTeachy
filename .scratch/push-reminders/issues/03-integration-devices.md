@@ -4,7 +4,7 @@
 
 **Blocked by:** S5-BE-01..03, S5-FE-01..02
 
-**Status:** ready-for-agent
+**Status:** in-progress
 
 **Đọc:** SPEC-005 toàn bộ; `docs/setup/external-services.md` §4–§5 (BE repo).
 
