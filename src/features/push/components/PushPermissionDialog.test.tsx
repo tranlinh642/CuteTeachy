@@ -75,6 +75,8 @@ describe('PushPermissionDialog Component', () => {
 
       expect(html).toContain('Enable Reminders');
       expect(html).toContain('CuteTeachy sends timely notifications');
+      expect(html).toContain('Reminders before teaching sessions on your timetable');
+      expect(html).toContain('Timely reminders for scheduled tasks');
       expect(html).toContain('Enable Notifications');
       expect(html).toContain('Not now');
     });

@@ -72,7 +72,7 @@ describe('PushNotificationPrompt Component (SPEC-005 US 1, 2)', () => {
   const renderPrompt = (hasItems = false) => {
     mockServices = {
       tasks: {
-        list: vi.fn().mockResolvedValue({ items: hasItems ? [{ id: 'task-1' }] : [] }),
+        list: vi.fn().mockResolvedValue({ items: hasItems ? [{ id: 'task-1', time: '08:00' }] : [] }),
       },
       timetableSlots: {
         list: vi.fn().mockResolvedValue({ items: [] }),
@@ -114,5 +114,90 @@ describe('PushNotificationPrompt Component (SPEC-005 US 1, 2)', () => {
     const html = renderPrompt(true);
     expect(html).toBe('');
     mockPushNotification.decision = 'can_prompt';
+  });
+
+  it('does not show banner when user only has timeless tasks (time is missing or empty)', async () => {
+    mockServices = {
+      tasks: {
+        list: vi.fn().mockResolvedValue({
+          items: [
+            { id: 'task-1', title: 'Task no time' },
+            { id: 'task-2', title: 'Task empty time', time: '' },
+          ],
+        }),
+      },
+      timetableSlots: {
+        list: vi.fn().mockResolvedValue({ items: [] }),
+      },
+      push: {
+        getVapidPublicKey: vi.fn(),
+        createPushSubscription: vi.fn(),
+        deletePushSubscription: vi.fn(),
+      },
+    } as unknown as Services;
+
+    const [taskList, slotList] = await Promise.all([
+      mockServices.tasks.list(),
+      mockServices.timetableSlots.list(),
+    ]);
+    const timedTasks = (taskList.items ?? []).filter(
+      (task: { time?: string }) => task.time != null && task.time !== '',
+    );
+    const hasItem = timedTasks.length > 0 || (slotList.items?.length ?? 0) > 0;
+
+    queryClient.setQueryData(['push-prompt-check'], hasItem);
+
+    const html = renderToStaticMarkup(
+      <QueryClientProvider client={queryClient}>
+        <ServicesContext.Provider value={mockServices}>
+          <I18nProvider defaultLocale="vi">
+            <PushNotificationPrompt isAuthenticatedOverride={true} />
+          </I18nProvider>
+        </ServicesContext.Provider>
+      </QueryClientProvider>,
+    );
+
+    expect(html).toBe('');
+  });
+
+  it('shows banner when user has a timed task (task.time != null && task.time !== "")', async () => {
+    mockServices = {
+      tasks: {
+        list: vi.fn().mockResolvedValue({
+          items: [{ id: 'task-1', title: 'Task with time', time: '08:30' }],
+        }),
+      },
+      timetableSlots: {
+        list: vi.fn().mockResolvedValue({ items: [] }),
+      },
+      push: {
+        getVapidPublicKey: vi.fn(),
+        createPushSubscription: vi.fn(),
+        deletePushSubscription: vi.fn(),
+      },
+    } as unknown as Services;
+
+    const [taskList, slotList] = await Promise.all([
+      mockServices.tasks.list(),
+      mockServices.timetableSlots.list(),
+    ]);
+    const timedTasks = (taskList.items ?? []).filter(
+      (task: { time?: string }) => task.time != null && task.time !== '',
+    );
+    const hasItem = timedTasks.length > 0 || (slotList.items?.length ?? 0) > 0;
+
+    queryClient.setQueryData(['push-prompt-check'], hasItem);
+
+    const html = renderToStaticMarkup(
+      <QueryClientProvider client={queryClient}>
+        <ServicesContext.Provider value={mockServices}>
+          <I18nProvider defaultLocale="vi">
+            <PushNotificationPrompt isAuthenticatedOverride={true} />
+          </I18nProvider>
+        </ServicesContext.Provider>
+      </QueryClientProvider>,
+    );
+
+    expect(html).toContain('Đừng bỏ lỡ tiết dạy &amp; công việc');
   });
 });

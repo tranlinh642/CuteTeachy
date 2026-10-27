@@ -39,21 +39,6 @@ describe('pushService', () => {
       expect(http.post).toHaveBeenCalledWith('/push/subscriptions', payload);
       expect(result).toEqual(payload);
     });
-
-    it('createSubscription alias behaves identically', async () => {
-      const http = createMockHttp();
-      const payload = {
-        endpoint: 'https://push.example.com/sub/123',
-        keys: { p256dh: 'test-p256dh', auth: 'test-auth' },
-      };
-      vi.mocked(http.post).mockResolvedValueOnce({ data: payload });
-
-      const service = createPushService(http);
-      const result = await service.createSubscription(payload);
-
-      expect(http.post).toHaveBeenCalledWith('/push/subscriptions', payload);
-      expect(result).toEqual(payload);
-    });
   });
 
   describe('deletePushSubscription', () => {
@@ -64,17 +49,6 @@ describe('pushService', () => {
 
       const service = createPushService(http);
       await service.deletePushSubscription(payload);
-
-      expect(http.delete).toHaveBeenCalledWith('/push/subscriptions', { data: payload });
-    });
-
-    it('deleteSubscription alias behaves identically', async () => {
-      const http = createMockHttp();
-      const payload = { endpoint: 'https://push.example.com/sub/123' };
-      vi.mocked(http.delete).mockResolvedValueOnce({ data: undefined });
-
-      const service = createPushService(http);
-      await service.deleteSubscription(payload);
 
       expect(http.delete).toHaveBeenCalledWith('/push/subscriptions', { data: payload });
     });

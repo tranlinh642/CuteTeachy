@@ -117,3 +117,55 @@ export function serializePushSubscription(subscription: PushSubscription): Creat
     },
   };
 }
+
+export interface UnsubscribeDeviceOptions {
+  readonly window?: Window;
+  readonly deletePushSubscription?: (payload: { endpoint: string }) => Promise<unknown>;
+}
+
+/**
+ * Unsubscribes the current device:
+ * 1. Checks serviceWorker availability.
+ * 2. Gets the active subscription.
+ * 3. Deletes the subscription on the backend if deletePushSubscription callback is provided.
+ * 4. Unsubscribes the PushSubscription locally in the browser.
+ * Never throws an unhandled exception to prevent blocking caller flows (e.g. logout).
+ */
+export async function unsubscribeDevice(options?: UnsubscribeDeviceOptions): Promise<boolean> {
+  const win = options?.window ?? (typeof window !== 'undefined' ? window : undefined);
+  const nav = win?.navigator ?? (typeof navigator !== 'undefined' ? navigator : undefined);
+
+  if (!nav || !('serviceWorker' in nav)) {
+    return false;
+  }
+
+  try {
+    const reg = await nav.serviceWorker.ready;
+    const sub = await reg?.pushManager?.getSubscription();
+    if (!sub) {
+      return false;
+    }
+
+    if (sub.endpoint && options?.deletePushSubscription) {
+      try {
+        await options.deletePushSubscription({ endpoint: sub.endpoint });
+      } catch (err) {
+        // Network errors must not block the flow
+        console.warn('[Push] Failed to delete push subscription on server:', err);
+      }
+    }
+
+    try {
+      if (typeof sub.unsubscribe === 'function') {
+        await sub.unsubscribe();
+      }
+    } catch (err) {
+      console.warn('[Push] Failed to unsubscribe push manager:', err);
+    }
+
+    return true;
+  } catch (err) {
+    console.warn('[Push] Unsubscribe device error:', err);
+    return false;
+  }
+}

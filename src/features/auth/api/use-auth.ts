@@ -12,6 +12,7 @@ import type {
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { ApiError } from '@/lib/api';
 import { useServices } from '@/lib/api';
+import { unsubscribeDevice } from '@/features/push';
 
 export function useRegister() {
   const { auth } = useServices();
@@ -43,18 +44,9 @@ export function useLogout() {
       const token = typeof refreshToken === 'string' ? refreshToken : useSessionStore.getState().session?.refreshToken;
 
       // SPEC-005 / S5-FE-01: Delete active device PushSubscription if present before clearing session
-      try {
-        if (typeof window !== 'undefined' && 'serviceWorker' in navigator && 'PushManager' in window) {
-          const reg = await navigator.serviceWorker.ready;
-          const sub = await reg?.pushManager?.getSubscription();
-          if (sub?.endpoint) {
-            await push.deletePushSubscription({ endpoint: sub.endpoint });
-          }
-        }
-      } catch (err) {
-        // Network errors must not block the user logout process
-        console.warn('[Push] Failed to delete push subscription on logout:', err);
-      }
+      await unsubscribeDevice({
+        deletePushSubscription: (payload) => push.deletePushSubscription(payload),
+      });
 
       return auth.logout(token);
     },

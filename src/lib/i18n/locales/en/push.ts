@@ -5,6 +5,8 @@ export const push: typeof Schema = {
     explanationTitle: 'Enable Reminders',
     explanationDescription:
       'CuteTeachy sends timely notifications before your classes and scheduled tasks, helping you stay ahead and never miss a lesson.',
+    benefitTimetable: 'Reminders before teaching sessions on your timetable',
+    benefitTask: 'Timely reminders for scheduled tasks',
     iosGuideTitle: 'Add to Home Screen first',
     iosGuideDescription:
       'On iOS devices (iPhone/iPad), Apple requires CuteTeachy to be added to your Home Screen before it can receive push notifications.',

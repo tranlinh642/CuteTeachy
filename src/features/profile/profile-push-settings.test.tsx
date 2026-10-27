@@ -33,6 +33,25 @@ vi.mock('@/components/ui/ConfirmDialog', () => ({
   ConfirmDialog: () => null,
 }));
 
+let capturedSwitchOnChange: ((checked: boolean) => void) | undefined;
+
+vi.mock('@/components/ui/Switch', () => ({
+  Switch: ({
+    checked,
+    onChange,
+    label,
+  }: {
+    checked: boolean;
+    onChange: (checked: boolean) => void;
+    label: string;
+  }) => {
+    if (label.includes('Thông báo')) {
+      capturedSwitchOnChange = onChange;
+    }
+    return <button data-testid="switch" aria-checked={checked}>{label}</button>;
+  },
+}));
+
 // Mock hook to control push notification decisions during tests
 const mockPushNotification = {
   isSupported: true,
@@ -65,6 +84,7 @@ describe('ProfileView Push Notifications Switch (SPEC-005 & S5-FE-01)', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    capturedSwitchOnChange = undefined;
     queryClient = new QueryClient({
       defaultOptions: {
         queries: { retry: false },
@@ -143,5 +163,14 @@ describe('ProfileView Push Notifications Switch (SPEC-005 & S5-FE-01)', () => {
     const html = renderProfile();
     expect(html).toContain('data-testid="dialog"');
     expect(html).toContain('data-title="Bật thông báo nhắc việc"');
+  });
+
+  it('calls confirmPermission to re-register push subscription when switch is enabled and permission is already granted', () => {
+    mockPushNotification.decision = 'already_granted';
+    mockPushNotification.confirmPermission.mockResolvedValue(true);
+    renderProfile();
+    expect(capturedSwitchOnChange).toBeDefined();
+    capturedSwitchOnChange?.(true);
+    expect(mockPushNotification.confirmPermission).toHaveBeenCalledTimes(1);
   });
 });

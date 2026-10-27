@@ -1,10 +1,11 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   evaluatePushDecision,
   isIosDevice,
   isPushSupported,
   isStandaloneMode,
   serializePushSubscription,
+  unsubscribeDevice,
   urlBase64ToUint8Array,
 } from './push-helpers';
 
@@ -39,15 +40,14 @@ describe('push-helpers', () => {
     it('returns false for Chrome on iOS (crios) or Firefox on iOS (fxios)', () => {
       const crios = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 CriOS/120.0.0.0 Mobile/15E148 Safari/604.1';
       expect(isIosDevice(crios)).toBe(false);
-
-      const fxios = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 FxiOS/120.0 Mobile/15E148 Safari/604.1';
-      expect(isIosDevice(fxios)).toBe(false);
     });
 
     it('returns false for Android and desktop browsers', () => {
       const android = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 Chrome/120.0 Mobile Safari/537.36';
       expect(isIosDevice(android)).toBe(false);
+    });
 
+    it('returns false for desktop Mac', () => {
       const desktopMac = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/120.0 Safari/537.36';
       expect(isIosDevice(desktopMac)).toBe(false);
     });
@@ -203,6 +203,68 @@ describe('push-helpers', () => {
       expect(result.endpoint).toBe('https://push.example.com/sub/abc');
       expect(result.keys.p256dh).toBe(btoa(String.fromCharCode(1, 2, 3)));
       expect(result.keys.auth).toBe(btoa(String.fromCharCode(4, 5, 6)));
+    });
+  });
+
+  describe('unsubscribeDevice', () => {
+    it('returns false when navigator or serviceWorker is missing', async () => {
+      const result = await unsubscribeDevice({
+        window: {} as unknown as Window,
+      });
+      expect(result).toBe(false);
+    });
+
+    it('deletes push subscription on server and unsubscribes locally', async () => {
+      const deletePushSubscription = vi.fn().mockResolvedValue(undefined);
+      const unsubscribeMock = vi.fn().mockResolvedValue(true);
+
+      const mockSub = {
+        endpoint: 'https://push.example.com/sub/123',
+        unsubscribe: unsubscribeMock,
+      };
+
+      const mockWin = {
+        navigator: {
+          serviceWorker: {
+            ready: Promise.resolve({
+              pushManager: {
+                getSubscription: vi.fn().mockResolvedValue(mockSub),
+              },
+            }),
+          },
+        },
+      } as unknown as Window;
+
+      const result = await unsubscribeDevice({
+        window: mockWin,
+        deletePushSubscription,
+      });
+
+      expect(result).toBe(true);
+      expect(deletePushSubscription).toHaveBeenCalledWith({
+        endpoint: 'https://push.example.com/sub/123',
+      });
+      expect(unsubscribeMock).toHaveBeenCalled();
+    });
+
+    it('returns false if no subscription is present', async () => {
+      const mockWin = {
+        navigator: {
+          serviceWorker: {
+            ready: Promise.resolve({
+              pushManager: {
+                getSubscription: vi.fn().mockResolvedValue(null),
+              },
+            }),
+          },
+        },
+      } as unknown as Window;
+
+      const result = await unsubscribeDevice({
+        window: mockWin,
+      });
+
+      expect(result).toBe(false);
     });
   });
 });

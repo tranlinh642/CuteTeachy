@@ -21,16 +21,10 @@ export function handlePushEvent(
 
   if (event.data) {
     try {
-      if (typeof event.data.json === 'function') {
-        rawPayload = event.data.json();
-      } else if (typeof event.data.text === 'function') {
-        rawPayload = event.data.text();
-      }
+      rawPayload = event.data.json();
     } catch {
       try {
-        if (typeof event.data.text === 'function') {
-          rawPayload = event.data.text();
-        }
+        rawPayload = event.data.text();
       } catch {
         rawPayload = null;
       }

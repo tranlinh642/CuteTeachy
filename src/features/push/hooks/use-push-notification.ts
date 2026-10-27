@@ -9,6 +9,7 @@ import {
   isPushSupported,
   isStandaloneMode,
   serializePushSubscription,
+  unsubscribeDevice as unsubscribeDeviceHelper,
   urlBase64ToUint8Array,
   type PushDecision,
 } from '../utils/push-helpers';
@@ -179,18 +180,11 @@ export function usePushNotification(options: UsePushNotificationOptions = {}) {
   }, [push, updateSettings]);
 
   const unsubscribeDevice = useCallback(async () => {
-    if (typeof window === 'undefined' || !('serviceWorker' in navigator)) return;
-
-    try {
-      const reg = await navigator.serviceWorker.ready;
-      const sub = await reg.pushManager.getSubscription();
-      if (sub?.endpoint) {
-        await push.deletePushSubscription({ endpoint: sub.endpoint });
-        await sub.unsubscribe();
-      }
+    const unsubscribed = await unsubscribeDeviceHelper({
+      deletePushSubscription: (input) => push.deletePushSubscription(input),
+    });
+    if (unsubscribed) {
       setIsSubscribed(false);
-    } catch (err) {
-      console.warn('[Push] Unsubscribe error:', err);
     }
   }, [push]);
 
