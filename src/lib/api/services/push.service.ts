@@ -20,9 +20,7 @@ export const createPushService = (http: AxiosInstance) => {
   return {
     getVapidPublicKey,
     createPushSubscription,
-    createSubscription: createPushSubscription,
     deletePushSubscription,
-    deleteSubscription: deletePushSubscription,
   };
 };
 

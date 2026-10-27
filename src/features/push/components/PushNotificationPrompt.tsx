@@ -31,9 +31,12 @@ export function PushNotificationPrompt({
           taskService.list(),
           slotService.list(),
         ]);
-        const taskCount = taskList.items?.length ?? 0;
+        // SPEC-005 / S5-FE-01: Chỉ kích hoạt sau khi tạo Task có giờ hoặc tiết học đầu tiên
+        const timedTasks = (taskList.items ?? []).filter(
+          (task) => task.time != null && task.time !== '',
+        );
         const slotCount = slotList.items?.length ?? 0;
-        return taskCount > 0 || slotCount > 0;
+        return timedTasks.length > 0 || slotCount > 0;
       } catch {
         return false;
       }

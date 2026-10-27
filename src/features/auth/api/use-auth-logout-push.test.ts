@@ -1,5 +1,6 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 import { useSessionStore } from '@/stores';
+import { unsubscribeDevice } from '@/features/push';
 
 describe('useLogout push unsubscription integration (SPEC-005 & S5-FE-01)', () => {
   beforeEach(() => {
@@ -23,6 +24,7 @@ describe('useLogout push unsubscription integration (SPEC-005 & S5-FE-01)', () =
 
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.unstubAllGlobals();
   });
 
   it('calls push.deletePushSubscription with endpoint before auth.logout', async () => {
@@ -41,30 +43,36 @@ describe('useLogout push unsubscription integration (SPEC-005 & S5-FE-01)', () =
       }),
     };
 
+    const mockSubscription = {
+      endpoint: mockEndpoint,
+      unsubscribe: vi.fn().mockResolvedValue(true),
+    };
+
     const mockPushManager = {
-      getSubscription: vi.fn().mockResolvedValue({
-        endpoint: mockEndpoint,
-      }),
+      getSubscription: vi.fn().mockResolvedValue(mockSubscription),
     };
 
-    const mockNavigator = {
+    const mockRegistration = {
+      pushManager: mockPushManager,
+    };
+
+    // Setup browser globals
+    vi.stubGlobal('navigator', {
       serviceWorker: {
-        ready: Promise.resolve({
-          pushManager: mockPushManager,
-        }),
+        ready: Promise.resolve(mockRegistration),
       },
-    };
+    });
+    vi.stubGlobal('PushManager', class {});
 
-    // Simulate mutationFn logic
-    const reg = await mockNavigator.serviceWorker.ready;
-    const sub = await reg.pushManager.getSubscription();
-    if (sub?.endpoint) {
-      await mockPush.deletePushSubscription({ endpoint: sub.endpoint });
-    }
+    const success = await unsubscribeDevice({
+      deletePushSubscription: mockPush.deletePushSubscription,
+    });
     await mockAuth.logout('refresh-456');
 
+    expect(success).toBe(true);
     expect(calls).toEqual([`push.delete:${mockEndpoint}`, 'auth.logout']);
     expect(mockPush.deletePushSubscription).toHaveBeenCalledWith({ endpoint: mockEndpoint });
+    expect(mockSubscription.unsubscribe).toHaveBeenCalled();
     expect(mockAuth.logout).toHaveBeenCalledWith('refresh-456');
   });
 
@@ -80,34 +88,34 @@ describe('useLogout push unsubscription integration (SPEC-005 & S5-FE-01)', () =
       logout: vi.fn().mockResolvedValue(undefined),
     };
 
+    const mockSubscription = {
+      endpoint: mockEndpoint,
+      unsubscribe: vi.fn().mockResolvedValue(true),
+    };
+
     const mockPushManager = {
-      getSubscription: vi.fn().mockResolvedValue({
-        endpoint: mockEndpoint,
-      }),
+      getSubscription: vi.fn().mockResolvedValue(mockSubscription),
     };
 
-    const mockNavigator = {
+    const mockRegistration = {
+      pushManager: mockPushManager,
+    };
+
+    vi.stubGlobal('navigator', {
       serviceWorker: {
-        ready: Promise.resolve({
-          pushManager: mockPushManager,
-        }),
+        ready: Promise.resolve(mockRegistration),
       },
-    };
+    });
+    vi.stubGlobal('PushManager', class {});
 
-    // Simulate mutationFn logic with try/catch
-    try {
-      const reg = await mockNavigator.serviceWorker.ready;
-      const sub = await reg.pushManager.getSubscription();
-      if (sub?.endpoint) {
-        await mockPush.deletePushSubscription({ endpoint: sub.endpoint });
-      }
-    } catch (err) {
-      console.warn('[Push] Failed to delete push subscription on logout:', err);
-    }
-
+    const success = await unsubscribeDevice({
+      deletePushSubscription: mockPush.deletePushSubscription,
+    });
     await mockAuth.logout('refresh-456');
 
+    expect(success).toBe(true);
     expect(mockPush.deletePushSubscription).toHaveBeenCalledWith({ endpoint: mockEndpoint });
+    expect(mockSubscription.unsubscribe).toHaveBeenCalled();
     expect(mockAuth.logout).toHaveBeenCalledWith('refresh-456');
     expect(warnSpy).toHaveBeenCalled();
   });

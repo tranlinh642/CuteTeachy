@@ -3,6 +3,8 @@ export const push = {
     explanationTitle: 'Bật thông báo nhắc việc',
     explanationDescription:
       'CuteTeachy sẽ gửi thông báo nhắc bạn trước khi đến giờ tiết dạy hoặc việc cần làm, giúp bạn luôn chủ động trên lớp và không quên công việc.',
+    benefitTimetable: 'Nhắc trước giờ tiết dạy theo thời khoá biểu',
+    benefitTask: 'Nhắc công việc có giờ hẹn (Task) đúng lúc',
     iosGuideTitle: 'Thêm vào Màn hình chính trước',
     iosGuideDescription:
       'Trên thiết bị iOS (iPhone/iPad), Apple chỉ cho phép gửi thông báo đẩy khi ứng dụng đã được thêm vào Màn hình chính ở chế độ PWA.',

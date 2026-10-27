@@ -126,13 +126,13 @@ export function PushPermissionDialog({
           <div className="flex items-center gap-3">
             <Icon name="school" size={20} className="text-primary shrink-0" />
             <span className="text-body-sm text-on-surface font-medium">
-              Nhắc trước giờ tiết dạy theo thời khoá biểu
+              {t('push.dialog.benefitTimetable')}
             </span>
           </div>
           <div className="flex items-center gap-3">
             <Icon name="clock" size={20} className="text-primary shrink-0" />
             <span className="text-body-sm text-on-surface font-medium">
-              Nhắc công việc có giờ hẹn (Task) đúng lúc
+              {t('push.dialog.benefitTask')}
             </span>
           </div>
         </div>

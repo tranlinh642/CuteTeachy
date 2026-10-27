@@ -662,12 +662,14 @@ describe('SPEC-005 Push & Reminders E2E Cross-Repo Integration Suite (FE ↔ BE 
       const endTime = `${String(endH).padStart(2, '0')}:${String(endM).padStart(2, '0')}`;
 
       // Tạo buổi lẻ (ad-hoc session) hôm nay nhưng bị đánh dấu huỷ
-      await harness.services.classSessions.create({
+      const createdSession = await harness.services.classSessions.create({
         date: target.date,
         startTime: target.time,
         endTime,
         subject: 'Vật lý bổ trợ',
         tone: 'lavender',
+      });
+      await harness.services.classSessions.update(createdSession.id, {
         cancelled: true,
       });
 
@@ -702,7 +704,7 @@ describe('SPEC-005 Push & Reminders E2E Cross-Repo Integration Suite (FE ↔ BE 
         endTime,
         subject: 'Hóa học phụ đạo',
         tone: 'mint',
-        cancelled: false,
+        
       });
 
       receivedPushes.length = 0;
@@ -866,3 +868,5 @@ describe('SPEC-005 Push & Reminders E2E Cross-Repo Integration Suite (FE ↔ BE 
     });
   });
 });
+
+

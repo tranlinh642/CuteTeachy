@@ -134,15 +134,15 @@ export function ProfileView() {
     }
 
     if (pushNotification.decision === 'already_granted') {
-      updateSettings.mutate(
-        { pushEnabled: true },
-        {
-          onError: (err) => {
-            const apiErr = toApiError(err);
-            setSettingsError(t(apiErr.messageKey));
-          },
-        },
-      );
+      // Re-register push subscription with BE to ensure active endpoint
+      void pushNotification.confirmPermission().then((success) => {
+        if (!success && pushNotification.error) {
+          setSettingsError(pushNotification.error);
+        }
+      }).catch((err: unknown) => {
+        const apiErr = toApiError(err);
+        setSettingsError(t(apiErr.messageKey));
+      });
       return;
     }
 
@@ -453,3 +453,5 @@ export function ProfileView() {
     </div>
   );
 }
+
+
