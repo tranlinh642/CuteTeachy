@@ -8,4 +8,5 @@ export * from './class.service';
 export * from './timetable-slot.service';
 export * from './class-session.service';
 export * from './inspiration.service';
+export * from './push.service';
 export * from './create-services';

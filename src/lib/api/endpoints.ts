@@ -47,4 +47,8 @@ export const ENDPOINTS = {
   inspirations: {
     today: '/inspirations/today',
   },
+  push: {
+    vapidPublicKey: '/push/vapid-public-key',
+    subscriptions: '/push/subscriptions',
+  },
 } as const;

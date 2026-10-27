@@ -9,6 +9,7 @@ import { notes } from './notes';
 import { onboarding } from './onboarding';
 import { pickers } from './pickers';
 import { profile } from './profile';
+import { push } from './push';
 import { pwa } from './pwa';
 import { tags } from './tags';
 import { tasks } from './tasks';
@@ -33,5 +34,6 @@ export const en: TranslationSchema = {
   profile,
   validation,
   errors,
+  push,
   pwa,
 };

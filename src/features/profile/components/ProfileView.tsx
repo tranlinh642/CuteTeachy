@@ -31,6 +31,7 @@ import { LogoutButton } from '@/features/auth';
 import { EditProfileDialog } from './EditProfileDialog';
 import { useUploadAvatar, useDeleteAvatar } from '../api';
 import { validateAvatarFile } from '../utils/avatar-file';
+import { usePushNotification, PushPermissionDialog } from '@/features/push';
 
 export function ProfileView() {
   const { t, locale: currentLocale } = useTranslation();
@@ -40,6 +41,7 @@ export function ProfileView() {
 
   const { data: settings } = useSettings();
   const updateSettings = useUpdateSettings();
+  const pushNotification = usePushNotification();
 
   const locale = settings?.locale ?? currentLocale;
   const pushEnabled = settings?.pushEnabled ?? true;
@@ -117,15 +119,34 @@ export function ProfileView() {
 
   const handlePushNotificationsChange = (enabled: boolean) => {
     setSettingsError(null);
-    updateSettings.mutate(
-      { pushEnabled: enabled },
-      {
-        onError: (err) => {
-          const apiErr = toApiError(err);
-          setSettingsError(t(apiErr.messageKey));
+    if (!enabled) {
+      // SPEC-005: Tắt công tắc thông báo chỉ đổi Settings, không huỷ subscription.
+      updateSettings.mutate(
+        { pushEnabled: false },
+        {
+          onError: (err) => {
+            const apiErr = toApiError(err);
+            setSettingsError(t(apiErr.messageKey));
+          },
         },
-      },
-    );
+      );
+      return;
+    }
+
+    if (pushNotification.decision === 'already_granted') {
+      updateSettings.mutate(
+        { pushEnabled: true },
+        {
+          onError: (err) => {
+            const apiErr = toApiError(err);
+            setSettingsError(t(apiErr.messageKey));
+          },
+        },
+      );
+      return;
+    }
+
+    pushNotification.openDialog();
   };
 
   const handleReminderLeadChange = (val: string) => {
@@ -355,6 +376,12 @@ export function ProfileView() {
               <Icon name="bell" size={24} className="text-primary" />
               <div>
                 <p className="text-title-md font-medium text-on-surface">{t('profile.pushNotifications')}</p>
+                {pushNotification.decision === 'permission_denied' && (
+                  <p className="text-body-xs text-error mt-0.5">{t('push.settings.statusDenied')}</p>
+                )}
+                {pushNotification.decision === 'ios_needs_pwa' && (
+                  <p className="text-body-xs text-on-surface-variant mt-0.5">{t('push.settings.statusIosNeedsPwa')}</p>
+                )}
               </div>
             </div>
             <Switch
@@ -397,6 +424,15 @@ export function ProfileView() {
       <div className="pt-2">
         <LogoutButton appearance="block" />
       </div>
+
+      <PushPermissionDialog
+        open={pushNotification.isDialogOpen}
+        step={pushNotification.dialogStep}
+        isSubscribing={pushNotification.isSubscribing}
+        error={pushNotification.error}
+        onClose={pushNotification.closeDialog}
+        onConfirm={pushNotification.confirmPermission}
+      />
 
       <EditProfileDialog
         open={isEditDialogOpen}

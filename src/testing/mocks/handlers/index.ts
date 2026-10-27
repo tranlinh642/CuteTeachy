@@ -8,10 +8,12 @@ import { settingsRoutes } from './settings.handler';
 import { tagRoutes } from './tag.handler';
 import { taskRoutes } from './task.handler';
 import { timetableSlotRoutes } from './timetable-slot.handler';
+import { pushRoutes } from './push.handler';
 
 export const mockRoutes: readonly MockRoute[] = [
   ...authRoutes,
   ...settingsRoutes,
+  ...pushRoutes,
   ...taskRoutes,
   ...noteRoutes,
   ...tagRoutes,
