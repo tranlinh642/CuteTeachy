@@ -9,6 +9,7 @@ export * from './task.schema';
 export * from './note.schema';
 export * from './tag.schema';
 export * from './profile.schema';
+export * from './timetable-slot.schema';
 export * from './date-math';
 export * from './date-parse';
 export * from './date-format';
