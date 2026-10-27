@@ -40,4 +40,4 @@ flowchart LR
 | S5-BE-03 | done | ticket/s5-be-03-class-session-reminders | Đã merge ec31519 |
 | S5-FE-01 | done | ticket/s5-fe-01-permission-subscription | Đã merge 44bc7f8 |
 | S5-FE-02 | done | ticket/s5-fe-02-service-worker-push | Đã merge 5d69521 |
-| S5-INT | in-progress | ticket/s5-int-devices-cross-repo | Wave 4 |
+| S5-INT | done | ticket/s5-int-devices-cross-repo | Đã merge 8b2af43 |
