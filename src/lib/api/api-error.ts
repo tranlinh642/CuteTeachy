@@ -17,6 +17,9 @@ export type ApiErrorCode =
   | 'gone'
   | 'id_conflict'
   | 'tag_name_taken'
+  | 'timetable_conflict'
+  | 'cannot_delete_generated_session'
+  | 'conflict'
   | 'unknown';
 
 const CODE_TO_KEY: Readonly<Record<ApiErrorCode, TranslationKey>> = {
@@ -35,6 +38,9 @@ const CODE_TO_KEY: Readonly<Record<ApiErrorCode, TranslationKey>> = {
   gone: 'errors.gone',
   id_conflict: 'errors.idConflict',
   tag_name_taken: 'errors.tagNameTaken',
+  timetable_conflict: 'errors.timetableConflict',
+  cannot_delete_generated_session: 'classSession.cannotDeleteGenerated',
+  conflict: 'errors.generic',
   unknown: 'errors.generic',
 };
 
@@ -54,6 +60,9 @@ const KNOWN_CODES = new Set<ApiErrorCode>([
   'gone',
   'id_conflict',
   'tag_name_taken',
+  'timetable_conflict',
+  'cannot_delete_generated_session',
+  'conflict',
 ]);
 
 /** Normalised error thrown by every service call. */
