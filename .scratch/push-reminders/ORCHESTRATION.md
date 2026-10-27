@@ -39,5 +39,5 @@ flowchart LR
 | S5-BE-02 | ready-for-agent | | |
 | S5-BE-03 | ready-for-agent | | |
 | S5-FE-01 | in-progress | ticket/s5-fe-01-permission-subscription | Wave 1 |
-| S5-FE-02 | in-progress | ticket/s5-fe-02-service-worker-push | Wave 1 (không bị chặn) |
+| S5-FE-02 | done | ticket/s5-fe-02-service-worker-push | Đã merge 5d69521 |
 | S5-INT | ready-for-agent | | |
