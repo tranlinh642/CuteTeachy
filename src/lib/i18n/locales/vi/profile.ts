@@ -1,6 +1,15 @@
 export const profile = {
   title: 'Cá nhân & Cài đặt',
+  notificationsTitle: 'Thông báo',
   pushNotifications: 'Thông báo đẩy',
+  reminderLeadMinutes: 'Nhắc trước giờ hẹn',
+  reminderLeadOptions: {
+    min5: '5 phút',
+    min10: '10 phút',
+    min15: '15 phút',
+    min30: '30 phút',
+    min60: '60 phút',
+  },
   themePreferences: 'Giao diện',
   accountDetails: 'Thông tin tài khoản',
   language: 'Ngôn ngữ',
@@ -22,6 +31,20 @@ export const profile = {
     female: 'Cô',
     male: 'Thầy',
     other: '',
+  },
+  avatar: {
+    title: 'Ảnh đại diện',
+    upload: 'Tải ảnh lên',
+    change: 'Đổi ảnh',
+    delete: 'Xóa ảnh',
+    deleteConfirmTitle: 'Xóa ảnh đại diện',
+    deleteConfirmMessage: 'Bạn có chắc chắn muốn xóa ảnh đại diện?',
+    uploading: 'Đang tải ảnh lên…',
+    deleting: 'Đang xóa ảnh…',
+    uploadSuccess: 'Cập nhật ảnh đại diện thành công',
+    deleteSuccess: 'Đã xóa ảnh đại diện',
+    hint: 'Tối đa 2MB. Hỗ trợ định dạng JPEG, PNG, WebP',
+    chooseFile: 'Chọn ảnh từ thiết bị',
   },
   edit: {
     button: 'Chỉnh sửa thông tin',
@@ -48,4 +71,3 @@ export const profile = {
     blue: 'Xanh phiến thạch (Thầy giáo)',
   },
 };
-

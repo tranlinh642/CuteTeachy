@@ -1,10 +1,11 @@
-﻿'use client';
+"use client";
 
-import { checklistProgress, formatShortDate } from '@/utils';
-import { useTranslation } from '@/lib/i18n';
-import type { ID, Note, Tag } from '@/types';
-import { Card, Checkbox, Chip, IconButton, TagChip } from '@/components/ui';
-import { cn } from '@/utils/cn';
+import { checklistProgress, formatShortDate } from "@/utils";
+import { useTranslation } from "@/lib/i18n";
+import type { ID, Note, Tag } from "@/types";
+import { Card, Checkbox, Chip, IconButton, TagChip } from "@/components/ui";
+import { cn } from "@/utils/cn";
+import { useUpdateNote } from "../api";
 
 export interface NoteCardProps {
   readonly note: Note;
@@ -24,26 +25,61 @@ export function NoteCard({
   className,
 }: NoteCardProps) {
   const { t, localeTag } = useTranslation();
+  const updateNote = useUpdateNote();
   const { done, total } = checklistProgress(note);
+
+  const hasChecklist = note.checklist.length > 0;
+  const isCompleted = hasChecklist
+    ? done === total && total > 0
+    : Boolean(note.completed);
 
   return (
     <Card
       as="article"
       variant="elevated"
       padding="md"
-      className={cn('group flex flex-col gap-3 transition-all hover:shadow-md', className)}
+      className={cn(
+        "group flex flex-col gap-3 transition-all hover:shadow-md",
+        isCompleted && "opacity-60",
+        className,
+      )}
     >
       {/* Header: Title + Due date + Actions */}
       <div className="flex items-start justify-between gap-2">
-        <div className="min-w-0 flex-1">
-          <h3 className="text-title-md font-bold text-on-surface line-clamp-2">
-            {note.title}
-          </h3>
-          {note.dueDate && (
-            <p className="text-label-md text-primary font-medium mt-0.5">
-              {t('weekly.dueAt', { time: formatShortDate(new Date(note.dueDate), localeTag) })}
-            </p>
+        <div className="flex items-start gap-2.5 min-w-0 flex-1">
+          {!hasChecklist && (
+            <div className="pt-0.5">
+              <Checkbox
+                checked={Boolean(note.completed)}
+                onChange={() =>
+                  updateNote.mutate({
+                    id: note.id,
+                    input: { completed: !note.completed },
+                  })
+                }
+                label={note.title}
+                hideLabel
+                shape="circle"
+              />
+            </div>
           )}
+          <div className="min-w-0 flex-1">
+            <h3
+              className={cn(
+                "text-title-md font-bold text-on-surface line-clamp-2",
+                isCompleted && "line-through text-on-surface-variant",
+              )}
+            >
+              {note.title}
+            </h3>
+            {note.dueDate && (
+              <p className="text-label-md text-primary font-medium mt-0.5">
+                {t("weekly.dueAt", {
+                  time: formatShortDate(new Date(note.dueDate), localeTag),
+                })}
+              </p>
+            )}
+          </div>
         </div>
 
         <div className="flex items-center gap-1">
@@ -58,7 +94,7 @@ export function NoteCard({
             <IconButton
               icon="edit"
               size="sm"
-              aria-label={`${t('common.actions.edit')}: ${note.title}`}
+              aria-label={`${t("common.actions.edit")}: ${note.title}`}
               onClick={() => onEdit(note)}
             />
           )}
@@ -66,7 +102,7 @@ export function NoteCard({
             <IconButton
               icon="delete"
               size="sm"
-              aria-label={`${t('common.actions.delete')}: ${note.title}`}
+              aria-label={`${t("common.actions.delete")}: ${note.title}`}
               onClick={() => onDelete(note)}
               className="hover:text-error"
             />
@@ -97,8 +133,8 @@ export function NoteCard({
               />
               <span
                 className={cn(
-                  'flex-1 text-on-surface',
-                  item.done && 'line-through text-on-surface-variant',
+                  "flex-1 text-on-surface",
+                  item.done && "line-through text-on-surface-variant",
                 )}
               >
                 {item.text}

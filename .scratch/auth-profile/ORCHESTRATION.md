@@ -72,7 +72,7 @@ Mỗi vai trò là một subagent riêng (context riêng). Coordinator giao vi�
 ### Bước 0 — Coordinator chuẩn bị (một lần)
 
 1. ~~`CuteTeachy-BE` chưa là git repo~~ — **đã xong 2026-10-24**: remote `https://github.com/tranlinh642/CuteTeachy-BE`, `main` và `feat/auth-profile` đã push (commit `5eae0f1`).
-2. `CuteTeachy-FE`: working tree phải sạch (hiện có `next-env.d.ts` bị sửa, chưa commit — hỏi người dùng commit hay bỏ).
+2. ~~`CuteTeachy-FE`: working tree phải sạch~~ — **đã xong 2026-10-24**: đã commit `next-env.d.ts` vào `dev` và sync sang `feat/auth-profile`.
 3. ~~Tạo `feat/auth-profile` ở cả hai repo~~ — **đã xong 2026-10-24** (BE từ `main`, FE từ `dev`, đều đã push).
 4. Sau khi BE-02 merge: index BE bằng GitNexus (skill `gitnexus-cli`); index lại FE nếu stale.
 
@@ -108,20 +108,20 @@ Vòng đời: `ready-for-agent → in-progress → in-review → done`, hoặc `
 
 | Ticket | Status | Branch | Ghi chú |
 | --- | --- | --- | --- |
-| BE-01 | ready-for-agent | | |
-| BE-02 | ready-for-agent | | |
-| BE-03 | ready-for-agent | | |
-| BE-04 | ready-for-agent | | |
-| BE-05 | ready-for-agent | | |
-| BE-06 | ready-for-agent | | |
-| BE-07 | ready-for-agent | | giai đoạn cuối |
-| FE-01 | ready-for-agent | | |
-| FE-02 | ready-for-agent | | |
-| FE-03 | ready-for-agent | | |
-| FE-04 | ready-for-agent | | |
-| FE-05 | ready-for-agent | | |
-| FE-06 | ready-for-agent | | giai đoạn cuối |
-| FE-07 | ready-for-agent | | tích hợp |
+| BE-01 | done | ticket/be-01-docker-dev-infra | Đã merge 778b90e |
+| BE-02 | done | ticket/be-02-scaffold-nestjs-clean-architecture | Đã merge 0a451a4 |
+| BE-03 | done | ticket/be-03-account-password-login-tokens | Đã merge dc54371 |
+| BE-04 | done | ticket/be-04-onboarding-profile-update | Đã merge 29ec2d0 |
+| BE-05 | done | ticket/be-05-google-oauth-account-linking | Đã merge 0921aed |
+| BE-06 | done | ticket/be-06-avatar-upload-minio | Đã merge 7f42b9c |
+| BE-07 | done | ticket/be-07-email-verification-password-reset | Đã merge e0dad46 |
+| FE-01 | done | ticket/fe-01-contract-session-refresh-mock | Đã merge 6984868 |
+| FE-02 | done | ticket/fe-02-register-screen | Đã merge 91e78d0 |
+| FE-03 | done | ticket/fe-03-onboarding-screen-guard | Đã merge eb42f66 |
+| FE-04 | done | ticket/fe-04-google-login-callback | Đã merge a983984 |
+| FE-05 | done | ticket/fe-05-avatar-display-upload | Đã merge 46253af |
+| FE-06 | done | ticket/fe-06-email-verification-forgot-password | Đã merge e5bc633 |
+| FE-07 | done | ticket/fe-07-e2e-integration-cross-repo | Đã merge 572f03e |
 
 ## 7. Mẫu prompt
 

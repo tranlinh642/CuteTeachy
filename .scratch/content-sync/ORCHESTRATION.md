@@ -41,15 +41,15 @@ flowchart LR
 
 | Ticket | Status | Branch | Ghi chú |
 | --- | --- | --- | --- |
-| S3-BE-01 | ready-for-agent | | |
-| S3-BE-02 | ready-for-agent | | |
-| S3-BE-03 | ready-for-agent | | |
-| S3-BE-04 | ready-for-agent | | |
-| S3-BE-05 | ready-for-agent | | |
-| S3-BE-06 | ready-for-agent | | |
-| S3-FE-01 | ready-for-agent | | |
-| S3-FE-02 | ready-for-agent | | |
-| S3-FE-03 | ready-for-agent | | |
-| S3-FE-04 | ready-for-agent | | |
-| S3-FE-05 | ready-for-agent | | |
-| S3-INT | ready-for-agent | | |
+| S3-BE-01 | done | ticket/s3-be-01-tags-sync-foundation | Đã merge c6a1e69 |
+| S3-BE-02 | done | ticket/s3-be-02-settings | Đã merge 75f5401 |
+| S3-BE-03 | done | ticket/s3-be-03-tasks | Đã merge 91d1679 |
+| S3-BE-04 | done | ticket/s3-be-04-notes | Đã merge 46df3f2 |
+| S3-BE-05 | done | ticket/s3-be-05-tag-delete-unlink | Đã merge e9a2bd7 |
+| S3-BE-06 | done | ticket/s3-be-06-inspiration | Đã merge a00f90a |
+| S3-FE-01 | done | ticket/s3-fe-01-client-sync-layer | Đã merge eb7ad38 |
+| S3-FE-02 | done | ticket/s3-fe-02-tags | Đã merge d80cd60 |
+| S3-FE-03 | done | ticket/s3-fe-03-tasks | Đã merge 1173f97 |
+| S3-FE-04 | done | ticket/s3-fe-04-notes | Đã merge 4a2ea16 |
+| S3-FE-05 | done | ticket/s3-fe-05-settings | Đã merge 113ed67 |
+| S3-INT | done | ticket/s3-int-e2e-integration | Đã merge 02aa6f0 |

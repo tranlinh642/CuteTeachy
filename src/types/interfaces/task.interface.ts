@@ -20,6 +20,6 @@ export interface Task extends Timestamps {
 }
 
 export type CreateTaskInput = Pick<Task, 'title' | 'date' | 'category'> &
-  Partial<Pick<Task, 'notes' | 'time' | 'priority' | 'tagIds'>>;
+  Partial<Pick<Task, 'id' | 'notes' | 'time' | 'priority' | 'tagIds' | 'completed'>>;
 
 export type UpdateTaskInput = Partial<Omit<Task, 'id' | keyof Timestamps>>;

@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { MOCK_DEMO_CREDENTIALS, useLogin } from '../api';
 import { loginSchema, validate, type FieldErrors, type LoginFormValues } from '@/utils';
 import type { TranslationKey } from '@/lib/i18n';
@@ -15,6 +16,7 @@ const INITIAL_STATE: LoginFormState = { email: '', password: '', remember: true 
 
 /** View-model form đăng nhập: validate bằng zod (core) rồi gọi `useLogin`. */
 export function useLoginForm() {
+  const router = useRouter();
   const login = useLogin();
   const [values, setValues] = useState<LoginFormState>(INITIAL_STATE);
   const [errors, setErrors] = useState<FieldErrors<LoginFormValues>>({});
@@ -33,7 +35,13 @@ export function useLoginForm() {
       setErrors(result.errors);
       return;
     }
-    login.mutate(result.data);
+    login.mutate(result.data, {
+      onError: (error) => {
+        if (error.code === 'email_not_verified') {
+          router.push(`/verify-email?email=${encodeURIComponent(result.data.email)}`);
+        }
+      },
+    });
   };
 
   const fillDemoCredentials = () => {
@@ -42,6 +50,7 @@ export function useLoginForm() {
   };
 
   const serverErrorKey: TranslationKey | undefined = login.error?.messageKey;
+  const serverErrorCode = login.error?.code;
 
   return {
     values,
@@ -52,6 +61,7 @@ export function useLoginForm() {
     submit,
     isSubmitting: login.isPending,
     serverErrorKey,
+    serverErrorCode,
     fillDemoCredentials,
   };
 }

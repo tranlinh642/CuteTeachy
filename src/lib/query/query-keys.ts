@@ -9,13 +9,22 @@ export const queryKeys = {
     all: ['auth'] as const,
     me: ['auth', 'me'] as const,
   },
+  settings: {
+    all: ['settings'] as const,
+  },
   tasks: {
     all: ['tasks'] as const,
     list: (range?: DateRange) => ['tasks', 'list', range ?? 'all'] as const,
   },
   notes: {
     all: ['notes'] as const,
-    list: () => ['notes', 'list'] as const,
+    list: (filters?: { q?: string; tagId?: string }) =>
+      filters?.q || filters?.tagId
+        ? (['notes', 'list', { q: filters.q ?? '', tagId: filters.tagId ?? '' }] as const)
+        : (['notes', 'list'] as const),
+    infinite: (filters?: { q?: string; tagId?: string }) =>
+      ['notes', 'infinite', { q: filters?.q ?? '', tagId: filters?.tagId ?? '' }] as const,
+    syncCheckpoint: ['notes', 'sync-checkpoint'] as const,
   },
   tags: {
     all: ['tags'] as const,
@@ -23,6 +32,14 @@ export const queryKeys = {
   classes: {
     all: ['classes'] as const,
     list: (range: DateRange) => ['classes', 'list', range] as const,
+  },
+  timetableSlots: {
+    all: ['timetable-slots'] as const,
+    list: () => ['timetable-slots', 'list'] as const,
+  },
+  classSessions: {
+    all: ['class-sessions'] as const,
+    list: (range: DateRange) => ['class-sessions', 'list', range] as const,
   },
   inspirations: {
     today: ['inspirations', 'today'] as const,

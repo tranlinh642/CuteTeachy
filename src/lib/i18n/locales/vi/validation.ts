@@ -5,6 +5,10 @@ export const validation = {
   maxLength: '{{field}} tối đa {{count}} ký tự',
   invalidDate: 'Ngày không hợp lệ',
   invalidTime: 'Giờ không hợp lệ',
+  maxTags: 'Tối đa {{count}} thẻ',
+  startTimeBeforeEndTime: 'Giờ bắt đầu phải trước giờ kết thúc',
+  effectiveToAfterFrom: 'Ngày kết thúc hiệu lực phải sau hoặc bằng ngày bắt đầu',
+  invalidWeekday: 'Thứ trong tuần không hợp lệ (Thứ Hai – Chủ Nhật)',
 };
 
 export const errors = {
@@ -14,4 +18,11 @@ export const errors = {
   notFound: 'Không tìm thấy dữ liệu',
   validation: 'Dữ liệu gửi lên chưa hợp lệ',
   pageNotFound: 'Không tìm thấy trang bạn cần',
+  fileTooLarge: 'Kích thước tệp quá lớn (tối đa 2MB)',
+  unsupportedFileType: 'Định dạng tệp không được hỗ trợ',
+  rateLimited: 'Bạn thao tác quá nhanh, vui lòng thử lại sau',
+  gone: 'Dữ liệu đã bị xóa trước đó',
+  idConflict: 'Mã định danh bị trùng lặp',
+  tagNameTaken: 'Tên thẻ đã được sử dụng',
+  timetableConflict: 'Trùng lịch với tiết dạy khác trong thời khoá biểu',
 };

@@ -7,6 +7,10 @@ export const validation: typeof ValidationSchema = {
   maxLength: '{{field}} must be at most {{count}} characters',
   invalidDate: 'Invalid date',
   invalidTime: 'Invalid time',
+  maxTags: 'At most {{count}} tags allowed',
+  startTimeBeforeEndTime: 'Start time must be before end time',
+  effectiveToAfterFrom: 'End date must be on or after start date',
+  invalidWeekday: 'Invalid weekday (Monday – Sunday)',
 };
 
 export const errors: typeof ErrorsSchema = {
@@ -16,4 +20,11 @@ export const errors: typeof ErrorsSchema = {
   notFound: 'Not found',
   validation: 'Some fields are invalid',
   pageNotFound: "We couldn't find that page",
+  fileTooLarge: 'File is too large (max 2MB)',
+  unsupportedFileType: 'Unsupported file type',
+  rateLimited: 'Too many requests, please try again later',
+  gone: 'This item has already been deleted',
+  idConflict: 'Identifier conflict detected',
+  tagNameTaken: 'Tag name is already taken',
+  timetableConflict: 'Schedule conflict with another timetable slot',
 };

@@ -16,7 +16,7 @@ export interface ToneColors {
  * - If preference is 'auto', adapt based on gender ('male' -> 'blue', otherwise 'pink').
  */
 export function resolveActiveTheme(
-  gender?: Gender,
+  gender?: Gender | null,
   themePreference: ThemePreference = 'auto',
 ): ThemePalette {
   if (themePreference === 'blue') return 'blue';
@@ -41,12 +41,12 @@ export function getThemeTones(palette: ThemePalette): Readonly<Record<Tone, Tone
 
 /**
  * Determines whether themePreference should be reset to 'auto' upon profile update.
- * Per ADR 0001 (non-legacy model where all users have a predefined gender):
+ * Per ADR 0001:
  * Only resets to 'auto' if gender actually transitions to a different value (newGender !== prevGender).
  */
 export function shouldResetThemeOnGenderChange(
-  newGender: Gender | undefined,
-  prevGender: Gender | undefined,
+  newGender: Gender | null | undefined,
+  prevGender: Gender | null | undefined,
 ): boolean {
   if (newGender === undefined) return false;
   return newGender !== prevGender;

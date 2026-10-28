@@ -6,10 +6,13 @@
  */
 export * from './interfaces/common.interface';
 export * from './interfaces/user.interface';
+export * from './interfaces/settings.interface';
 export * from './interfaces/auth.interface';
 export * from './interfaces/tag.interface';
 export * from './interfaces/task.interface';
 export * from './interfaces/note.interface';
 export * from './interfaces/class-session.interface';
+export * from './interfaces/timetable-slot.interface';
 export * from './interfaces/inspiration.interface';
 export * from './interfaces/agenda.interface';
+export * from './interfaces/push.interface';

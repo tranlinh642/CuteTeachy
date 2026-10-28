@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   formatTeacherDisplayName,
   getAvatarName,
@@ -12,23 +12,50 @@ import { selectCurrentUser, usePreferencesStore, useSessionStore } from '@/store
 import { APP_VERSION } from '@/config';
 import type { ThemePreference } from '@/lib/theme';
 import { useTranslation } from '@/lib/i18n';
-import type { Locale } from '@/types';
-import { Avatar, Button, Card, Icon, IconButton, SectionHeader, SegmentedControl, Switch } from '@/components/ui';
+import type { Locale, ReminderLeadMinutes } from '@/types';
+import { toApiError } from '@/lib/api';
+import { useSettings, useUpdateSettings } from '@/features/settings';
+import {
+  Avatar,
+  Button,
+  Card,
+  ConfirmDialog,
+  Icon,
+  IconButton,
+  SectionHeader,
+  SegmentedControl,
+  Spinner,
+  Switch,
+} from '@/components/ui';
 import { LogoutButton } from '@/features/auth';
 import { EditProfileDialog } from './EditProfileDialog';
+import { useUploadAvatar, useDeleteAvatar } from '../api';
+import { validateAvatarFile } from '../utils/avatar-file';
+import { usePushNotification, PushPermissionDialog } from '@/features/push';
 
 export function ProfileView() {
-  const { t } = useTranslation();
+  const { t, locale: currentLocale } = useTranslation();
   const user = useSessionStore(selectCurrentUser);
-  const locale = usePreferencesStore((s) => s.locale);
-  const setLocale = usePreferencesStore((s) => s.setLocale);
-  const pushNotifications = usePreferencesStore((s) => s.pushNotifications);
-  const setPushNotifications = usePreferencesStore((s) => s.setPushNotifications);
   const themePreference = usePreferencesStore((s) => s.themePreference);
   const setThemePreference = usePreferencesStore((s) => s.setThemePreference);
 
+  const { data: settings } = useSettings();
+  const updateSettings = useUpdateSettings();
+  const pushNotification = usePushNotification();
+
+  const locale = settings?.locale ?? currentLocale;
+  const pushEnabled = settings?.pushEnabled ?? true;
+  const reminderLeadMinutes = settings?.reminderLeadMinutes ?? 15;
+
+  const uploadAvatar = useUploadAvatar();
+  const deleteAvatar = useDeleteAvatar();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [avatarError, setAvatarError] = useState<string | null>(null);
+  const [settingsError, setSettingsError] = useState<string | null>(null);
+  const [confirmDeleteAvatarOpen, setConfirmDeleteAvatarOpen] = useState(false);
 
   // Tự động ẩn thông báo thành công sau 4 giây, có dọn dẹp khi unmount
   useEffect(() => {
@@ -41,6 +68,100 @@ export function ProfileView() {
     setSuccessMessage(t('profile.edit.success'));
   };
 
+  const handleAvatarFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+
+    setAvatarError(null);
+
+    // Kiểm tra trước khi gửi: <= 2 MB, jpeg/png/webp; sai -> báo lỗi ngay, không gọi API
+    const validation = validateAvatarFile(file);
+    if (!validation.valid && validation.errorKey) {
+      setAvatarError(t(validation.errorKey));
+      return;
+    }
+
+    try {
+      await uploadAvatar.mutateAsync(file);
+      setSuccessMessage(t('profile.avatar.uploadSuccess'));
+    } catch (err) {
+      const apiErr = toApiError(err);
+      setAvatarError(t(apiErr.messageKey));
+    }
+  };
+
+  const handleConfirmDeleteAvatar = async () => {
+    setAvatarError(null);
+    try {
+      await deleteAvatar.mutateAsync();
+      setConfirmDeleteAvatarOpen(false);
+      setSuccessMessage(t('profile.avatar.deleteSuccess'));
+    } catch (err) {
+      setConfirmDeleteAvatarOpen(false);
+      const apiErr = toApiError(err);
+      setAvatarError(t(apiErr.messageKey));
+    }
+  };
+
+  const handleLocaleChange = (newLocale: Locale) => {
+    setSettingsError(null);
+    updateSettings.mutate(
+      { locale: newLocale },
+      {
+        onError: (err) => {
+          const apiErr = toApiError(err);
+          setSettingsError(t(apiErr.messageKey));
+        },
+      },
+    );
+  };
+
+  const handlePushNotificationsChange = (enabled: boolean) => {
+    setSettingsError(null);
+    if (!enabled) {
+      // SPEC-005: Tắt công tắc thông báo chỉ đổi Settings, không huỷ subscription.
+      updateSettings.mutate(
+        { pushEnabled: false },
+        {
+          onError: (err) => {
+            const apiErr = toApiError(err);
+            setSettingsError(t(apiErr.messageKey));
+          },
+        },
+      );
+      return;
+    }
+
+    if (pushNotification.decision === 'already_granted') {
+      // Re-register push subscription with BE to ensure active endpoint
+      void pushNotification.confirmPermission().then((success) => {
+        if (!success && pushNotification.error) {
+          setSettingsError(pushNotification.error);
+        }
+      }).catch((err: unknown) => {
+        const apiErr = toApiError(err);
+        setSettingsError(t(apiErr.messageKey));
+      });
+      return;
+    }
+
+    pushNotification.openDialog();
+  };
+
+  const handleReminderLeadChange = (val: string) => {
+    setSettingsError(null);
+    updateSettings.mutate(
+      { reminderLeadMinutes: Number(val) as ReminderLeadMinutes },
+      {
+        onError: (err) => {
+          const apiErr = toApiError(err);
+          setSettingsError(t(apiErr.messageKey));
+        },
+      },
+    );
+  };
+
   const languageOptions: readonly { value: Locale; label: string }[] = [
     { value: 'vi', label: t('profile.languages.vi') },
     { value: 'en', label: t('profile.languages.en') },
@@ -50,6 +171,14 @@ export function ProfileView() {
     { value: 'auto', label: t('profile.themes.auto') },
     { value: 'pink', label: t('profile.themes.pink') },
     { value: 'blue', label: t('profile.themes.blue') },
+  ];
+
+  const reminderLeadOptions: readonly { value: string; label: string }[] = [
+    { value: '5', label: t('profile.reminderLeadOptions.min5') },
+    { value: '10', label: t('profile.reminderLeadOptions.min10') },
+    { value: '15', label: t('profile.reminderLeadOptions.min15') },
+    { value: '30', label: t('profile.reminderLeadOptions.min30') },
+    { value: '60', label: t('profile.reminderLeadOptions.min60') },
   ];
 
   const showFullNameSubtitle = shouldShowFullNameSubtitle(user);
@@ -81,15 +210,95 @@ export function ProfileView() {
         </div>
       )}
 
+      {/* Thông báo lỗi avatar */}
+      {avatarError && (
+        <div
+          role="alert"
+          className="flex items-center justify-between rounded-xl bg-error-container px-4 py-2 text-body-md font-medium text-on-error-container shadow-sm"
+        >
+          <span>{avatarError}</span>
+          <IconButton
+            icon="close"
+            size="sm"
+            variant="ghost"
+            onClick={() => setAvatarError(null)}
+            aria-label={t('common.actions.close')}
+          />
+        </div>
+      )}
+
+      {/* Thông báo lỗi cài đặt */}
+      {settingsError && (
+        <div
+          role="alert"
+          className="flex items-center justify-between rounded-xl bg-error-container px-4 py-2 text-body-md font-medium text-on-error-container shadow-sm"
+        >
+          <span>{settingsError}</span>
+          <IconButton
+            icon="close"
+            size="sm"
+            variant="ghost"
+            onClick={() => setSettingsError(null)}
+            aria-label={t('common.actions.close')}
+          />
+        </div>
+      )}
+
       {/* Thông tin tài khoản */}
       <Card variant="tonalSubtle" padding="lg" className="flex items-center justify-between gap-5">
         <div className="flex items-center gap-5 min-w-0">
-          <Avatar
-            name={getAvatarName(user)}
-            size="lg"
-            label={getTeacherAvatarLabel(user, t)}
-            ring
-          />
+          <div className="flex flex-col items-center gap-2 shrink-0">
+            <div className="relative">
+              <Avatar
+                name={getAvatarName(user)}
+                src={user?.avatarUrl}
+                size="lg"
+                label={getTeacherAvatarLabel(user, t)}
+                ring
+              />
+              {uploadAvatar.isPending && (
+                <div
+                  role="status"
+                  aria-label={t('profile.avatar.uploading')}
+                  className="bg-surface/70 absolute inset-0 flex items-center justify-center rounded-full backdrop-blur-xs"
+                >
+                  <Spinner size="md" />
+                </div>
+              )}
+            </div>
+            <div className="flex items-center gap-1.5">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="sr-only"
+                onChange={handleAvatarFileChange}
+                disabled={uploadAvatar.isPending || deleteAvatar.isPending}
+              />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadAvatar.isPending || deleteAvatar.isPending}
+                className="text-label-sm text-primary hover:text-primary-fixed-dim hover:underline font-bold disabled:opacity-50 cursor-pointer min-h-touch inline-flex items-center px-1"
+              >
+                {user?.avatarUrl ? t('profile.avatar.change') : t('profile.avatar.upload')}
+              </button>
+              {user?.avatarUrl && (
+                <>
+                  <span className="text-outline-variant text-label-sm" aria-hidden="true">•</span>
+                  <button
+                    type="button"
+                    onClick={() => setConfirmDeleteAvatarOpen(true)}
+                    disabled={uploadAvatar.isPending || deleteAvatar.isPending}
+                    className="text-label-sm text-error hover:underline font-medium disabled:opacity-50 cursor-pointer min-h-touch inline-flex items-center px-1"
+                  >
+                    {t('profile.avatar.delete')}
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+
           <div className="flex flex-col gap-1 min-w-0">
             <h2 className="text-headline-md font-bold text-on-primary-container truncate">
               {formatTeacherDisplayName(user, t)}
@@ -152,7 +361,7 @@ export function ProfileView() {
               label={t('profile.language')}
               options={languageOptions}
               value={locale}
-              onChange={setLocale}
+              onChange={handleLocaleChange}
             />
           </div>
         </Card>
@@ -160,18 +369,42 @@ export function ProfileView() {
 
       {/* Cài đặt: Thông báo */}
       <section className="flex flex-col gap-3">
-        <Card padding="md" className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Icon name="bell" size={24} className="text-primary" />
-            <div>
-              <p className="text-title-md font-medium text-on-surface">{t('profile.pushNotifications')}</p>
+        <SectionHeader title={t('profile.notificationsTitle')} />
+        <Card padding="md" className="flex flex-col gap-5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Icon name="bell" size={24} className="text-primary" />
+              <div>
+                <p className="text-title-md font-medium text-on-surface">{t('profile.pushNotifications')}</p>
+                {pushNotification.decision === 'permission_denied' && (
+                  <p className="text-body-xs text-error mt-0.5">{t('push.settings.statusDenied')}</p>
+                )}
+                {pushNotification.decision === 'ios_needs_pwa' && (
+                  <p className="text-body-xs text-on-surface-variant mt-0.5">{t('push.settings.statusIosNeedsPwa')}</p>
+                )}
+              </div>
             </div>
+            <Switch
+              checked={pushEnabled}
+              onChange={handlePushNotificationsChange}
+              label={t('profile.pushNotifications')}
+            />
           </div>
-          <Switch
-            checked={pushNotifications}
-            onChange={setPushNotifications}
-            label={t('profile.pushNotifications')}
-          />
+
+          <div className="border-t border-outline-variant/40 pt-4 flex flex-col gap-3">
+            <div className="flex items-center gap-3">
+              <Icon name="clock" size={24} className="text-primary" />
+              <div>
+                <p className="text-title-md font-medium text-on-surface">{t('profile.reminderLeadMinutes')}</p>
+              </div>
+            </div>
+            <SegmentedControl
+              label={t('profile.reminderLeadMinutes')}
+              options={reminderLeadOptions}
+              value={String(reminderLeadMinutes)}
+              onChange={handleReminderLeadChange}
+            />
+          </div>
         </Card>
       </section>
 
@@ -192,11 +425,33 @@ export function ProfileView() {
         <LogoutButton appearance="block" />
       </div>
 
+      <PushPermissionDialog
+        open={pushNotification.isDialogOpen}
+        step={pushNotification.dialogStep}
+        isSubscribing={pushNotification.isSubscribing}
+        error={pushNotification.error}
+        onClose={pushNotification.closeDialog}
+        onConfirm={pushNotification.confirmPermission}
+      />
+
       <EditProfileDialog
         open={isEditDialogOpen}
         onClose={() => setIsEditDialogOpen(false)}
         onSuccess={handleEditSuccess}
       />
+
+      <ConfirmDialog
+        open={confirmDeleteAvatarOpen}
+        onClose={() => setConfirmDeleteAvatarOpen(false)}
+        onConfirm={handleConfirmDeleteAvatar}
+        title={t('profile.avatar.deleteConfirmTitle')}
+        message={t('profile.avatar.deleteConfirmMessage')}
+        confirmLabel={t('common.actions.delete')}
+        loading={deleteAvatar.isPending}
+        destructive
+      />
     </div>
   );
 }
+
+

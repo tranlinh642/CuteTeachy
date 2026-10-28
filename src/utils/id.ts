@@ -1,7 +1,6 @@
-/** Generates a unique string ID */
-export const createId = (): string => {
-  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
-    return crypto.randomUUID();
-  }
-  return `id-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
-};
+import { generateClientUuid, isUuid, withClientId } from '@/lib/sync';
+
+/** Generates a unique string ID (UUID v4) */
+export const createId = (): string => generateClientUuid();
+
+export { generateClientUuid, isUuid, withClientId };

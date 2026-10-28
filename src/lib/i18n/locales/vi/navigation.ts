@@ -1,6 +1,7 @@
 export const navigation = {
   home: 'Trang chủ',
   calendar: 'Lịch',
+  timetable: 'Thời khoá biểu',
   notes: 'Ghi chú',
   profile: 'Cá nhân',
   logout: 'Đăng xuất',

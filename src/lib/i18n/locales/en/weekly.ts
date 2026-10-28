@@ -19,4 +19,7 @@ export const weekly: typeof Schema = {
   mindfulMoment: 'Mindful Moment',
   mindfulMomentHint: 'Take a 5-minute breather before your next class.',
   dayTodos: 'To-dos for the day',
+  cancelled: 'Cancelled',
+  sessionCancelled: 'Cancelled session',
+  adHocBadge: 'Make-up / Substitute',
 };

@@ -4,7 +4,7 @@
 
 **Blocked by:** FE-01, FE-02 (cần màn đăng ký để gắn nút)
 
-**Status:** ready-for-agent
+**Status:** done
 
 **Đọc:** SPEC-002 mục *Google OAuth & Account Linking*, *API Contract* (`/auth/google`, `/auth/google/exchange`); ADR BE 0001 (lý do không đặt token trên URL).
 

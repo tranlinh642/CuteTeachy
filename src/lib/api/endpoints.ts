@@ -3,10 +3,23 @@
  */
 export const ENDPOINTS = {
   auth: {
+    register: '/auth/register',
     login: '/auth/login',
+    refresh: '/auth/refresh',
     logout: '/auth/logout',
     me: '/auth/me',
+    google: '/auth/google',
+    googleCallback: '/auth/google/callback',
+    googleExchange: '/auth/google/exchange',
     profile: '/auth/profile',
+    avatar: '/auth/profile/avatar',
+    verifyEmail: '/auth/email/verify',
+    resendEmailCode: '/auth/email/resend',
+    forgotPassword: '/auth/password/forgot',
+    resetPassword: '/auth/password/reset',
+  },
+  settings: {
+    me: '/me/settings',
   },
   tasks: {
     root: '/tasks',
@@ -23,7 +36,19 @@ export const ENDPOINTS = {
   classes: {
     root: '/classes',
   },
+  timetableSlots: {
+    root: '/timetable-slots',
+    byId: (id: string) => `/timetable-slots/${id}`,
+  },
+  classSessions: {
+    root: '/class-sessions',
+    byId: (id: string) => `/class-sessions/${id}`,
+  },
   inspirations: {
     today: '/inspirations/today',
+  },
+  push: {
+    vapidPublicKey: '/push/vapid-public-key',
+    subscriptions: '/push/subscriptions',
   },
 } as const;

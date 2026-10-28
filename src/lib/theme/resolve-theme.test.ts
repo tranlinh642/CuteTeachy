@@ -16,19 +16,21 @@ describe('resolve-theme', () => {
       expect(resolveActiveTheme('female', 'auto')).toBe('pink');
     });
 
-    it('defaults to pink when gender is undefined/other and auto', () => {
+    it('defaults to pink when gender is undefined/null/other and auto', () => {
       expect(resolveActiveTheme('other', 'auto')).toBe('pink');
       expect(resolveActiveTheme(undefined, 'auto')).toBe('pink');
+      expect(resolveActiveTheme(null, 'auto')).toBe('pink');
     });
 
     it('respects explicit manual override regardless of gender', () => {
       expect(resolveActiveTheme('male', 'pink')).toBe('pink');
       expect(resolveActiveTheme('female', 'blue')).toBe('blue');
       expect(resolveActiveTheme('other', 'blue')).toBe('blue');
+      expect(resolveActiveTheme(null, 'blue')).toBe('blue');
     });
 
     it('matches the inline anti-flash script expression across all gender and preference combinations', () => {
-      const genders = ['male', 'female', 'other', undefined] as const;
+      const genders = ['male', 'female', 'other', undefined, null] as const;
       const preferences = ['auto', 'pink', 'blue', undefined] as const;
 
       for (const gender of genders) {
@@ -67,11 +69,14 @@ describe('resolve-theme', () => {
       expect(shouldResetThemeOnGenderChange('other', 'female')).toBe(true);
       expect(shouldResetThemeOnGenderChange('female', 'other')).toBe(true);
       expect(shouldResetThemeOnGenderChange('male', 'other')).toBe(true);
+      expect(shouldResetThemeOnGenderChange('male', null)).toBe(true);
+      expect(shouldResetThemeOnGenderChange(null, 'male')).toBe(true);
 
       // Unchanged gender preserves themePreference
       expect(shouldResetThemeOnGenderChange('male', 'male')).toBe(false);
       expect(shouldResetThemeOnGenderChange('female', 'female')).toBe(false);
       expect(shouldResetThemeOnGenderChange('other', 'other')).toBe(false);
+      expect(shouldResetThemeOnGenderChange(null, null)).toBe(false);
 
       // Undefined new gender
       expect(shouldResetThemeOnGenderChange(undefined, 'male')).toBe(false);

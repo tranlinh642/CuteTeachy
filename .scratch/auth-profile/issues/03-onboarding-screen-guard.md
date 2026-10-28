@@ -4,7 +4,7 @@
 
 **Blocked by:** FE-01
 
-**Status:** ready-for-agent
+**Status:** done
 
 **Đọc:** SPEC-002 mục *Onboarding*; `GLOSSARY.md` (Onboarding, Smart Default Theme); ADR 0001; SPEC-001 (validation Profile).
 

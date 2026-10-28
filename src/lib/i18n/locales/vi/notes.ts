@@ -8,6 +8,7 @@ export const notes = {
   captureThought: 'Ghi lại một ý tưởng',
   captureThoughtHint: 'Viết nhanh điều gì đó nhẹ nhàng.',
   empty: 'Chưa có ghi chú nào. Hãy viết điều đầu tiên nhé!',
+  loadMore: 'Tải thêm ghi chú',
   dueTomorrow: 'Ngày mai',
   dueOn: 'Hạn {{date}}',
   deleteConfirm: 'Xóa ghi chú “{{title}}”?',
@@ -27,6 +28,7 @@ export const notes = {
     tagsLabel: 'Thẻ',
     addTag: 'Thêm thẻ',
     dueDateLabel: 'Hạn chót (không bắt buộc)',
+    completedLabel: 'Đã hoàn thành',
     save: 'Lưu ghi chú',
   },
 };

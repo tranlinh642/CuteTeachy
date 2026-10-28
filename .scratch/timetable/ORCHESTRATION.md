@@ -34,11 +34,11 @@ Chuỗi BE tuần tự vì cùng chạm logic sinh buổi; FE chạy song song v
 
 | Ticket | Status | Branch | Ghi chú |
 | --- | --- | --- | --- |
-| S4-BE-01 | ready-for-agent | | |
-| S4-BE-02 | ready-for-agent | | |
-| S4-BE-03 | ready-for-agent | | |
-| S4-BE-04 | ready-for-agent | | |
-| S4-FE-01 | ready-for-agent | | |
-| S4-FE-02 | ready-for-agent | | |
-| S4-FE-03 | ready-for-agent | | |
-| S4-INT | ready-for-agent | | |
+| S4-BE-01 | done | ticket/s4-be-01-slots-generated-sessions | Đã merge baab158 |
+| S4-BE-02 | done | ticket/s4-be-02-session-overrides-adhoc | Đã merge 684e90d |
+| S4-BE-03 | done | ticket/s4-be-03-edit-delete-slot-split | Đã merge 54bba37 |
+| S4-BE-04 | done | ticket/s4-be-04-class-session-delta-sync | Đã merge fb4edbd |
+| S4-FE-01 | done | ticket/s4-fe-01-types-mock-calendar | Đã merge 28c1810 |
+| S4-FE-02 | done | ticket/s4-fe-02-timetable-management | Đã merge f0cc492 |
+| S4-FE-03 | done | ticket/s4-fe-03-session-detail-adhoc | Đã merge cf25993 |
+| S4-INT | done | ticket/s4-int-e2e-integration | Đã merge def8783 |

@@ -41,13 +41,13 @@ export function shouldShowFullNameSubtitle(
   return Boolean(trimmedDisplay && trimmedFull && trimmedDisplay !== trimmedFull);
 }
 
-export function getTeacherRoleKey(gender?: Gender): TranslationKey {
+export function getTeacherRoleKey(gender?: Gender | null): TranslationKey {
   if (gender === 'male') return 'profile.roles.male';
   if (gender === 'female') return 'profile.roles.female';
   return 'profile.roles.other';
 }
 
-export function getTeacherHonorificKey(gender?: Gender): TranslationKey {
+export function getTeacherHonorificKey(gender?: Gender | null): TranslationKey {
   if (gender === 'male') return 'profile.honorifics.male';
   if (gender === 'female') return 'profile.honorifics.female';
   return 'profile.honorifics.other';
@@ -56,14 +56,14 @@ export function getTeacherHonorificKey(gender?: Gender): TranslationKey {
 /**
  * Returns teacher role based on gender ("Thầy giáo" | "Cô giáo" | "Giáo viên").
  */
-export function getTeacherRole(gender: Gender | undefined, t: TranslateFn): string {
+export function getTeacherRole(gender: Gender | null | undefined, t: TranslateFn): string {
   return t(getTeacherRoleKey(gender));
 }
 
 /**
  * Returns honorific prefix ("Thầy" | "Cô" | "").
  */
-export function getTeacherHonorific(gender: Gender | undefined, t: TranslateFn): string {
+export function getTeacherHonorific(gender: Gender | null | undefined, t: TranslateFn): string {
   return t(getTeacherHonorificKey(gender));
 }
 
@@ -78,16 +78,16 @@ export function formatTeacherDisplayName(
 ): string;
 export function formatTeacherDisplayName(
   displayName: string | undefined,
-  gender: Gender | undefined,
+  gender: Gender | null | undefined,
   t: TranslateFn,
 ): string;
 export function formatTeacherDisplayName(
   userOrName: TeacherUser | string | null | undefined,
-  genderOrT: Gender | TranslateFn | undefined,
+  genderOrT: Gender | null | TranslateFn | undefined,
   maybeT?: TranslateFn,
 ): string {
   let displayName: string | undefined;
-  let gender: Gender | undefined;
+  let gender: Gender | null | undefined;
   let t: TranslateFn;
 
   if (typeof genderOrT === 'function') {
@@ -124,4 +124,3 @@ export function getTeacherAvatarLabel(
   const name = getEffectiveDisplayName(user) || getTeacherRole(user?.gender, t);
   return t('common.a11y.avatar', { name });
 }
-

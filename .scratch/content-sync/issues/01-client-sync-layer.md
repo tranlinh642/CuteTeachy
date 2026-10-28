@@ -4,15 +4,15 @@
 
 **Blocked by:** auth-profile FE-01
 
-**Status:** ready-for-agent
+**Status:** done
 
 **Đọc:** SPEC-003 mục *Quy tắc đồng bộ chung*, *Thay đổi FE*; ADR BE 0003.
 
 **Vùng sở hữu:** lớp API dùng chung (kiểu envelope, xử lý lỗi `gone`/`id_conflict`), tiện ích áp envelope vào cache TanStack Query, lưu `serverTime` theo danh sách (bền qua reload, cùng cơ chế persist hiện có), hạ tầng mock backend cho đồng bộ (xoá mềm, `updatedSince`, tạo idempotent). Không đổi màn hình.
 
-- [ ] Kiểu envelope dùng chung; `ApiErrorCode` + i18n vi/en thêm `gone`, `id_conflict`.
-- [ ] Tiện ích áp envelope: thêm/cập nhật theo `items`, gỡ theo `deletedIds`, cập nhật mốc `serverTime`; unit test đủ ba trường hợp và trường hợp `updatedSince` bị từ chối (`400`) → tải lại toàn bộ.
-- [ ] Tạo mới luôn kèm `id` UUID của client; mutation gửi lại (offline) dùng đúng `id` cũ.
-- [ ] `410 gone` khi tạo/sửa → bỏ bản ghi khỏi cache, không báo lỗi gây hoảng cho người dùng.
-- [ ] Mock backend: hạ tầng chung cho tạo idempotent, xoá mềm 30 ngày, `updatedSince`, envelope — sẵn cho handler từng tài nguyên dùng.
-- [ ] `pnpm check-types`, `pnpm lint`, `pnpm test` xanh.
+- [x] Kiểu envelope dùng chung; `ApiErrorCode` + i18n vi/en thêm `gone`, `id_conflict`.
+- [x] Tiện ích áp envelope: thêm/cập nhật theo `items`, gỡ theo `deletedIds`, cập nhật mốc `serverTime`; unit test đủ ba trường hợp và trường hợp `updatedSince` bị từ chối (`400`) → tải lại toàn bộ.
+- [x] Tạo mới luôn kèm `id` UUID của client; mutation gửi lại (offline) dùng đúng `id` cũ.
+- [x] `410 gone` khi tạo/sửa → bỏ bản ghi khỏi cache, không báo lỗi gây hoảng cho người dùng.
+- [x] Mock backend: hạ tầng chung cho tạo idempotent, xoá mềm 30 ngày, `updatedSince`, envelope — sẵn cho handler từng tài nguyên dùng.
+- [x] `pnpm check-types`, `pnpm lint`, `pnpm test` xanh.

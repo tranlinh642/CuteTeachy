@@ -1,23 +1,63 @@
 'use client';
 
 import { useTranslation } from '@/lib/i18n';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense, useEffect } from 'react';
 import { Card, Icon } from '@/components/ui';
 import { useAuthStatus } from '../hooks/use-auth-status';
+import { resolveOAuthErrorMessage } from '../hooks/use-auth-callback';
 import { FullPageLoader } from './FullPageLoader';
 import { LoginForm } from './LoginForm';
+
+function OAuthErrorMessage() {
+  const { t } = useTranslation();
+  const searchParams = useSearchParams();
+  const errorParam = searchParams.get('error');
+  const message = resolveOAuthErrorMessage(errorParam, t);
+
+  if (!message) return null;
+
+  return (
+    <div
+      role="alert"
+      className="bg-error-container text-on-error-container text-body-sm mb-5 flex items-center gap-2 rounded-md px-4 py-3"
+    >
+      <Icon name="flag" size={18} />
+      <span>{message}</span>
+    </div>
+  );
+}
+
+function ResetSuccessBanner() {
+  const { t } = useTranslation();
+  const searchParams = useSearchParams();
+  const resetParam = searchParams.get('reset');
+
+  if (resetParam !== 'success') return null;
+
+  return (
+    <div
+      role="status"
+      className="bg-secondary-container text-on-secondary-container text-body-sm mb-5 flex items-center gap-2 rounded-md px-4 py-3"
+    >
+      <Icon name="check" size={18} />
+      <span>{t('auth.login.resetSuccessBanner')}</span>
+    </div>
+  );
+}
 
 /** Trang đăng nhập: panel thương hiệu (desktop) + thẻ form. */
 export function LoginScreen() {
   const { t } = useTranslation();
   const router = useRouter();
-  const { hydrated, isAuthenticated } = useAuthStatus();
+  const { hydrated, isAuthenticated, isOnboarded } = useAuthStatus();
 
-  // Đã đăng nhập (hoặc vừa đăng nhập xong) → về trang chủ.
+  // Đã đăng nhập (hoặc vừa đăng nhập xong) → nếu đã hoàn tất hồ sơ về '/', chưa thì về '/onboarding'.
   useEffect(() => {
-    if (hydrated && isAuthenticated) router.replace('/');
-  }, [hydrated, isAuthenticated, router]);
+    if (hydrated && isAuthenticated) {
+      router.replace(isOnboarded ? '/' : '/onboarding');
+    }
+  }, [hydrated, isAuthenticated, isOnboarded, router]);
 
   if (!hydrated || isAuthenticated) return <FullPageLoader />;
 
@@ -44,6 +84,10 @@ export function LoginScreen() {
             <p className="text-body-lg text-on-surface-variant">{t('auth.login.subtitle')}</p>
           </header>
           <Card variant="filled" padding="lg" className="bg-tertiary-container/40">
+            <Suspense fallback={null}>
+              <ResetSuccessBanner />
+              <OAuthErrorMessage />
+            </Suspense>
             <LoginForm />
           </Card>
         </div>

@@ -21,7 +21,7 @@ export const taskSchema = z.object({
     .transform((value) => (value ? value : undefined)),
   category: z.enum(TASK_CATEGORIES),
   priority: z.enum(TASK_PRIORITIES).default('normal'),
-  tagIds: z.array(z.string()).default([]),
+  tagIds: z.array(z.string()).max(10, 'validation.maxTags').default([]),
   notes: optionalText(LIMITS.notesMax),
 });
 

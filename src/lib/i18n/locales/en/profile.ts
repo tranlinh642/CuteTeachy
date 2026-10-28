@@ -2,7 +2,16 @@ import type { profile as Schema } from '../vi/profile';
 
 export const profile: typeof Schema = {
   title: 'Profile & Settings',
+  notificationsTitle: 'Notifications',
   pushNotifications: 'Push Notifications',
+  reminderLeadMinutes: 'Reminder Lead Time',
+  reminderLeadOptions: {
+    min5: '5 min',
+    min10: '10 min',
+    min15: '15 min',
+    min30: '30 min',
+    min60: '60 min',
+  },
   themePreferences: 'Theme Preferences',
   accountDetails: 'Account Details',
   language: 'Language',
@@ -24,6 +33,20 @@ export const profile: typeof Schema = {
     female: 'Ms.',
     male: 'Mr.',
     other: '',
+  },
+  avatar: {
+    title: 'Profile Picture',
+    upload: 'Upload photo',
+    change: 'Change photo',
+    delete: 'Remove photo',
+    deleteConfirmTitle: 'Remove Profile Picture',
+    deleteConfirmMessage: 'Are you sure you want to remove your profile picture?',
+    uploading: 'Uploading photo…',
+    deleting: 'Removing photo…',
+    uploadSuccess: 'Profile picture updated successfully',
+    deleteSuccess: 'Profile picture removed',
+    hint: 'Max 2MB. Supported formats: JPEG, PNG, WebP',
+    chooseFile: 'Choose photo from device',
   },
   edit: {
     button: 'Edit Profile',
@@ -50,4 +73,3 @@ export const profile: typeof Schema = {
     blue: 'Slate Blue (Male)',
   },
 };
-

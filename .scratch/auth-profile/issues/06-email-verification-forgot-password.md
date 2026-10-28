@@ -4,7 +4,7 @@
 
 **Blocked by:** FE-02, FE-03, FE-04, FE-05 (cố ý xếp cuối theo quyết định của người dùng)
 
-**Status:** ready-for-agent
+**Status:** done
 
 **Đọc:** SPEC-002 mục *Xác minh email & quên mật khẩu*, *API Contract* (các endpoint đánh dấu \*).
 

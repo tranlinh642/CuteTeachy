@@ -46,15 +46,61 @@ export const createLocalStorageAdapter = (): KeyValueStorage => ({
   },
 });
 
-let activeStorage: KeyValueStorage =
+export const createSessionStorageAdapter = (): KeyValueStorage => ({
+  getItem: (key) => {
+    try {
+      if (typeof window === 'undefined') return null;
+      return window.sessionStorage.getItem(key);
+    } catch {
+      return null;
+    }
+  },
+  setItem: (key, value) => {
+    try {
+      if (typeof window !== 'undefined') {
+        window.sessionStorage.setItem(key, value);
+      }
+    } catch {
+      // Bỏ qua khi hết dung lượng / chế độ riêng tư.
+    }
+  },
+  removeItem: (key) => {
+    try {
+      if (typeof window !== 'undefined') {
+        window.sessionStorage.removeItem(key);
+      }
+    } catch {
+      // Bỏ qua.
+    }
+  },
+});
+
+let activePersistentStorage: KeyValueStorage =
   typeof window !== 'undefined' ? createLocalStorageAdapter() : createMemoryStorage();
 
-export const configureStorage = (storage: KeyValueStorage): void => {
-  activeStorage = storage;
+let activeSessionStorage: KeyValueStorage =
+  typeof window !== 'undefined' ? createSessionStorageAdapter() : createMemoryStorage();
+
+export const configureStorage = (
+  storage: KeyValueStorage,
+  sessionStorage?: KeyValueStorage,
+): void => {
+  activePersistentStorage = storage;
+  if (sessionStorage) {
+    activeSessionStorage = sessionStorage;
+  }
 };
 
-export const storageProxy: KeyValueStorage = {
-  getItem: (key) => activeStorage.getItem(key),
-  setItem: (key, value) => activeStorage.setItem(key, value),
-  removeItem: (key) => activeStorage.removeItem(key),
+export const persistentStorageProxy: KeyValueStorage = {
+  getItem: (key) => activePersistentStorage.getItem(key),
+  setItem: (key, value) => activePersistentStorage.setItem(key, value),
+  removeItem: (key) => activePersistentStorage.removeItem(key),
 };
+
+export const sessionStorageProxy: KeyValueStorage = {
+  getItem: (key) => activeSessionStorage.getItem(key),
+  setItem: (key, value) => activeSessionStorage.setItem(key, value),
+  removeItem: (key) => activeSessionStorage.removeItem(key),
+};
+
+export const storageProxy: KeyValueStorage = persistentStorageProxy;
