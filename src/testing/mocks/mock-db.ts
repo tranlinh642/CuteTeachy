@@ -1,6 +1,7 @@
 import type {
   ClassSession,
   CreatePushSubscriptionInput,
+  InAppNotification,
   Inspiration,
   Note,
   Settings,
@@ -14,6 +15,7 @@ import type { SoftDeletedRecord } from './mock-sync';
 import { seedClasses } from './seed/class.seed';
 import { seedInspirations } from './seed/inspiration.seed';
 import { seedNotes } from './seed/note.seed';
+import { seedNotifications } from './seed/notification.seed';
 import { createSeedContext } from './seed/seed-context';
 import { seedTags } from './seed/tag.seed';
 import { seedTasks } from './seed/task.seed';
@@ -38,6 +40,7 @@ export interface MockDb {
   adhocSessions: ClassSession[];
   classes: ClassSession[];
   inspirations: Inspiration[];
+  notifications: InAppNotification[];
   pushSubscriptions?: CreatePushSubscriptionInput[];
   tombstones?: {
     tags: SoftDeletedRecord[];
@@ -66,6 +69,7 @@ export const createMockDb = (today: Date = new Date()): MockDb => {
     adhocSessions,
     classes,
     inspirations: seedInspirations(),
+    notifications: seedNotifications(context),
     pushSubscriptions: [],
     tombstones: {
       tags: [],

@@ -6,6 +6,7 @@ import { common } from './common';
 import { home } from './home';
 import { navigation } from './navigation';
 import { notes } from './notes';
+import { notifications } from './notifications';
 import { onboarding } from './onboarding';
 import { pickers } from './pickers';
 import { profile } from './profile';
@@ -28,6 +29,7 @@ export const en: TranslationSchema = {
   classSession,
   timetable,
   notes,
+  notifications,
   tasks,
   tags,
   pickers,

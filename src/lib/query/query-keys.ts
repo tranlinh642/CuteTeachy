@@ -44,4 +44,11 @@ export const queryKeys = {
   inspirations: {
     today: ['inspirations', 'today'] as const,
   },
+  notifications: {
+    all: ['notifications'] as const,
+    list: (params?: { unreadOnly?: boolean; limit?: number }) =>
+      params?.unreadOnly !== undefined || params?.limit !== undefined
+        ? (['notifications', 'list', params] as const)
+        : (['notifications', 'list'] as const),
+  },
 } as const;

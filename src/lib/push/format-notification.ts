@@ -78,13 +78,17 @@ const FALLBACK_BODIES = {
 
 /**
  * Computes a unique notification tag to prevent duplicate/overlapping notifications.
- * Formats tag by item type and id (e.g. `reminder-task-${id}` or `reminder-class-session-${id}`).
+ * Formats tag by explicitTag (`${type}-${targetId}-${remindAtMs}`) or by item type and id.
  */
 export function computeReminderTag(
   type?: string,
   id?: string | number,
   explicitTag?: string,
 ): string {
+  if (explicitTag && typeof explicitTag === 'string' && explicitTag.trim()) {
+    return explicitTag.trim();
+  }
+
   const normalizedId = id !== undefined && id !== null ? String(id).trim() : '';
   const normalizedType = typeof type === 'string' ? type.trim() : '';
 
@@ -103,10 +107,6 @@ export function computeReminderTag(
       return `reminder-${sanitizedType}-${normalizedId}`;
     }
     return `reminder-${normalizedId}`;
-  }
-
-  if (explicitTag && typeof explicitTag === 'string' && explicitTag.trim()) {
-    return explicitTag.trim();
   }
 
   return 'reminder-general';

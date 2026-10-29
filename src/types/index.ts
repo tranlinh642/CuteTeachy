@@ -16,3 +16,4 @@ export * from './interfaces/timetable-slot.interface';
 export * from './interfaces/inspiration.interface';
 export * from './interfaces/agenda.interface';
 export * from './interfaces/push.interface';
+export * from './interfaces/notification.interface';

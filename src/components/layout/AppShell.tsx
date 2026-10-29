@@ -3,6 +3,7 @@
 import { useTranslation } from '@/lib/i18n';
 import type { ReactNode } from 'react';
 import { OfflineIndicator } from '@/components/feedback';
+import { LocalReminderTicker, NotificationBell } from '@/features/notifications';
 import { MobileBottomNav } from './MobileBottomNav';
 import { Sidebar } from './Sidebar';
 import { Topbar } from './Topbar';
@@ -37,8 +38,17 @@ export function AppShell({ sidebarAction, sidebarFooter, topbarTitle, topbarEnd,
       </a>
       <Sidebar action={sidebarAction} footer={sidebarFooter} />
       <div className="flex min-h-dvh flex-col md:pl-sidebar">
-        <Topbar title={topbarTitle} end={topbarEnd} />
+        <Topbar
+          title={topbarTitle}
+          end={
+            <>
+              <NotificationBell />
+              {topbarEnd}
+            </>
+          }
+        />
         <OfflineIndicator />
+        <LocalReminderTicker />
         <main
           id={MAIN_CONTENT_ID}
           tabIndex={-1}
