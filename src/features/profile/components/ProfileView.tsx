@@ -13,7 +13,7 @@ import { APP_VERSION } from '@/config';
 import type { ThemePreference } from '@/lib/theme';
 import { useTranslation } from '@/lib/i18n';
 import type { Locale, ReminderLeadMinutes } from '@/types';
-import { toApiError } from '@/lib/api';
+import { toApiError, useServices } from '@/lib/api';
 import { useSettings, useUpdateSettings } from '@/features/settings';
 import {
   Avatar,
@@ -39,6 +39,7 @@ export function ProfileView() {
   const themePreference = usePreferencesStore((s) => s.themePreference);
   const setThemePreference = usePreferencesStore((s) => s.setThemePreference);
 
+  const { push: pushService } = useServices();
   const { data: settings } = useSettings();
   const updateSettings = useUpdateSettings();
   const pushNotification = usePushNotification();
@@ -56,6 +57,8 @@ export function ProfileView() {
   const [avatarError, setAvatarError] = useState<string | null>(null);
   const [settingsError, setSettingsError] = useState<string | null>(null);
   const [confirmDeleteAvatarOpen, setConfirmDeleteAvatarOpen] = useState(false);
+  const [isTestingPush, setIsTestingPush] = useState(false);
+  const [testPushMessage, setTestPushMessage] = useState<string | null>(null);
 
   // Tự động ẩn thông báo thành công sau 4 giây, có dọn dẹp khi unmount
   useEffect(() => {
@@ -135,18 +138,61 @@ export function ProfileView() {
 
     if (pushNotification.decision === 'already_granted') {
       // Re-register push subscription with BE to ensure active endpoint
-      void pushNotification.confirmPermission().then((success) => {
-        if (!success && pushNotification.error) {
-          setSettingsError(pushNotification.error);
-        }
-      }).catch((err: unknown) => {
-        const apiErr = toApiError(err);
-        setSettingsError(t(apiErr.messageKey));
-      });
+      void pushNotification
+        .confirmPermission()
+        .then((success) => {
+          if (!success && pushNotification.error) {
+            setSettingsError(pushNotification.error);
+          }
+        })
+        .catch((err: unknown) => {
+          const apiErr = toApiError(err);
+          setSettingsError(t(apiErr.messageKey));
+        });
       return;
     }
 
     pushNotification.openDialog();
+  };
+
+  const handleDirectPermissionRequest = () => {
+    setSettingsError(null);
+    void pushNotification
+      .confirmPermission()
+      .then((success) => {
+        if (success) {
+          setSuccessMessage(t('push.dialog.successMessage'));
+        } else if (pushNotification.error) {
+          setSettingsError(pushNotification.error);
+        }
+      })
+      .catch((err: unknown) => {
+        const apiErr = toApiError(err);
+        setSettingsError(t(apiErr.messageKey));
+      });
+  };
+
+  const handleSendTestNotification = async () => {
+    setSettingsError(null);
+    setTestPushMessage(null);
+    setIsTestingPush(true);
+
+    try {
+      const sendFn =
+        typeof pushNotification.sendTestNotification === 'function'
+          ? () => pushNotification.sendTestNotification()
+          : () => pushService.sendTestNotification();
+      const res = await sendFn();
+      if (res.sent > 0) {
+        setTestPushMessage(t('push.settings.testSuccessSent', { sent: res.sent }));
+      } else {
+        setTestPushMessage(t('push.settings.testSuccessInAppOnly'));
+      }
+    } catch {
+      setSettingsError(t('push.settings.testError'));
+    } finally {
+      setIsTestingPush(false);
+    }
   };
 
   const handleReminderLeadChange = (val: string) => {
@@ -391,6 +437,55 @@ export function ProfileView() {
             />
           </div>
 
+          {/* Hướng dẫn cài PWA 3 bước cho iOS chưa ở chế độ standalone */}
+          {pushNotification.decision === 'ios_needs_pwa' && (
+            <div
+              data-testid="ios-pwa-guide-card"
+              className="rounded-xl bg-surface-container-low border border-primary/20 p-4 flex flex-col gap-3"
+            >
+              <p className="text-body-sm font-semibold text-on-surface">
+                {t('push.dialog.iosGuideTitle')}
+              </p>
+              <ol className="flex flex-col gap-1.5 text-body-sm text-on-surface-variant list-decimal list-inside">
+                <li>{t('push.dialog.iosStep1')}</li>
+                <li>{t('push.dialog.iosStep2')}</li>
+                <li>{t('push.dialog.iosStep3')}</li>
+              </ol>
+              <div>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  icon="spa"
+                  onClick={pushNotification.openDialog}
+                >
+                  {t('push.settings.openIosGuideButton')}
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Nút 1 chạm kích hoạt Notification.requestPermission() trên iOS standalone hoặc Android/Desktop */}
+          {pushNotification.decision === 'can_prompt' && (
+            <div className="rounded-xl bg-primary-container/30 border border-primary/20 p-4 flex flex-wrap items-center justify-between gap-3">
+              <p className="text-body-sm text-on-surface flex-1 min-w-48">
+                {t('push.banner.description')}
+              </p>
+              <Button
+                type="button"
+                variant="primary"
+                size="sm"
+                icon="bell"
+                loading={pushNotification.isSubscribing}
+                onClick={handleDirectPermissionRequest}
+              >
+                {pushNotification.isIos && pushNotification.isStandalone
+                  ? t('push.settings.enableIosButton')
+                  : t('push.settings.enableDeviceButton')}
+              </Button>
+            </div>
+          )}
+
           <div className="border-t border-outline-variant/40 pt-4 flex flex-col gap-3">
             <div className="flex items-center gap-3">
               <Icon name="clock" size={24} className="text-primary" />
@@ -404,6 +499,38 @@ export function ProfileView() {
               value={String(reminderLeadMinutes)}
               onChange={handleReminderLeadChange}
             />
+          </div>
+
+          {/* Nút Gửi thông báo thử */}
+          <div className="border-t border-outline-variant/40 pt-4 flex flex-col gap-3">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <Icon name="bell" size={20} className="text-primary" />
+                <span className="text-body-md font-medium text-on-surface">
+                  {t('push.settings.testButton')}
+                </span>
+              </div>
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                icon="bell"
+                loading={isTestingPush}
+                onClick={() => void handleSendTestNotification()}
+              >
+                {isTestingPush ? t('push.settings.testSending') : t('push.settings.testButton')}
+              </Button>
+            </div>
+
+            {testPushMessage && (
+              <div
+                role="status"
+                data-testid="test-push-feedback"
+                className="rounded-xl bg-primary-container/60 px-3 py-2 text-body-sm font-medium text-on-primary-container"
+              >
+                {testPushMessage}
+              </div>
+            )}
           </div>
         </Card>
       </section>
@@ -453,5 +580,3 @@ export function ProfileView() {
     </div>
   );
 }
-
-

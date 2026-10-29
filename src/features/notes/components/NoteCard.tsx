@@ -1,9 +1,9 @@
 "use client";
 
-import { checklistProgress, formatShortDate } from "@/utils";
+import { checklistProgress, formatShortDate, formatTime } from "@/utils";
 import { useTranslation } from "@/lib/i18n";
 import type { ID, Note, Tag } from "@/types";
-import { Card, Checkbox, Chip, IconButton, TagChip } from "@/components/ui";
+import { Card, Checkbox, Chip, Icon, IconButton, TagChip } from "@/components/ui";
 import { cn } from "@/utils/cn";
 import { useUpdateNote } from "../api";
 
@@ -72,12 +72,25 @@ export function NoteCard({
             >
               {note.title}
             </h3>
-            {note.dueDate && (
-              <p className="text-label-md text-primary font-medium mt-0.5">
-                {t("weekly.dueAt", {
-                  time: formatShortDate(new Date(note.dueDate), localeTag),
-                })}
-              </p>
+            {(note.dueDate || note.remindTime) && (
+              <div className="flex flex-wrap items-center gap-2 mt-0.5">
+                {note.dueDate && (
+                  <p className="text-label-md text-primary font-medium">
+                    {t("weekly.dueAt", {
+                      time: formatShortDate(new Date(note.dueDate), localeTag),
+                    })}
+                  </p>
+                )}
+                {note.remindTime && (
+                  <span
+                    data-testid="note-remind-time"
+                    className="inline-flex items-center gap-1 rounded-full bg-primary-container/60 px-2 py-0.5 text-label-sm font-medium text-on-primary-container"
+                  >
+                    <Icon name="clock" size={14} />
+                    <span>{formatTime(note.remindTime, localeTag)}</span>
+                  </span>
+                )}
+              </div>
             )}
           </div>
         </div>

@@ -50,5 +50,6 @@ export const ENDPOINTS = {
   push: {
     vapidPublicKey: '/push/vapid-public-key',
     subscriptions: '/push/subscriptions',
+    testSubscription: '/push/subscriptions/test',
   },
 } as const;

@@ -10,8 +10,8 @@ import {
   type NoteFormValues,
 } from "@/utils";
 import { useTranslation } from "@/lib/i18n";
-import type { ChecklistItem, ID, ISODate, Note } from "@/types";
-import { DateField } from "@/components/pickers";
+import type { ChecklistItem, ID, ISODate, Note, TimeOfDay } from "@/types";
+import { DateField, TimeField } from "@/components/pickers";
 import {
   Button,
   Checkbox,
@@ -35,13 +35,20 @@ export function NoteDialog({ open, onClose, note }: NoteDialogProps) {
   const createNote = useCreateNote();
   const updateNote = useUpdateNote();
 
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [checklist, setChecklist] = useState<ChecklistItem[]>([]);
+  const [title, setTitle] = useState(note?.title ?? "");
+  const [content, setContent] = useState(note?.content ?? "");
+  const [checklist, setChecklist] = useState<ChecklistItem[]>(() =>
+    note?.checklist ? [...note.checklist] : [],
+  );
   const [newChecklistText, setNewChecklistText] = useState("");
-  const [tagIds, setTagIds] = useState<ID[]>([]);
-  const [dueDate, setDueDate] = useState<ISODate | undefined>(undefined);
-  const [completed, setCompleted] = useState(false);
+  const [tagIds, setTagIds] = useState<ID[]>(() =>
+    note?.tagIds ? [...note.tagIds] : [],
+  );
+  const [dueDate, setDueDate] = useState<ISODate | undefined>(note?.dueDate);
+  const [remindTime, setRemindTime] = useState<TimeOfDay | undefined>(
+    note?.remindTime ?? undefined,
+  );
+  const [completed, setCompleted] = useState(Boolean(note?.completed));
   const [errors, setErrors] = useState<FieldErrors<NoteFormValues>>({});
 
   useEffect(() => {
@@ -51,6 +58,7 @@ export function NoteDialog({ open, onClose, note }: NoteDialogProps) {
       setChecklist([...note.checklist]);
       setTagIds([...note.tagIds]);
       setDueDate(note.dueDate);
+      setRemindTime(note.remindTime ?? undefined);
       setCompleted(Boolean(note.completed));
     } else {
       setTitle("");
@@ -58,6 +66,7 @@ export function NoteDialog({ open, onClose, note }: NoteDialogProps) {
       setChecklist([]);
       setTagIds([]);
       setDueDate(undefined);
+      setRemindTime(undefined);
       setCompleted(false);
     }
     setNewChecklistText("");
@@ -93,6 +102,7 @@ export function NoteDialog({ open, onClose, note }: NoteDialogProps) {
       checklist,
       tagIds,
       dueDate,
+      remindTime: dueDate ? remindTime || undefined : undefined,
       completed: checklist.length === 0 ? completed : undefined,
     });
 
@@ -103,7 +113,20 @@ export function NoteDialog({ open, onClose, note }: NoteDialogProps) {
 
     setErrors({});
     if (note) {
-      await updateNote.mutateAsync({ id: note.id, input: result.data });
+      const effectiveRemindTime = result.data.dueDate
+        ? (result.data.remindTime ?? (note.remindTime ? null : undefined))
+        : note.remindTime
+          ? null
+          : undefined;
+      await updateNote.mutateAsync({
+        id: note.id,
+        input: {
+          ...result.data,
+          ...(effectiveRemindTime !== undefined
+            ? { remindTime: effectiveRemindTime }
+            : {}),
+        },
+      });
     } else {
       await createNote.mutateAsync(result.data);
     }
@@ -227,11 +250,28 @@ export function NoteDialog({ open, onClose, note }: NoteDialogProps) {
           onChange={setTagIds}
         />
 
-        <DateField
-          label={t("tasks.editor.dateLabel")}
-          value={dueDate}
-          onChange={setDueDate}
-        />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <DateField
+            label={t("tasks.editor.dateLabel")}
+            value={dueDate}
+            onChange={(nextDate) => {
+              setDueDate(nextDate);
+              if (!nextDate) {
+                setRemindTime(undefined);
+              }
+            }}
+            error={formatError(errors.dueDate, t("tasks.editor.dateLabel"))}
+          />
+          <TimeField
+            label={t("notes.editor.remindTimeLabel")}
+            value={remindTime}
+            onChange={setRemindTime}
+            error={formatError(
+              errors.remindTime,
+              t("notes.editor.remindTimeLabel"),
+            )}
+          />
+        </div>
       </form>
     </Dialog>
   );

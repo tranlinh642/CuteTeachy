@@ -1,6 +1,7 @@
 'use client';
 
 import { usePreferencesStore } from '@/stores';
+import { isIosDevice } from '@/features/push/utils/push-helpers';
 import { useCallback, useEffect, useState } from 'react';
 
 interface BeforeInstallPromptEvent extends Event {
@@ -32,10 +33,8 @@ export function usePwaInstall() {
       return;
     }
 
-    // 2. Nhận diện thiết bị iOS
-    const userAgent = window.navigator.userAgent.toLowerCase();
-    const isIosDevice = /iphone|ipad|ipod/.test(userAgent) && !/crios|fxios/.test(userAgent);
-    setIsIos(isIosDevice);
+    // 2. Nhận diện thiết bị iOS (mọi trình duyệt trên iPhone/iPad/iPod & iPadOS)
+    setIsIos(isIosDevice(window.navigator.userAgent, window.navigator));
 
     // 3. Bắt sự kiện `beforeinstallprompt` trên Chromium/Android/Desktop
     const handleBeforeInstallPrompt = (e: Event) => {

@@ -21,22 +21,25 @@ export function PushNotificationPrompt({
   const sessionAuth = useSessionStore(selectIsAuthenticated);
   const isAuthenticated = isAuthenticatedOverride ?? sessionAuth;
   const pushNotification = usePushNotification();
-  const { tasks: taskService, timetableSlots: slotService } = useServices();
+  const { tasks: taskService, timetableSlots: slotService, notes: noteService } = useServices();
 
   const { data: hasCreatedItem } = useQuery({
     queryKey: ['push-prompt-check'],
     queryFn: async () => {
       try {
-        const [taskList, slotList] = await Promise.all([
+        const [taskList, slotList, noteList] = await Promise.all([
           taskService.list(),
           slotService.list(),
+          noteService ? noteService.list() : Promise.resolve({ items: [] }),
         ]);
-        // SPEC-005 / S5-FE-01: Chỉ kích hoạt sau khi tạo Task có giờ hoặc tiết học đầu tiên
         const timedTasks = (taskList.items ?? []).filter(
           (task) => task.time != null && task.time !== '',
         );
         const slotCount = slotList.items?.length ?? 0;
-        return timedTasks.length > 0 || slotCount > 0;
+        const dueNotes = (noteList.items ?? []).filter(
+          (note) => note.dueDate != null && note.dueDate !== '',
+        );
+        return timedTasks.length > 0 || slotCount > 0 || dueNotes.length > 0;
       } catch {
         return false;
       }
@@ -47,12 +50,15 @@ export function PushNotificationPrompt({
 
   const hasItem = hasCreatedItemOverride !== undefined ? hasCreatedItemOverride : Boolean(hasCreatedItem);
 
+  const canShowDecision =
+    (pushNotification.isSupported && pushNotification.decision === 'can_prompt') ||
+    pushNotification.decision === 'ios_needs_pwa';
+
   const shouldShow =
     isAuthenticated &&
     !isDismissed &&
     hasItem &&
-    pushNotification.isSupported &&
-    pushNotification.decision === 'can_prompt';
+    canShowDecision;
 
   if (!shouldShow && !pushNotification.isDialogOpen) {
     return null;
