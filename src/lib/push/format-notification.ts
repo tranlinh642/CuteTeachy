@@ -13,6 +13,11 @@ export type PushReminderType = 'task' | 'class_session' | 'note' | (string & {})
 export interface PushReminderPayload {
   type?: PushReminderType;
   id?: string | number;
+  targetId?: string | number;
+  sessionId?: string | number;
+  taskId?: string | number;
+  noteId?: string | number;
+  remindAt?: string | number | Date;
   title?: string;
   body?: string;
   url?: string;
@@ -22,6 +27,7 @@ export interface PushReminderPayload {
   icon?: string;
   badge?: string;
   tag?: string;
+  data?: Record<string, unknown>;
   [key: string]: unknown;
 }
 
@@ -76,14 +82,40 @@ const FALLBACK_BODIES = {
   },
 } as const;
 
+function parseRemindAtToMs(remindAt: unknown): number | null {
+  if (remindAt === undefined || remindAt === null || remindAt === '') {
+    return null;
+  }
+  if (typeof remindAt === 'number' && Number.isFinite(remindAt)) {
+    return remindAt;
+  }
+  if (remindAt instanceof Date) {
+    const ms = remindAt.getTime();
+    return Number.isFinite(ms) ? ms : null;
+  }
+  if (typeof remindAt === 'string') {
+    const trimmed = remindAt.trim();
+    if (!trimmed) return null;
+    if (/^\d+$/.test(trimmed)) {
+      const numeric = Number(trimmed);
+      return Number.isFinite(numeric) ? numeric : null;
+    }
+    const parsedMs = new Date(trimmed).getTime();
+    return Number.isFinite(parsedMs) ? parsedMs : null;
+  }
+  return null;
+}
+
 /**
  * Computes a unique notification tag to prevent duplicate/overlapping notifications.
- * Formats tag by explicitTag (`${type}-${targetId}-${remindAtMs}`) or by item type and id.
+ * Formats tag by explicitTag, or `${type}-${targetId}-${remindAtMs}` (synced with LocalReminderTicker),
+ * or falls back to `reminder-${type}-${id}` for legacy payloads without remindAt.
  */
 export function computeReminderTag(
   type?: string,
   id?: string | number,
   explicitTag?: string,
+  remindAt?: unknown,
 ): string {
   if (explicitTag && typeof explicitTag === 'string' && explicitTag.trim()) {
     return explicitTag.trim();
@@ -91,6 +123,11 @@ export function computeReminderTag(
 
   const normalizedId = id !== undefined && id !== null ? String(id).trim() : '';
   const normalizedType = typeof type === 'string' ? type.trim() : '';
+  const remindAtMs = parseRemindAtToMs(remindAt);
+
+  if (normalizedType && normalizedId && remindAtMs !== null) {
+    return `${normalizedType}-${normalizedId}-${remindAtMs}`;
+  }
 
   if (normalizedId) {
     if (normalizedType === 'task') {
@@ -228,18 +265,60 @@ export function formatPushNotification(rawPayload?: unknown): FormattedNotificat
     payload = rawPayload as Record<string, unknown>;
   }
 
-  const rawType = typeof payload.type === 'string' ? payload.type.trim() : undefined;
+  const nestedData =
+    payload.data && typeof payload.data === 'object' && !Array.isArray(payload.data)
+      ? (payload.data as Record<string, unknown>)
+      : {};
+
+  const rawType =
+    typeof payload.type === 'string' && payload.type.trim()
+      ? payload.type.trim()
+      : typeof nestedData.type === 'string' && nestedData.type.trim()
+        ? nestedData.type.trim()
+        : undefined;
+
+  const rawIdCandidate =
+    payload.id ??
+    payload.targetId ??
+    payload.sessionId ??
+    payload.taskId ??
+    payload.noteId ??
+    nestedData.id ??
+    nestedData.targetId ??
+    nestedData.sessionId ??
+    nestedData.taskId ??
+    nestedData.noteId;
+
   const rawId =
-    payload.id !== undefined && payload.id !== null ? String(payload.id).trim() : undefined;
+    rawIdCandidate !== undefined &&
+    rawIdCandidate !== null &&
+    String(rawIdCandidate).trim() !== ''
+      ? String(rawIdCandidate).trim()
+      : undefined;
+
+  const rawRemindAt =
+    payload.remindAt ??
+    nestedData.remindAt ??
+    payload.remindAtMs ??
+    nestedData.remindAtMs;
+
   const rawDate =
     typeof payload.targetDate === 'string' && payload.targetDate.trim()
       ? payload.targetDate.trim()
       : typeof payload.date === 'string' && payload.date.trim()
         ? payload.date.trim()
-        : undefined;
+        : typeof nestedData.targetDate === 'string' && nestedData.targetDate.trim()
+          ? nestedData.targetDate.trim()
+          : typeof nestedData.date === 'string' && nestedData.date.trim()
+            ? nestedData.date.trim()
+            : undefined;
 
   const rawUrl =
-    typeof payload.url === 'string' && payload.url.trim() ? payload.url.trim() : undefined;
+    typeof payload.url === 'string' && payload.url.trim()
+      ? payload.url.trim()
+      : typeof nestedData.url === 'string' && nestedData.url.trim()
+        ? nestedData.url.trim()
+        : undefined;
   const rawTitle =
     typeof payload.title === 'string' && payload.title.trim() ? payload.title.trim() : undefined;
   const rawBody =
@@ -247,7 +326,11 @@ export function formatPushNotification(rawPayload?: unknown): FormattedNotificat
   const rawLocale =
     typeof payload.locale === 'string' && payload.locale.trim() ? payload.locale.trim() : undefined;
   const rawTag =
-    typeof payload.tag === 'string' && payload.tag.trim() ? payload.tag.trim() : undefined;
+    typeof payload.tag === 'string' && payload.tag.trim()
+      ? payload.tag.trim()
+      : typeof nestedData.tag === 'string' && nestedData.tag.trim()
+        ? nestedData.tag.trim()
+        : undefined;
   const rawIcon =
     typeof payload.icon === 'string' && payload.icon.trim() ? payload.icon.trim() : undefined;
   const rawBadge =
@@ -256,7 +339,7 @@ export function formatPushNotification(rawPayload?: unknown): FormattedNotificat
   const title = computeReminderTitle(rawTitle, rawType, rawLocale);
   const body = computeReminderBody(rawBody, rawType, rawLocale);
   const url = computeReminderUrl(rawUrl, rawType, rawDate, rawId);
-  const tag = computeReminderTag(rawType, rawId, rawTag);
+  const tag = computeReminderTag(rawType, rawId, rawTag, rawRemindAt);
   const icon = rawIcon || DEFAULT_NOTIFICATION_ICON;
   const badge = rawBadge || DEFAULT_NOTIFICATION_BADGE;
 

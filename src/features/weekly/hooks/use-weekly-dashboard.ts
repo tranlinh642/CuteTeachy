@@ -5,10 +5,11 @@ import { useClasses } from '@/features/calendar';
 import { useDeleteTask, useTasks, useToggleTask } from '@/features/tasks';
 import { useTags } from '@/features/tags';
 import { classesOnDate, getWeekDays, resolveTags, tasksOnDate, toISODate } from '@/utils';
-import type { ISODate } from '@/types';
+import type { ISODate, ScheduleCategory } from '@/types';
 
-export function useWeeklyDashboard() {
+export function useWeeklyDashboard(initialCategory: ScheduleCategory | 'all' = 'all') {
   const [selectedDate, setSelectedDate] = useState<ISODate>(() => toISODate(new Date()));
+  const [selectedCategory, setSelectedCategory] = useState<ScheduleCategory | 'all'>(initialCategory);
 
   const weekDays = useMemo(() => getWeekDays(new Date()), []);
   const range = useMemo(
@@ -25,10 +26,12 @@ export function useWeeklyDashboard() {
   const { toggle } = useToggleTask();
   const deleteTask = useDeleteTask();
 
-  const classes = useMemo(
-    () => classesOnDate(classesQuery.data ?? [], selectedDate),
-    [classesQuery.data, selectedDate],
-  );
+  const classes = useMemo(() => {
+    const dayClasses = classesOnDate(classesQuery.data ?? [], selectedDate);
+    if (selectedCategory === 'all') return dayClasses;
+    return dayClasses.filter((cls) => (cls.category ?? 'school_teaching') === selectedCategory);
+  }, [classesQuery.data, selectedDate, selectedCategory]);
+
   const tasks = useMemo(
     () => tasksOnDate(tasksQuery.data ?? [], selectedDate),
     [tasksQuery.data, selectedDate],
@@ -38,6 +41,8 @@ export function useWeeklyDashboard() {
     weekDays,
     selectedDate,
     selectDate: setSelectedDate,
+    selectedCategory,
+    selectCategory: setSelectedCategory,
     classes,
     tasks,
     tagsFor: (tagIds: readonly string[]) => resolveTags(tagIds, tags),

@@ -62,7 +62,7 @@ export function CalendarView({ defaultCategoryFilter = 'all' }: CalendarViewProp
     if (categoryFilter === 'all') return agenda;
     return agenda.filter(
       (entry) =>
-        entry.kind === 'class' &&
+        entry.kind === 'task' ||
         (entry.item.category ?? 'school_teaching') === categoryFilter,
     );
   }, [agenda, categoryFilter]);

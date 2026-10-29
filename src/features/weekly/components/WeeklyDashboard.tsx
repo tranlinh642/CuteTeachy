@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo, useState } from 'react';
 import {
   formatTeacherDisplayName,
   getAvatarName,
@@ -7,15 +8,23 @@ import {
   getTeacherAvatarLabel,
 } from '@/utils';
 import { selectCurrentUser, useSessionStore } from '@/stores';
-import { useTranslation } from '@/lib/i18n';
+import { useTranslation, type TranslationKey } from '@/lib/i18n';
+import { SCHEDULE_CATEGORIES, type ScheduleCategory } from '@/types';
 import { Avatar, Button, Card, EmptyState, Icon, SectionHeader } from '@/components/ui';
 import { TaskDialog, TaskItem, useTaskDialog } from '@/features/tasks';
 import { useWeeklyDashboard } from '../hooks/use-weekly-dashboard';
 import { ClassCard } from '@/features/calendar';
+import { cn } from '@/utils/cn';
 import { InspirationCard } from './InspirationCard';
 import { WeekStrip } from './WeekStrip';
 
-export function WeeklyDashboard() {
+const CATEGORY_FILTERS: readonly (ScheduleCategory | 'all')[] = ['all', ...SCHEDULE_CATEGORIES];
+
+export interface WeeklyDashboardProps {
+  readonly defaultCategoryFilter?: ScheduleCategory | 'all';
+}
+
+export function WeeklyDashboard({ defaultCategoryFilter = 'all' }: WeeklyDashboardProps = {}) {
   const { t } = useTranslation();
   const user = useSessionStore(selectCurrentUser);
   const period = getGreetingPeriod();
@@ -25,14 +34,29 @@ export function WeeklyDashboard() {
     weekDays,
     selectedDate,
     selectDate,
+    selectCategory,
     classes,
     tasks,
     tagsFor,
     toggleTask,
     deleteTask,
-  } = useWeeklyDashboard();
+  } = useWeeklyDashboard(defaultCategoryFilter);
 
+  const [categoryFilter, setCategoryFilter] = useState<ScheduleCategory | 'all'>(
+    defaultCategoryFilter,
+  );
   const taskDialog = useTaskDialog();
+
+  const handleSelectCategory = (cat: ScheduleCategory | 'all') => {
+    setCategoryFilter(cat);
+    selectCategory?.(cat);
+  };
+
+  const filteredClasses = useMemo(() => {
+    if (categoryFilter === 'all') return classes;
+    return classes.filter((cls) => (cls.category ?? 'school_teaching') === categoryFilter);
+  }, [classes, categoryFilter]);
+
   const pendingCount = tasks.filter((t) => !t.completed).length;
 
   return (
@@ -75,7 +99,7 @@ export function WeeklyDashboard() {
             </span>
           </div>
           <span className="text-display-lg font-bold text-secondary">
-            {classes.length}
+            {filteredClasses.length}
           </span>
           <span className="text-label-md font-bold uppercase tracking-wider text-secondary">
             {t('home.classesToday').replace('\n', ' ')}
@@ -98,10 +122,35 @@ export function WeeklyDashboard() {
         </Card>
       </div>
 
-      {/* Dải chọn ngày trong tuần */}
+      {/* Dải chọn ngày trong tuần & Bộ lọc theo loại lịch */}
       <section className="flex flex-col gap-3">
         <SectionHeader title={t('weekly.title')} />
         <WeekStrip days={weekDays} selectedDate={selectedDate} onSelect={selectDate} />
+        <div
+          data-testid="weekly-category-filter"
+          className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar"
+        >
+          {CATEGORY_FILTERS.map((cat) => {
+            const selected = categoryFilter === cat;
+            return (
+              <button
+                key={cat}
+                type="button"
+                data-testid={`weekly-category-filter-${cat}`}
+                onClick={() => handleSelectCategory(cat)}
+                aria-pressed={selected}
+                className={cn(
+                  'inline-flex min-h-11 items-center justify-center rounded-full px-4 text-body-sm font-medium transition-all whitespace-nowrap cursor-pointer',
+                  selected
+                    ? 'bg-primary text-on-primary font-bold shadow-xs'
+                    : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high',
+                )}
+              >
+                {t(`calendar.categories.${cat}` as TranslationKey)}
+              </button>
+            );
+          })}
+        </div>
       </section>
 
       {/* Bố cục 2 cột chính: Lớp dạy & Việc cá nhân */}
@@ -112,14 +161,14 @@ export function WeeklyDashboard() {
             title={t('weekly.teachingClasses')}
             icon="school"
           />
-          {classes.length === 0 ? (
+          {filteredClasses.length === 0 ? (
             <EmptyState
               icon="school"
               title={t('weekly.noClasses')}
             />
           ) : (
             <div className="flex flex-col gap-3">
-              {classes.map((cls) => (
+              {filteredClasses.map((cls) => (
                 <ClassCard key={cls.id} session={cls} />
               ))}
             </div>

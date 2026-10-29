@@ -1,13 +1,15 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { I18nProvider } from '@/lib/i18n';
 import { ServicesContext } from '@/lib/api/services-context';
+import { queryKeys } from '@/lib/query';
 import type { Note, Tag } from '@/types';
 import { NotesView } from './NotesView';
 import { NoteCard } from './NoteCard';
 import { NoteDialog } from './NoteDialog';
+import { readNoteIdFromSearch } from '../hooks/use-notes-view';
 
 vi.mock('@/components/ui/Dialog', () => ({
   Dialog: ({
@@ -46,13 +48,35 @@ const mockNotes: Note[] = [
 const mockTags: Tag[] = [{ id: 'tag-1', name: 'Giảng dạy', tone: 'blue', updatedAt: '2026-10-26T10:00:00Z' }];
 
 describe('NotesView Component (S3-FE-04 & S6-FE-01)', () => {
-  const renderWithProviders = (element: React.ReactElement, servicesOverride: Record<string, unknown> = {}) => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  const renderWithProviders = (
+    element: React.ReactElement,
+    servicesOverride: Record<string, unknown> = {},
+    seedCache = false,
+  ) => {
     const queryClient = new QueryClient({
       defaultOptions: {
         queries: { retry: false },
         mutations: { retry: false },
       },
     });
+
+    if (seedCache) {
+      queryClient.setQueryData(queryKeys.notes.infinite({ q: undefined, tagId: undefined }), {
+        pages: [
+          {
+            items: mockNotes,
+            deletedIds: [],
+            serverTime: '2026-10-26T10:00:00Z',
+            nextCursor: null,
+          },
+        ],
+        pageParams: [undefined],
+      });
+    }
 
     const defaultServices = {
       notes: {
@@ -149,5 +173,23 @@ describe('NotesView Component (S3-FE-04 & S6-FE-01)', () => {
     );
     expect(html).toContain('Giờ nhắc');
     expect(html).toContain('09:15');
+  });
+
+  it('reads noteId from /notes?noteId=<id> deep-link, highlights the target NoteCard and opens NoteDialog (SPEC-006 lines 27, 49)', () => {
+    expect(readNoteIdFromSearch('?noteId=note-1')).toBe('note-1');
+    expect(readNoteIdFromSearch('')).toBeNull();
+
+    vi.stubGlobal('window', {
+      location: { search: '?noteId=note-1' },
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    });
+
+    const html = renderWithProviders(<NotesView />, {}, true);
+    expect(html).toContain('data-note-id="note-1"');
+    expect(html).toContain('data-highlighted="true"');
+    expect(html).toContain('ring-2 ring-primary');
+    expect(html).toContain('data-testid="note-dialog"');
+    expect(html).toContain('Chuẩn bị bài học');
   });
 });

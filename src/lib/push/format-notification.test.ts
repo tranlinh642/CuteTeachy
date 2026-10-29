@@ -10,7 +10,7 @@ import {
   formatPushNotification,
 } from './format-notification';
 
-describe('formatPushNotification (S5-FE-02)', () => {
+describe('formatPushNotification (S5-FE-02 & S6-FE-02)', () => {
   describe('Full payload cases', () => {
     it('formats a complete task reminder payload correctly', () => {
       const payload = {
@@ -119,6 +119,51 @@ describe('formatPushNotification (S5-FE-02)', () => {
     it('falls back to reminder-general if neither id nor tag is given', () => {
       const result = formatPushNotification({});
       expect(result.tag).toBe('reminder-general');
+    });
+
+    it('synchronizes tag format (${type}-${targetId}-${remindAtMs}) with LocalReminderTicker when remindAt is provided', () => {
+      const remindAtIso = '2026-10-29T00:45:00.000Z';
+      const remindAtMs = new Date(remindAtIso).getTime();
+
+      const taskPush = formatPushNotification({
+        title: 'Nhắc nhở công việc: Chấm bài',
+        body: '08:00',
+        data: {
+          type: 'task',
+          targetId: 'task-10',
+          remindAt: remindAtIso,
+          url: '/tasks?date=2026-10-29',
+        },
+      });
+      expect(taskPush.tag).toBe(`task-task-10-${remindAtMs}`);
+
+      const sessionPush = formatPushNotification({
+        type: 'class_session',
+        sessionId: 'cs-20',
+        remindAt: remindAtIso,
+      });
+      expect(sessionPush.tag).toBe(`class_session-cs-20-${remindAtMs}`);
+
+      const notePush = formatPushNotification({
+        data: {
+          type: 'note',
+          noteId: 'note-30',
+          remindAt: remindAtMs,
+        },
+      });
+      expect(notePush.tag).toBe(`note-note-30-${remindAtMs}`);
+    });
+
+    it('prioritizes explicit payload.tag even when remindAt is present', () => {
+      const result = formatPushNotification({
+        tag: 'server-explicit-tag',
+        type: 'task',
+        id: 'task-10',
+        data: {
+          remindAt: '2026-10-29T00:45:00.000Z',
+        },
+      });
+      expect(result.tag).toBe('server-explicit-tag');
     });
   });
 
@@ -308,6 +353,9 @@ describe('formatPushNotification (S5-FE-02)', () => {
       expect(computeReminderTag('', '30')).toBe('reminder-30');
       expect(computeReminderTag(undefined, undefined, 'explicit-tag')).toBe('explicit-tag');
       expect(computeReminderTag(undefined, undefined, undefined)).toBe('reminder-general');
+      expect(computeReminderTag('task', '10', undefined, 1761698700000)).toBe(
+        'task-10-1761698700000',
+      );
     });
 
     it('computeReminderUrl works as expected across edge cases', () => {

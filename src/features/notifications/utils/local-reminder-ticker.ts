@@ -138,6 +138,43 @@ export function buildReminderTag(
   return `${type}-${targetId}-${remindAtMs}`;
 }
 
+/**
+ * Plays a gentle in-app reminder chime using Web Audio API.
+ * Safely wrapped in try/catch so missing APIs or autoplay restrictions never throw.
+ */
+export function playReminderChime(): void {
+  if (typeof window === 'undefined') return;
+  try {
+    const AudioContextClass =
+      window.AudioContext ??
+      (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!AudioContextClass) return;
+
+    const ctx = new AudioContextClass();
+    const oscillator = ctx.createOscillator();
+    const gainNode = ctx.createGain();
+
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(880, ctx.currentTime);
+
+    gainNode.gain.setValueAtTime(0.08, ctx.currentTime);
+    if (typeof gainNode.gain.exponentialRampToValueAtTime === 'function') {
+      gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+    }
+
+    oscillator.connect(gainNode);
+    gainNode.connect(ctx.destination);
+
+    oscillator.start();
+    oscillator.stop(ctx.currentTime + 0.25);
+    oscillator.onended = () => {
+      void Promise.resolve(ctx.close?.()).catch(() => {});
+    };
+  } catch {
+    // Ignore autoplay policy or unsupported audio context errors
+  }
+}
+
 export type MinimalStorage = Pick<Storage, 'getItem' | 'setItem'>;
 
 function getDefaultStorage(): MinimalStorage | null {
@@ -307,6 +344,7 @@ export function evaluateDueReminders({
 
 export interface RunReminderTickInput extends EvaluateDueRemindersInput {
   readonly invalidateNotifications?: () => Promise<unknown> | void;
+  readonly playChime?: () => void;
   readonly notificationPermission?: NotificationPermission;
   readonly visibilityState?: DocumentVisibilityState;
   readonly serviceWorkerReady?: Promise<Pick<ServiceWorkerRegistration, 'showNotification'>> | null;
@@ -316,6 +354,12 @@ export async function runReminderTick(input: RunReminderTickInput): Promise<DueR
   const newlyDue = evaluateDueReminders(input);
   if (newlyDue.length === 0) {
     return [];
+  }
+
+  try {
+    (input.playChime ?? playReminderChime)();
+  } catch {
+    // Ignore audio errors
   }
 
   if (input.invalidateNotifications) {
@@ -358,6 +402,8 @@ export async function runReminderTick(input: RunReminderTickInput): Promise<DueR
                   url: item.url,
                   type: item.type,
                   id: item.targetId,
+                  targetId: item.targetId,
+                  remindAt: new Date(item.remindAtMs).toISOString(),
                 },
               }),
             ),

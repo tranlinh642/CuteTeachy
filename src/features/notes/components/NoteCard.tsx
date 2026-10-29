@@ -10,6 +10,7 @@ import { useUpdateNote } from "../api";
 export interface NoteCardProps {
   readonly note: Note;
   readonly tags?: readonly Tag[];
+  readonly highlighted?: boolean;
   readonly onToggleItem?: (note: Note, itemId: ID) => void;
   readonly onEdit?: (note: Note) => void;
   readonly onDelete?: (note: Note) => void;
@@ -19,6 +20,7 @@ export interface NoteCardProps {
 export function NoteCard({
   note,
   tags = [],
+  highlighted = false,
   onToggleItem,
   onEdit,
   onDelete,
@@ -38,8 +40,11 @@ export function NoteCard({
       as="article"
       variant="elevated"
       padding="md"
+      data-note-id={note.id}
+      data-highlighted={highlighted ? "true" : undefined}
       className={cn(
         "group flex flex-col gap-3 transition-all hover:shadow-md",
+        highlighted && "ring-2 ring-primary",
         isCompleted && "opacity-60",
         className,
       )}
