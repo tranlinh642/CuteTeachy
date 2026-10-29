@@ -4,7 +4,7 @@
 
 **Blocked by:** 01 (S7-FE-01 — Hiển thị, Tạo/Sửa và Lọc theo 3 Loại lịch `ScheduleCategory`)
 
-**Status:** ready-for-agent
+**Status:** in-progress
 
 - [ ] Tạo service, hooks và mock handlers cho `/ai-assistant/messages` và `/ai-assistant/drafts/:messageId/apply`.
 - [ ] Xây dựng trang `/assistant` và nút mở nhanh `AiAssistantFabDrawer` trên màn hình Lịch / Thời khóa biểu.
