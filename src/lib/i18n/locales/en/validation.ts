@@ -27,4 +27,7 @@ export const errors: typeof ErrorsSchema = {
   idConflict: 'Identifier conflict detected',
   tagNameTaken: 'Tag name is already taken',
   timetableConflict: 'Schedule conflict with another timetable slot',
+  aiDraftAlreadyApplied: 'This AI schedule draft has already been applied',
+  aiProviderNotConfigured: 'AI Assistant is not configured on the server',
+  aiProviderError: 'Failed to connect to the AI service, please try again later',
 };
