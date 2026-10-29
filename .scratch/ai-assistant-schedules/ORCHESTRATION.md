@@ -25,5 +25,5 @@ flowchart LR
 | S7-BE-01 | done | ticket/s7-be-01-schedule-categories | Đã merge 09b7cb5 |
 | S7-BE-02 | in-progress | ticket/s7-be-02-ai-assistant-gemini | — |
 | S7-FE-01 | done | ticket/s7-fe-01-schedule-categories-ui | Đã merge 8300056 |
-| S7-FE-02 | in-progress | ticket/s7-fe-02-ai-assistant-ui | — |
+| S7-FE-02 | done | ticket/s7-fe-02-ai-assistant-ui | Đã merge 322c3fd |
 | S7-INT | ready-for-agent | ticket/s7-int-ai-assistant-schedules | Blocked by S7-BE-02, S7-FE-02, S6-INT |
