@@ -9,4 +9,11 @@ export const calendar: typeof Schema = {
   eventsCount: '{{count}} events',
   selectMonth: 'Select month',
   selectYear: 'Select year',
+  filterAll: 'All',
+  categories: {
+    all: 'All',
+    school_teaching: 'School class',
+    extra_teaching: 'Extra tutoring',
+    self_study: 'Self study',
+  },
 };

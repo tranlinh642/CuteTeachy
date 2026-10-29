@@ -8,7 +8,7 @@ import {
   type SessionOverride,
 } from './session-generator';
 
-describe('session-generator domain logic (SPEC-004)', () => {
+describe('session-generator domain logic (SPEC-004 & SPEC-007)', () => {
   const baseSlot: TimetableSlot = {
     id: 'slot-1',
     weekday: 1, // Monday
@@ -40,7 +40,6 @@ describe('session-generator domain logic (SPEC-004)', () => {
   });
 
   it('generates sessions across month boundary matching slot weekday and effective range', () => {
-    // Range from Mon 2026-10-26 to Sun 2026-11-08 (two weeks: 2 Mondays: 2026-10-26 and 2026-11-02)
     const sessions = generateClassSessions([baseSlot], [], [], '2026-10-26', '2026-11-08');
 
     expect(sessions).toHaveLength(2);
@@ -63,7 +62,6 @@ describe('session-generator domain logic (SPEC-004)', () => {
       effectiveTo: '2026-11-05',
     };
 
-    // Range includes Mondays: 2026-10-26 (before effectiveFrom), 2026-11-02 (within), 2026-11-09 (after effectiveTo)
     const sessions = generateClassSessions([boundedSlot], [], [], '2026-10-26', '2026-11-15');
 
     expect(sessions).toHaveLength(1);
@@ -110,10 +108,48 @@ describe('session-generator domain logic (SPEC-004)', () => {
     const sessions = generateClassSessions([baseSlot], [], [adhocSession], '2026-10-26', '2026-10-26');
 
     expect(sessions).toHaveLength(2);
-    // adhocSession starts at 07:00, baseSlot starts at 08:00 -> adhoc should be first
     expect(sessions[0]?.id).toBe('adhoc-1');
     expect(sessions[0]?.timetableSlotId).toBeNull();
     expect(sessions[1]?.id).toBe('cs_slot-1_2026-10-26');
+  });
+
+  it('inherits slot.category when generating ClassSession and allows override.category', () => {
+    const extraSlot: TimetableSlot = {
+      ...baseSlot,
+      id: 'slot-extra',
+      category: 'extra_teaching',
+    };
+
+    const sessionsWithoutOverride = generateClassSessions(
+      [extraSlot],
+      [],
+      [],
+      '2026-10-26',
+      '2026-10-26',
+    );
+    expect(sessionsWithoutOverride[0]?.category).toBe('extra_teaching');
+
+    const overrides: SessionOverride[] = [
+      {
+        timetableSlotId: 'slot-extra',
+        date: '2026-10-26',
+        category: 'self_study',
+        updatedAt: '2026-10-20T10:00:00.000Z',
+      },
+    ];
+    const sessionsWithOverride = generateClassSessions(
+      [extraSlot],
+      overrides,
+      [],
+      '2026-10-26',
+      '2026-10-26',
+    );
+    expect(sessionsWithOverride[0]?.category).toBe('self_study');
+  });
+
+  it('defaults category to school_teaching when slot or adhoc session has no explicit category', () => {
+    const sessions = generateClassSessions([baseSlot], [], [], '2026-10-26', '2026-10-26');
+    expect(sessions[0]?.category).toBe('school_teaching');
   });
 
   describe('checkSlotConflict', () => {

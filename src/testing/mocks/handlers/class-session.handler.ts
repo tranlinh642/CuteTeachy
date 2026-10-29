@@ -1,4 +1,10 @@
-import type { ClassSession, CreateClassSessionInput, UpdateClassSessionInput } from '@/types';
+import {
+  SCHEDULE_CATEGORIES,
+  type ClassSession,
+  type CreateClassSessionInput,
+  type ScheduleCategory,
+  type UpdateClassSessionInput,
+} from '@/types';
 import { ENDPOINTS } from '@/lib/api/endpoints';
 import {
   generateClassSessions,
@@ -19,6 +25,9 @@ import { nextId, nowISO } from './handler.utils';
 
 const CLASS_SESSION_BY_ID = ENDPOINTS.classSessions.byId(':id');
 const MAX_DATE_RANGE_DAYS = 42;
+
+const isValidCategory = (value: unknown): value is ScheduleCategory =>
+  typeof value === 'string' && (SCHEDULE_CATEGORIES as readonly string[]).includes(value);
 
 export const classSessionRoutes = [
   route('GET', ENDPOINTS.classSessions.root, (request, db) => {
@@ -89,7 +98,7 @@ export const classSessionRoutes = [
       return badRequest('Invalid request body', 'validation');
     }
 
-    const { date, startTime, endTime, subject, grade, room, tone, topic, prepItems, id } = body;
+    const { date, startTime, endTime, subject, grade, room, tone, category, topic, prepItems, id } = body;
 
     if (!date || !isValidISODate(date)) {
       return badRequest('date must be a valid YYYY-MM-DD string', 'validation');
@@ -107,6 +116,10 @@ export const classSessionRoutes = [
       return badRequest('subject must be between 1 and 120 characters', 'validation');
     }
 
+    if (category !== undefined && !isValidCategory(category)) {
+      return badRequest('category must be school_teaching, extra_teaching, or self_study', 'validation');
+    }
+
     // Buổi lẻ: timetableSlotId = null
     const adhocSession: ClassSession = {
       id: id ?? nextId('adhoc'),
@@ -118,6 +131,7 @@ export const classSessionRoutes = [
       startTime,
       endTime,
       tone: tone ?? 'mint',
+      category: category ?? 'school_teaching',
       topic: topic?.trim() || undefined,
       prepItems: prepItems ?? [],
       cancelled: false,
@@ -136,6 +150,10 @@ export const classSessionRoutes = [
       return badRequest('Invalid request body', 'validation');
     }
 
+    if (body.category !== undefined && !isValidCategory(body.category)) {
+      return badRequest('category must be school_teaching, extra_teaching, or self_study', 'validation');
+    }
+
     // Case 1: Ad-hoc session
     const adhocIndex = db.adhocSessions.findIndex((s) => s.id === id);
     if (adhocIndex !== -1) {
@@ -146,6 +164,7 @@ export const classSessionRoutes = [
         grade: body.grade !== undefined ? (body.grade?.trim() || undefined) : current.grade,
         room: body.room !== undefined ? (body.room?.trim() || null) : current.room,
         topic: body.topic !== undefined ? (body.topic?.trim() || undefined) : current.topic,
+        category: body.category ?? current.category ?? 'school_teaching',
         updatedAt: nowISO(),
       };
       db.adhocSessions[adhocIndex] = updated;
@@ -180,6 +199,7 @@ export const classSessionRoutes = [
         topic: body.topic !== undefined ? resolvedTopic : override.topic,
         prepItems: body.prepItems !== undefined ? body.prepItems : override.prepItems,
         cancelled: body.cancelled !== undefined ? body.cancelled : override.cancelled,
+        category: body.category !== undefined ? body.category : override.category,
         updatedAt: now,
       };
       db.sessionOverrides[overrideIndex] = updatedOverride;
@@ -191,6 +211,7 @@ export const classSessionRoutes = [
         topic: resolvedTopic,
         prepItems: body.prepItems ?? [],
         cancelled: body.cancelled ?? false,
+        category: body.category,
         updatedAt: now,
       };
       db.sessionOverrides.push(override);
@@ -206,6 +227,7 @@ export const classSessionRoutes = [
       startTime: slot.startTime,
       endTime: slot.endTime,
       tone: slot.tone,
+      category: override.category ?? slot.category ?? 'school_teaching',
       topic: override.topic,
       prepItems: override.prepItems ?? [],
       cancelled: override.cancelled ?? false,

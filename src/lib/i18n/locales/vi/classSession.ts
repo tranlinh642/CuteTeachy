@@ -4,6 +4,13 @@ export const classSession = {
   createAdHocTitle: 'Thêm buổi lẻ',
   slotGeneratedBadge: 'Tiết theo thời khoá biểu',
   adHocBadge: 'Dạy bù / dạy thay',
+  category: 'Loại lịch',
+  categories: {
+    all: 'Tất cả',
+    school_teaching: 'Lịch trên lớp',
+    extra_teaching: 'Lịch dạy thêm',
+    self_study: 'Lịch học thêm',
+  },
   subject: 'Môn học',
   grade: 'Lớp',
   room: 'Phòng học',

@@ -75,7 +75,7 @@ vi.mock('@tanstack/react-query', () => ({
   }),
 }));
 
-describe('SessionDetailDialog (S4-FE-03)', () => {
+describe('SessionDetailDialog (S4-FE-03 & S7-FE-01)', () => {
   const generatedSession: ClassSession = {
     id: 'cs_slot-1_2026-10-26',
     timetableSlotId: 'slot-1',
@@ -86,6 +86,7 @@ describe('SessionDetailDialog (S4-FE-03)', () => {
     startTime: '07:30',
     endTime: '09:00',
     tone: 'blue',
+    category: 'school_teaching',
     topic: 'Cấu tạo tế bào',
     prepItems: [
       { id: 'prep-1', label: 'Chuẩn bị kính hiển vi', done: false },
@@ -105,6 +106,7 @@ describe('SessionDetailDialog (S4-FE-03)', () => {
     startTime: '14:00',
     endTime: '15:30',
     tone: 'mint',
+    category: 'extra_teaching',
     topic: 'Quang hình học',
     prepItems: [{ id: 'prep-3', label: 'Mang thấu kính hội tụ', done: false }],
     cancelled: false,
@@ -125,13 +127,15 @@ describe('SessionDetailDialog (S4-FE-03)', () => {
   });
 
   describe('Slot-generated session details', () => {
-    it('renders subject, grade, room, and timetable slot badge', () => {
+    it('renders subject, grade, room, timetable slot badge, and ScheduleCategory badge', () => {
       const html = renderDialog(generatedSession);
 
       expect(html).toContain('Sinh học');
       expect(html).toContain('Lớp 10A1');
       expect(html).toContain('Phòng 302');
       expect(html).toContain('Tiết theo thời khoá biểu');
+      expect(html).toContain('Lịch trên lớp');
+      expect(html).toContain('data-testid="session-category-badge-school_teaching"');
       expect(html).toContain('Cấu tạo tế bào');
       expect(html).toContain('Chuẩn bị kính hiển vi');
       expect(html).toContain('In phiếu thực hành');
@@ -163,10 +167,12 @@ describe('SessionDetailDialog (S4-FE-03)', () => {
   });
 
   describe('Ad-hoc session details', () => {
-    it('renders ad-hoc badge and editable form fields', () => {
+    it('renders ad-hoc badge, ScheduleCategory badge/selector, and editable form fields', () => {
       const html = renderDialog(adhocSession);
 
       expect(html).toContain('Dạy bù / dạy thay');
+      expect(html).toContain('Lịch dạy thêm');
+      expect(html).toContain('data-testid="session-category-badge-extra_teaching"');
       expect(html).toContain('Dạy bù Vật lý');
       expect(html).toContain('Lớp 11B2');
       expect(html).toContain('Phòng 204');

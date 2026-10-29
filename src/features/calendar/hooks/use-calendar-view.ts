@@ -15,12 +15,13 @@ import {
   toISODate,
 } from '@/utils';
 import { useTranslation } from '@/lib/i18n';
-import type { ISODate } from '@/types';
+import type { ISODate, ScheduleCategory } from '@/types';
 
 export function useCalendarView() {
   const { localeTag } = useTranslation();
   const [currentDate, setCurrentDate] = useState<Date>(() => new Date());
   const [selectedDate, setSelectedDate] = useState<ISODate>(() => toISODate(new Date()));
+  const [selectedCategory, setSelectedCategory] = useState<ScheduleCategory | 'all'>('all');
 
   const year = currentDate.getFullYear();
   const monthIndex = currentDate.getMonth();
@@ -43,8 +44,24 @@ export function useCalendarView() {
   const classes = useMemo(() => classesQuery.data ?? [], [classesQuery.data]);
   const tasks = useMemo(() => tasksQuery.data ?? [], [tasksQuery.data]);
 
-  const markers = useMemo(() => countEventsByDate(classes, tasks), [classes, tasks]);
-  const agenda = useMemo(() => buildAgenda(classes, tasks, selectedDate), [classes, tasks, selectedDate]);
+  const filteredClasses = useMemo(() => {
+    if (selectedCategory === 'all') return classes;
+    return classes.filter((session) => (session.category ?? 'school_teaching') === selectedCategory);
+  }, [classes, selectedCategory]);
+
+  const filteredTasks = useMemo(() => {
+    if (selectedCategory === 'all') return tasks;
+    return [];
+  }, [tasks, selectedCategory]);
+
+  const markers = useMemo(
+    () => countEventsByDate(filteredClasses, filteredTasks),
+    [filteredClasses, filteredTasks],
+  );
+  const agenda = useMemo(
+    () => buildAgenda(filteredClasses, filteredTasks, selectedDate),
+    [filteredClasses, filteredTasks, selectedDate],
+  );
 
   const nextMonth = () => setCurrentDate((d) => addMonths(d, 1));
   const previousMonth = () => setCurrentDate((d) => addMonths(d, -1));
@@ -67,6 +84,8 @@ export function useCalendarView() {
     selectedDate,
     selectedDateLabel,
     selectDate: setSelectedDate,
+    selectedCategory,
+    selectCategory: setSelectedCategory,
     goToToday,
     nextMonth,
     previousMonth,
