@@ -5,10 +5,13 @@ import type { ReactNode } from 'react';
 import { OfflineIndicator } from '@/components/feedback';
 import { LocalReminderTicker, NotificationBell } from '@/features/notifications';
 import { MobileBottomNav } from './MobileBottomNav';
+import { NAV_ITEMS } from './nav-items';
 import { Sidebar } from './Sidebar';
 import { Topbar } from './Topbar';
 
 export const MAIN_CONTENT_ID = 'main-content';
+export const ASSISTANT_NAV_HREF =
+  NAV_ITEMS.find((item) => item.href === '/assistant')?.href ?? '/assistant';
 
 export interface AppShellProps {
   readonly sidebarAction?: ReactNode;

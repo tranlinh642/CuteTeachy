@@ -11,3 +11,4 @@ export * from './inspiration.interface';
 export * from './agenda.interface';
 export * from './push.interface';
 export * from './notification.interface';
+export * from './ai-assistant.interface';

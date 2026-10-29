@@ -14,6 +14,7 @@ import { useTranslation, type TranslationKey } from '@/lib/i18n';
 import { SCHEDULE_CATEGORIES, type ClassSession, type ScheduleCategory } from '@/types';
 import { Button, Card, EmptyState, IconButton, SectionHeader } from '@/components/ui';
 import { TaskDialog, TaskItem, useTaskDialog } from '@/features/tasks';
+import { AiAssistantFabDrawer } from '@/features/ai-assistant';
 import { ClassCard } from './ClassCard';
 import { SessionDetailDialog } from './SessionDetailDialog';
 import { AdHocSessionDialog } from './AdHocSessionDialog';
@@ -279,6 +280,9 @@ export function CalendarView({ defaultCategoryFilter = 'all' }: CalendarViewProp
         defaultDate={selectedDate}
         defaultCategory={categoryFilter === 'all' ? 'school_teaching' : categoryFilter}
       />
+
+      {/* Nút mở nhanh Trợ lý AI */}
+      <AiAssistantFabDrawer />
     </div>
   );
 }

@@ -57,4 +57,8 @@ export const ENDPOINTS = {
     markRead: (id: string) => `/notifications/${id}/read`,
     readAll: '/notifications/read-all',
   },
+  aiAssistant: {
+    messages: '/ai-assistant/messages',
+    applyDraft: (messageId: string) => `/ai-assistant/drafts/${messageId}/apply`,
+  },
 } as const;

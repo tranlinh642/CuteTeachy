@@ -1,4 +1,5 @@
 import type { TranslationSchema } from '../../translation.types';
+import { aiAssistant } from './aiAssistant';
 import { auth } from './auth';
 import { calendar } from './calendar';
 import { classSession } from './classSession';
@@ -28,6 +29,7 @@ export const en: TranslationSchema = {
   calendar,
   classSession,
   timetable,
+  aiAssistant,
   notes,
   notifications,
   tasks,

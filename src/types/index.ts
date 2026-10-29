@@ -17,3 +17,4 @@ export * from './interfaces/inspiration.interface';
 export * from './interfaces/agenda.interface';
 export * from './interfaces/push.interface';
 export * from './interfaces/notification.interface';
+export * from './interfaces/ai-assistant.interface';
