@@ -25,4 +25,7 @@ export const errors = {
   idConflict: 'Mã định danh bị trùng lặp',
   tagNameTaken: 'Tên thẻ đã được sử dụng',
   timetableConflict: 'Trùng lịch với tiết dạy khác trong thời khoá biểu',
+  aiDraftAlreadyApplied: 'Bản nháp lịch này đã được áp dụng trước đó',
+  aiProviderNotConfigured: 'Trợ lý AI chưa được cấu hình trên máy chủ',
+  aiProviderError: 'Không thể kết nối tới dịch vụ AI, vui lòng thử lại sau',
 };
