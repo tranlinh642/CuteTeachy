@@ -13,6 +13,7 @@ import {
   computeNoteRemindAt,
   computeTaskRemindAt,
   evaluateDueReminders,
+  playReminderChime,
   runReminderTick,
 } from '../utils/local-reminder-ticker';
 import { LocalReminderTicker } from './LocalReminderTicker';
@@ -224,10 +225,11 @@ describe('LocalReminderTicker & Reminder Calculation (SPEC-006 S6-FE-02)', () =>
       expect(secondRun).toHaveLength(0);
     });
 
-    it('invalidates notifications query and triggers Service Worker showNotification with matching tag when tab is hidden and permission is granted', async () => {
+    it('invalidates notifications query, plays gentle chime, and triggers Service Worker showNotification with matching tag when tab is hidden and permission is granted', async () => {
       const now = new Date('2026-10-29T00:45:10.000Z');
       const remindAtMs = new Date('2026-10-29T00:45:00.000Z').getTime();
       const invalidateSpy = vi.fn().mockResolvedValue(undefined);
+      const playChimeSpy = vi.fn();
       const showNotificationSpy = vi.fn().mockResolvedValue(undefined);
 
       const newlyDue = await runReminderTick({
@@ -240,6 +242,7 @@ describe('LocalReminderTicker & Reminder Calculation (SPEC-006 S6-FE-02)', () =>
         now,
         storage: storageAdapter,
         invalidateNotifications: invalidateSpy,
+        playChime: playChimeSpy,
         notificationPermission: 'granted',
         visibilityState: 'hidden',
         serviceWorkerReady: Promise.resolve({
@@ -248,6 +251,7 @@ describe('LocalReminderTicker & Reminder Calculation (SPEC-006 S6-FE-02)', () =>
       });
 
       expect(newlyDue).toHaveLength(1);
+      expect(playChimeSpy).toHaveBeenCalledTimes(1);
       expect(invalidateSpy).toHaveBeenCalledTimes(1);
       expect(showNotificationSpy).toHaveBeenCalledTimes(1);
       expect(showNotificationSpy).toHaveBeenCalledWith(
@@ -262,6 +266,45 @@ describe('LocalReminderTicker & Reminder Calculation (SPEC-006 S6-FE-02)', () =>
           }),
         }),
       );
+    });
+
+    it('plays gentle chime via Web Audio API safely in playReminderChime without throwing (SPEC-006 line 20)', () => {
+      const startSpy = vi.fn();
+      const stopSpy = vi.fn();
+      const connectSpy = vi.fn();
+
+      class MockAudioContext {
+        currentTime = 0;
+        destination = {};
+        createOscillator() {
+          return {
+            type: 'sine',
+            frequency: { setValueAtTime: vi.fn() },
+            connect: connectSpy,
+            start: startSpy,
+            stop: stopSpy,
+            onended: null,
+          };
+        }
+        createGain() {
+          return {
+            gain: {
+              setValueAtTime: vi.fn(),
+              exponentialRampToValueAtTime: vi.fn(),
+            },
+            connect: connectSpy,
+          };
+        }
+        close = vi.fn().mockResolvedValue(undefined);
+      }
+
+      vi.stubGlobal('window', {
+        AudioContext: MockAudioContext,
+      });
+
+      expect(() => playReminderChime()).not.toThrow();
+      expect(startSpy).toHaveBeenCalledTimes(1);
+      expect(stopSpy).toHaveBeenCalledTimes(1);
     });
   });
 

@@ -18,10 +18,13 @@ import { addDays, toISODate } from '@/utils';
 import {
   DEFAULT_TIME_ZONE,
   TICKER_INTERVAL_MS,
+  playReminderChime,
   runReminderTick,
   type DueReminderItem,
   type LocalReminderType,
 } from '../utils/local-reminder-ticker';
+
+export { playReminderChime };
 
 export interface LocalReminderTickerProps {
   readonly isAuthenticatedOverride?: boolean;
@@ -111,6 +114,7 @@ function LocalReminderTickerConnected({
       leadMinutes,
       timeZone,
       locale: effectiveLocale,
+      playChime: playReminderChime,
       invalidateNotifications: () =>
         queryClient.invalidateQueries({ queryKey: queryKeys.notifications.all }),
     }).then((newlyDue) => {

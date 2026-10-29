@@ -49,18 +49,13 @@ export function useCalendarView() {
     return classes.filter((session) => (session.category ?? 'school_teaching') === selectedCategory);
   }, [classes, selectedCategory]);
 
-  const filteredTasks = useMemo(() => {
-    if (selectedCategory === 'all') return tasks;
-    return [];
-  }, [tasks, selectedCategory]);
-
   const markers = useMemo(
-    () => countEventsByDate(filteredClasses, filteredTasks),
-    [filteredClasses, filteredTasks],
+    () => countEventsByDate(filteredClasses, tasks),
+    [filteredClasses, tasks],
   );
   const agenda = useMemo(
-    () => buildAgenda(filteredClasses, filteredTasks, selectedDate),
-    [filteredClasses, filteredTasks, selectedDate],
+    () => buildAgenda(filteredClasses, tasks, selectedDate),
+    [filteredClasses, tasks, selectedDate],
   );
 
   const nextMonth = () => setCurrentDate((d) => addMonths(d, 1));
