@@ -4,7 +4,7 @@
 
 **Blocked by:** 01 (S6-FE-01 — Giờ nhắc Ghi chú, Xin quyền iOS/Android & Nút Gửi thông báo thử)
 
-**Status:** ready-for-agent
+**Status:** in-progress
 
 - [ ] Tạo service, hooks và mock handlers cho `/notifications`, `/notifications/:id/read`, `/notifications/read-all`.
 - [ ] Đặt `NotificationBell` lên thanh Topbar trong `AppShell`, hiển thị badge `unreadCount`, popover/drawer danh sách thông báo, nút đánh dấu đã đọc từng mục hoặc tất cả, bấm vào điều hướng đúng `url`.
