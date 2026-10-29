@@ -4,9 +4,9 @@
 
 **Blocked by:** 01 (S6-FE-01 — Giờ nhắc Ghi chú, Xin quyền iOS/Android & Nút Gửi thông báo thử)
 
-**Status:** in-progress
+**Status:** done
 
-- [ ] Tạo service, hooks và mock handlers cho `/notifications`, `/notifications/:id/read`, `/notifications/read-all`.
-- [ ] Đặt `NotificationBell` lên thanh Topbar trong `AppShell`, hiển thị badge `unreadCount`, popover/drawer danh sách thông báo, nút đánh dấu đã đọc từng mục hoặc tất cả, bấm vào điều hướng đúng `url`.
-- [ ] Xây dựng `LocalReminderTicker` kiểm tra định kỳ các `Task`, `ClassSession`, `Note` sắp đến hạn theo `reminderLeadMinutes`, bật Toast/Banner nổi trong ứng dụng đúng thời điểm nhắc mà không báo trùng (dùng chung định dạng `tag` với Service Worker).
-- [ ] Unit test cho `NotificationBell` và `LocalReminderTicker`; `pnpm check-types`, `pnpm lint`, `pnpm test` xanh.
+- [x] Tạo service, hooks và mock handlers cho `/notifications`, `/notifications/:id/read`, `/notifications/read-all`.
+- [x] Đặt `NotificationBell` lên thanh Topbar trong `AppShell`, hiển thị badge `unreadCount`, popover/drawer danh sách thông báo, nút đánh dấu đã đọc từng mục hoặc tất cả, bấm vào điều hướng đúng `url`.
+- [x] Xây dựng `LocalReminderTicker` kiểm tra định kỳ các `Task`, `ClassSession`, `Note` sắp đến hạn theo `reminderLeadMinutes`, bật Toast/Banner nổi trong ứng dụng đúng thời điểm nhắc mà không báo trùng (dùng chung định dạng `tag` với Service Worker).
+- [x] Unit test cho `NotificationBell` và `LocalReminderTicker`; `pnpm check-types`, `pnpm lint`, `pnpm test` xanh.

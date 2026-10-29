@@ -23,5 +23,5 @@ flowchart LR
 | S6-BE-01 | done | ticket/s6-be-01-note-reminders-midnight | Đã merge 5a11735 |
 | S6-BE-02 | in-progress | ticket/s6-be-02-in-app-notifications | — |
 | S6-FE-01 | done | ticket/s6-fe-01-note-remind-mobile-push | Đã merge bfa5ac8 |
-| S6-FE-02 | in-progress | ticket/s6-fe-02-notification-bell-ticker | — |
+| S6-FE-02 | done | ticket/s6-fe-02-notification-bell-ticker | Đã merge 2269809 |
 | S6-INT | ready-for-agent | ticket/s6-int-dual-layer-notifications | Blocked by S6-BE-02, S6-FE-02 |
