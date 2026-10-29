@@ -52,4 +52,9 @@ export const ENDPOINTS = {
     subscriptions: '/push/subscriptions',
     testSubscription: '/push/subscriptions/test',
   },
+  notifications: {
+    root: '/notifications',
+    markRead: (id: string) => `/notifications/${id}/read`,
+    readAll: '/notifications/read-all',
+  },
 } as const;

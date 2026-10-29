@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '@/lib/query';
 import {
   formatTeacherDisplayName,
   getAvatarName,
@@ -40,6 +42,7 @@ export function ProfileView() {
   const setThemePreference = usePreferencesStore((s) => s.setThemePreference);
 
   const { push: pushService } = useServices();
+  const queryClient = useQueryClient();
   const { data: settings } = useSettings();
   const updateSettings = useUpdateSettings();
   const pushNotification = usePushNotification();
@@ -183,6 +186,7 @@ export function ProfileView() {
           ? () => pushNotification.sendTestNotification()
           : () => pushService.sendTestNotification();
       const res = await sendFn();
+      void queryClient.invalidateQueries({ queryKey: queryKeys.notifications.all });
       if (res.sent > 0) {
         setTestPushMessage(t('push.settings.testSuccessSent', { sent: res.sent }));
       } else {

@@ -4,6 +4,7 @@ import { classRoutes } from './class.handler';
 import { classSessionRoutes } from './class-session.handler';
 import { inspirationRoutes } from './inspiration.handler';
 import { noteRoutes } from './note.handler';
+import { notificationRoutes } from './notification.handler';
 import { settingsRoutes } from './settings.handler';
 import { tagRoutes } from './tag.handler';
 import { taskRoutes } from './task.handler';
@@ -14,6 +15,7 @@ export const mockRoutes: readonly MockRoute[] = [
   ...authRoutes,
   ...settingsRoutes,
   ...pushRoutes,
+  ...notificationRoutes,
   ...taskRoutes,
   ...noteRoutes,
   ...tagRoutes,
