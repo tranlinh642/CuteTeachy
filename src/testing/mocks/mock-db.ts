@@ -1,4 +1,5 @@
 import type {
+  AiChatMessage,
   ClassSession,
   CreatePushSubscriptionInput,
   InAppNotification,
@@ -12,6 +13,7 @@ import type {
 } from '@/types';
 import type { SessionOverride } from '@/utils';
 import type { SoftDeletedRecord } from './mock-sync';
+import { seedAiMessages } from './seed/ai-assistant.seed';
 import { seedClasses } from './seed/class.seed';
 import { seedInspirations } from './seed/inspiration.seed';
 import { seedNotes } from './seed/note.seed';
@@ -41,6 +43,7 @@ export interface MockDb {
   classes: ClassSession[];
   inspirations: Inspiration[];
   notifications: InAppNotification[];
+  aiMessages: AiChatMessage[];
   pushSubscriptions?: CreatePushSubscriptionInput[];
   tombstones?: {
     tags: SoftDeletedRecord[];
@@ -70,6 +73,7 @@ export const createMockDb = (today: Date = new Date()): MockDb => {
     classes,
     inspirations: seedInspirations(),
     notifications: seedNotifications(context),
+    aiMessages: seedAiMessages(context),
     pushSubscriptions: [],
     tombstones: {
       tags: [],

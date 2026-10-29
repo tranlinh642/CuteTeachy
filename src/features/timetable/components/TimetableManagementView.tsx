@@ -6,6 +6,7 @@ import { useTranslation, type TranslationKey } from '@/lib/i18n';
 import { Button, ConfirmDialog, EmptyState, IconButton } from '@/components/ui';
 import { SCHEDULE_CATEGORIES, type ScheduleCategory, type TimetableSlot } from '@/types';
 import { timeToMinutes, toISODate } from '@/utils';
+import { AiAssistantFabDrawer } from '@/features/ai-assistant';
 import { useDeleteTimetableSlot, useTimetableSlots } from '../api';
 import { TimetableSlotCard } from './TimetableSlotCard';
 import { TimetableSlotDialog } from './TimetableSlotDialog';
@@ -305,6 +306,9 @@ export function TimetableManagementView({
         destructive={!isDeletingStartedSlot}
         loading={deleteSlot.isPending}
       />
+
+      {/* Nút mở nhanh Trợ lý AI */}
+      <AiAssistantFabDrawer />
     </div>
   );
 }

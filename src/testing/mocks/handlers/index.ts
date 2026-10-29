@@ -1,4 +1,5 @@
 import type { MockRoute } from '../mock-router';
+import { aiAssistantRoutes } from './ai-assistant.handler';
 import { authRoutes } from './auth.handler';
 import { classRoutes } from './class.handler';
 import { classSessionRoutes } from './class-session.handler';
@@ -16,6 +17,7 @@ export const mockRoutes: readonly MockRoute[] = [
   ...settingsRoutes,
   ...pushRoutes,
   ...notificationRoutes,
+  ...aiAssistantRoutes,
   ...taskRoutes,
   ...noteRoutes,
   ...tagRoutes,

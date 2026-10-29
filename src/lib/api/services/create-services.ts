@@ -10,6 +10,7 @@ import { createTaskService } from './task.service';
 import { createTimetableSlotService } from './timetable-slot.service';
 import { createPushService } from './push.service';
 import { createNotificationService } from './notification.service';
+import { createAiAssistantService } from './ai-assistant.service';
 
 export const createServices = (http: AxiosInstance) => ({
   auth: createAuthService(http),
@@ -23,6 +24,7 @@ export const createServices = (http: AxiosInstance) => ({
   inspirations: createInspirationService(http),
   push: createPushService(http),
   notifications: createNotificationService(http),
+  aiAssistant: createAiAssistantService(http),
 });
 
 export type Services = ReturnType<typeof createServices>;

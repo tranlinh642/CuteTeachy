@@ -1,3 +1,4 @@
+import { aiAssistant } from './aiAssistant';
 import { auth } from './auth';
 import { calendar } from './calendar';
 import { classSession } from './classSession';
@@ -31,6 +32,7 @@ export const vi = {
   calendar,
   classSession,
   timetable,
+  aiAssistant,
   notes,
   notifications,
   tasks,

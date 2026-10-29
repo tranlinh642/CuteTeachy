@@ -10,4 +10,5 @@ export * from './class-session.service';
 export * from './inspiration.service';
 export * from './push.service';
 export * from './notification.service';
+export * from './ai-assistant.service';
 export * from './create-services';
