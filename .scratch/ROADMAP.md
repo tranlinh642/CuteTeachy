@@ -8,6 +8,8 @@ Thứ tự feature và nơi điều phối. Coordinator đọc file này để b
 | 2 | content-sync | SPEC-003 | [`content-sync/ORCHESTRATION.md`](content-sync/ORCHESTRATION.md) | auth BE-03, BE-04, FE-01, FE-03 |
 | 3 | timetable | SPEC-004 | [`timetable/ORCHESTRATION.md`](timetable/ORCHESTRATION.md) | S3-BE-01, S3-BE-02, S3-FE-01 |
 | 4 | push-reminders | SPEC-005 | [`push-reminders/ORCHESTRATION.md`](push-reminders/ORCHESTRATION.md) | auth BE-04, S3-BE-02, S3-BE-03, S3-FE-05, S4-BE-02 |
+| 5 | dual-layer-notifications | SPEC-006 | [`dual-layer-notifications/ORCHESTRATION.md`](dual-layer-notifications/ORCHESTRATION.md) | SPEC-003, SPEC-004, SPEC-005 |
+| 6 | ai-assistant-schedules | SPEC-007 | [`ai-assistant-schedules/ORCHESTRATION.md`](ai-assistant-schedules/ORCHESTRATION.md) | SPEC-003, SPEC-004, SPEC-006 |
 
 Ticket có blocker ở feature khác chỉ được giao khi blocker đó đã `done` **và** đã merge về branch mà integration branch của feature mới tách ra.
 

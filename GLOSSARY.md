@@ -33,14 +33,28 @@ Bộ mã màu thiết kế pastel dành cho giáo viên nam, sử dụng tông *
 ### Smart Default Theme (Theme mặc định thông minh)
 Cơ chế tự động chuyển đổi bảng màu giao diện chủ đạo theo `gender` của người dùng khi cập nhật hồ sơ (chỉ tự động reset về `'auto'` khi giới tính thay đổi sang giá trị khác `newGender !== prevGender`), đồng thời bảo toàn lựa chọn tùy chỉnh thủ công nếu chỉ thay đổi thông tin cá nhân khác.
 
-### Timetable Slot (Tiết trong thời khoá biểu)
-Một tiết dạy lặp lại hằng tuần của giáo viên: thứ trong tuần, giờ bắt đầu–kết thúc, môn, lớp, phòng, màu, và khoảng thời gian hiệu lực.
+### Timetable Slot (Khung thời khoá biểu)
+Một mục lịch lặp lại hằng tuần của giáo viên: loại lịch (`Schedule Category`), thứ trong tuần, giờ bắt đầu–kết thúc, môn/nội dung, lớp, phòng/địa điểm, màu, và khoảng thời gian hiệu lực.
 _Avoid_: class, lịch cố định
 
-### Class Session (Tiết dạy)
-Một lần dạy cụ thể vào một ngày, sinh ra từ một Timetable Slot hoặc được thêm riêng (dạy bù). Có thể mang nội dung riêng của buổi đó (chủ đề, việc cần chuẩn bị) hoặc bị huỷ mà không ảnh hưởng các buổi khác.
+### Class Session (Buổi lịch / Tiết lịch)
+Một buổi diễn ra cụ thể vào một ngày, sinh ra từ một Timetable Slot hoặc được thêm riêng (lịch lẻ / dạy bù). Có thể thuộc một trong các `Schedule Category`, mang nội dung riêng của buổi đó (chủ đề, việc cần chuẩn bị) hoặc bị huỷ mà không ảnh hưởng các buổi khác.
 _Avoid_: class (khi nói về một buổi), lớp
 
+### Schedule Category (Phân loại lịch)
+Mục đích nghiệp vụ của một Timetable Slot hoặc Class Session trên trục thời gian của giáo viên:
+- `school_teaching` (Lịch trên lớp): Tiết dạy chính khoá tại trường.
+- `extra_teaching` (Lịch dạy thêm): Ca dạy thêm bên ngoài hoặc phụ đạo riêng.
+- `self_study` (Lịch học thêm của giáo viên): Buổi học nâng cao, bồi dưỡng chuyên môn hoặc lớp học cá nhân của chính giáo viên.
+_Avoid_: loại tiết, category (khi không nói rõ là của Task hay Schedule)
+
 ### Reminder (Lời nhắc)
-Thông báo push gửi tới thiết bị của giáo viên trước giờ bắt đầu của một Task có giờ hoặc một Class Session, theo số phút nhắc trước mà giáo viên đã chọn.
-_Avoid_: notification (khi nói về nghiệp vụ nhắc việc), alarm
+Thông báo gửi tới giáo viên trước giờ diễn ra của một Task có giờ, một Class Session, hoặc một Note có hạn (`dueDate` kèm giờ nhắc hoặc đầu ngày), thông qua hai kênh bổ trợ nhau: In-App Notification (ngay trong ứng dụng) và Web Push (tới thiết bị nền).
+_Avoid_: alarm
+
+### In-App Notification (Thông báo trong ứng dụng)
+Bản ghi thông báo hiển thị tại Trung tâm Thông báo (biểu tượng Chuông) và qua banner/toast trực tiếp khi giáo viên đang mở ứng dụng, lưu trạng thái đã đọc/chưa đọc (`readAt`) để đảm bảo giáo viên không bỏ lỡ lời nhắc ngay cả khi thiết bị chặn Web Push.
+
+### AI Schedule Draft (Bản nháp lịch từ Trợ lý AI)
+Danh sách các mục lịch (`Timetable Slot`, `Class Session`, hoặc `Task`) do Trợ lý AI bóc tách từ ảnh chụp thời khoá biểu hoặc tin nhắn văn bản của giáo viên, hiển thị dưới dạng thẻ xem trước để giáo viên kiểm tra, chỉnh sửa và xác nhận trước khi lưu chính thức vào Account.
+_Avoid_: auto-import, lịch tự động
