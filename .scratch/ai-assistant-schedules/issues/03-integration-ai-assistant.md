@@ -4,7 +4,7 @@
 
 **Blocked by:** S7-BE-02, S7-FE-02, S6-INT
 
-**Status:** ready-for-agent
+**Status:** in-progress
 
 - [ ] Khớp hoàn toàn contract HTTP giữa `CuteTeachy-FE` và `CuteTeachy-BE` cho `ScheduleCategory` và `/ai-assistant/*`.
 - [ ] Toàn bộ unit test và e2e test ở cả 2 repo đều xanh (`pnpm check-types`, `pnpm lint`, `pnpm test`, `pnpm test:e2e`).
