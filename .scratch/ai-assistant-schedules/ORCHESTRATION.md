@@ -22,8 +22,8 @@ flowchart LR
 
 | Ticket | Status | Branch | Ghi chú |
 | --- | --- | --- | --- |
-| S7-BE-01 | ready-for-agent | ticket/s7-be-01-schedule-categories | Blocked by S6-BE-01 |
+| S7-BE-01 | in-progress | ticket/s7-be-01-schedule-categories | — |
 | S7-BE-02 | ready-for-agent | ticket/s7-be-02-ai-assistant-gemini | Blocked by S7-BE-01 |
-| S7-FE-01 | ready-for-agent | ticket/s7-fe-01-schedule-categories-ui | — |
+| S7-FE-01 | in-progress | ticket/s7-fe-01-schedule-categories-ui | — |
 | S7-FE-02 | ready-for-agent | ticket/s7-fe-02-ai-assistant-ui | Blocked by S7-FE-01 |
 | S7-INT | ready-for-agent | ticket/s7-int-ai-assistant-schedules | Blocked by S7-BE-02, S7-FE-02, S6-INT |

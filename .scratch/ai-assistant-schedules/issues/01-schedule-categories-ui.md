@@ -4,7 +4,7 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** in-progress
 
 - [ ] Mở rộng kiểu `TimetableSlot` và `ClassSession` trên FE với `category: 'school_teaching' | 'extra_teaching' | 'self_study'` (mặc định `'school_teaching'`).
 - [ ] Bổ sung bộ chọn `ScheduleCategory` vào `TimetableSlotDialog` và `AdHocSessionDialog`.
