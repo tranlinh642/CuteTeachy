@@ -49,9 +49,16 @@ export function PushPermissionDialog({
 
           <div className="rounded-2xl bg-surface-container-low border border-primary/20 p-4 flex items-start gap-3">
             <Icon name="checklist" size={24} className="text-primary shrink-0 mt-0.5" />
-            <p className="text-body-sm text-on-surface-variant font-medium leading-relaxed">
-              {t('push.dialog.iosGuideInstruction')}
-            </p>
+            <div className="flex flex-col gap-2">
+              <p className="text-body-sm text-on-surface-variant font-medium leading-relaxed">
+                {t('push.dialog.iosGuideInstruction')}
+              </p>
+              <ol className="flex flex-col gap-1.5 text-body-sm text-on-surface list-decimal list-inside">
+                <li>{t('push.dialog.iosStep1')}</li>
+                <li>{t('push.dialog.iosStep2')}</li>
+                <li>{t('push.dialog.iosStep3')}</li>
+              </ol>
+            </div>
           </div>
         </div>
       </Dialog>

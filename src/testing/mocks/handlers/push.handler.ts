@@ -1,6 +1,7 @@
 import { ENDPOINTS } from '@/lib/api/endpoints';
 import type { CreatePushSubscriptionInput, DeletePushSubscriptionInput } from '@/types';
 import { badRequest, created, noContent, ok, route, type MockRoute } from '../mock-router';
+import { nowISO } from './handler.utils';
 
 export const pushRoutes: readonly MockRoute[] = [
   route(
@@ -36,5 +37,32 @@ export const pushRoutes: readonly MockRoute[] = [
     db.pushSubscriptions = db.pushSubscriptions ?? [];
     db.pushSubscriptions = db.pushSubscriptions.filter((sub) => sub.endpoint !== body.endpoint);
     return noContent();
+  }),
+
+  route('POST', ENDPOINTS.push.testSubscription, (_request, db) => {
+    const subs = db.pushSubscriptions ?? [];
+    const sent = db.settings?.pushEnabled !== false ? subs.length : 0;
+
+    const maybeNotifications = (db as unknown as { notifications?: unknown[] }).notifications;
+    if (Array.isArray(maybeNotifications)) {
+      maybeNotifications.unshift({
+        id: `notif-test-${Date.now()}`,
+        accountId: db.user?.id ?? 'u-1',
+        type: 'system',
+        targetId: null,
+        title: 'Thông báo thử nghiệm từ CuteTeachy',
+        body: 'Thiết bị của bạn đã kết nối hệ thống thông báo thành công!',
+        url: '/',
+        data: { test: true },
+        readAt: null,
+        createdAt: nowISO(),
+      });
+    }
+
+    return ok({
+      sent,
+      failed: 0,
+      inAppCreated: true,
+    });
   }),
 ];

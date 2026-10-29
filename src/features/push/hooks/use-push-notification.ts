@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useServices } from '@/lib/api';
 import { useSettings, useUpdateSettings } from '@/features/settings';
+import type { TestPushNotificationResponse } from '@/types';
 import {
   evaluatePushDecision,
   isIosDevice,
@@ -135,7 +136,7 @@ export function usePushNotification(options: UsePushNotificationOptions = {}) {
     setIsSubscribing(true);
 
     try {
-      // 1. Request permission
+      // 1. Request permission directly inside user gesture stack
       const reqPermission = await Notification.requestPermission();
       setPermission(reqPermission);
 
@@ -188,6 +189,10 @@ export function usePushNotification(options: UsePushNotificationOptions = {}) {
     }
   }, [push]);
 
+  const sendTestNotification = useCallback(async (): Promise<TestPushNotificationResponse> => {
+    return push.sendTestNotification();
+  }, [push]);
+
   return {
     isSupported,
     isIos,
@@ -204,5 +209,6 @@ export function usePushNotification(options: UsePushNotificationOptions = {}) {
     closeDialog,
     confirmPermission,
     unsubscribeDevice,
+    sendTestNotification,
   };
 }

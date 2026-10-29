@@ -1,4 +1,4 @@
-import type { ID, ISODate, Timestamps } from './common.interface';
+import type { ID, ISODate, TimeOfDay, Timestamps } from './common.interface';
 
 export interface ChecklistItem {
   readonly id: ID;
@@ -15,11 +15,17 @@ export interface Note extends Timestamps {
   readonly imageUrl?: string;
   readonly tagIds: readonly ID[];
   readonly dueDate?: ISODate;
+  readonly remindTime?: TimeOfDay | null;
   readonly completed: boolean;
 }
 
 export type CreateNoteInput = Pick<Note, 'title'> &
-  Partial<Pick<Note, 'content' | 'checklist' | 'imageUrl' | 'tagIds' | 'dueDate' | 'completed'>> & {
+  Partial<
+    Pick<
+      Note,
+      'content' | 'checklist' | 'imageUrl' | 'tagIds' | 'dueDate' | 'remindTime' | 'completed'
+    >
+  > & {
     id?: ID;
   };
 

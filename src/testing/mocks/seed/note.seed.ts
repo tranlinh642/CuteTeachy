@@ -11,6 +11,7 @@ export const seedNotes = ({ day, now }: SeedContext): Note[] => {
       content: 'Lấy cốc thủy tinh, phẩm màu và phiếu bài tập cho tiết thí nghiệm chiều nay. Nhớ kiểm tra kính bảo hộ!',
       tagIds: ['tag-science', 'tag-prep'],
       dueDate: day(1),
+      remindTime: '13:30',
     },
     {
       ...base,

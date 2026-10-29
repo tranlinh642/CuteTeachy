@@ -20,7 +20,7 @@ const setupTest = () => {
   return { services, db, httpClient, setToken: (t: string | null) => (token = t) };
 };
 
-describe('Note Mock Handler (SPEC-003 & S3-FE-04 Contract)', () => {
+describe('Note Mock Handler (SPEC-003 & S3-FE-04 & S6-FE-01 Contract)', () => {
   const validUuid1 = '11111111-1111-4111-8111-111111111111';
   const validUuid2 = '22222222-2222-4222-8222-222222222222';
   const validItemUuid1 = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
@@ -269,6 +269,31 @@ describe('Note Mock Handler (SPEC-003 & S3-FE-04 Contract)', () => {
       });
       expect(noteFalse.completed).toBe(false);
     });
+
+    it('creates note with optional remindTime (HH:mm) and rejects invalid remindTime with 400 (S6-FE-01)', async () => {
+      const { services } = setupTest();
+
+      const createdWithRemind = await services.notes.create({
+        id: validUuid1,
+        title: 'Ghi chú có giờ nhắc',
+        dueDate: '2026-11-01',
+        remindTime: '08:15',
+      } as Parameters<typeof services.notes.create>[0]);
+      expect(createdWithRemind.dueDate).toBe('2026-11-01');
+      expect((createdWithRemind as { remindTime?: string | null }).remindTime).toBe('08:15');
+
+      const errInvalid = await services.notes
+        .create({
+          id: validUuid2,
+          title: 'Sai giờ nhắc',
+          dueDate: '2026-11-01',
+          remindTime: '24:60',
+        } as Parameters<typeof services.notes.create>[0])
+        .catch((e: unknown) => e);
+      expect(errInvalid).toBeInstanceOf(ApiError);
+      expect((errInvalid as ApiError).status).toBe(400);
+      expect((errInvalid as ApiError).code).toBe('validation');
+    });
   });
 
   describe('PATCH /notes/:id — Update & Completed Rule', () => {
@@ -316,6 +341,27 @@ describe('Note Mock Handler (SPEC-003 & S3-FE-04 Contract)', () => {
       // note-3 has empty checklist
       const updated = await services.notes.update('note-3', { completed: true });
       expect(updated.completed).toBe(true);
+    });
+
+    it('updates and clears remindTime on PATCH /notes/:id and rejects invalid format (S6-FE-01)', async () => {
+      const { services } = setupTest();
+      const updated = await services.notes.update('note-1', {
+        dueDate: '2026-11-05',
+        remindTime: '14:45',
+      } as Parameters<typeof services.notes.update>[1]);
+      expect((updated as { remindTime?: string | null }).remindTime).toBe('14:45');
+
+      const cleared = await services.notes.update('note-1', {
+        remindTime: null,
+      } as Parameters<typeof services.notes.update>[1]);
+      expect((cleared as { remindTime?: string | null }).remindTime).toBeNull();
+
+      const errInvalid = await services.notes
+        .update('note-1', { remindTime: '99:99' } as Parameters<typeof services.notes.update>[1])
+        .catch((e: unknown) => e);
+      expect(errInvalid).toBeInstanceOf(ApiError);
+      expect((errInvalid as ApiError).status).toBe(400);
+      expect((errInvalid as ApiError).code).toBe('validation');
     });
   });
 

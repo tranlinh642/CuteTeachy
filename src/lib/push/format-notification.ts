@@ -2,13 +2,13 @@
  * @file format-notification.ts
  * Pure function to format Web Push notification options and payload.
  *
- * SPEC-005 (Push & Reminder):
- * Handles reminder payloads for Task and Class Session, guarantees safe
+ * SPEC-005 & SPEC-006 (Push & Reminder):
+ * Handles reminder payloads for Task, Class Session, and Note, guarantees safe
  * fallbacks on missing/malformed payloads, sets distinct notification tags
- * per item, and resolves target URLs to the correct date.
+ * per item, and resolves target URLs to the correct date or note.
  */
 
-export type PushReminderType = 'task' | 'class_session' | (string & {});
+export type PushReminderType = 'task' | 'class_session' | 'note' | (string & {});
 
 export interface PushReminderPayload {
   type?: PushReminderType;
@@ -50,11 +50,13 @@ const FALLBACK_TITLES = {
   vi: {
     task: 'Nhắc nhở công việc',
     class_session: 'Nhắc nhở tiết dạy',
+    note: 'Nhắc nhở ghi chú',
     default: 'CuteTeachy',
   },
   en: {
     task: 'Task Reminder',
     class_session: 'Class Session Reminder',
+    note: 'Note Reminder',
     default: 'CuteTeachy',
   },
 } as const;
@@ -63,11 +65,13 @@ const FALLBACK_BODIES = {
   vi: {
     task: 'Bạn có một việc cần làm sắp đến giờ.',
     class_session: 'Bạn có một tiết dạy sắp bắt đầu.',
+    note: 'Bạn có một ghi chú đến hạn.',
     default: 'Bạn có thông báo mới từ CuteTeachy.',
   },
   en: {
     task: 'You have an upcoming task.',
     class_session: 'You have an upcoming class session.',
+    note: 'You have a note due.',
     default: 'You have a new reminder from CuteTeachy.',
   },
 } as const;
@@ -91,6 +95,9 @@ export function computeReminderTag(
     if (normalizedType === 'class_session') {
       return `reminder-class-session-${normalizedId}`;
     }
+    if (normalizedType === 'note') {
+      return `reminder-note-${normalizedId}`;
+    }
     if (normalizedType) {
       const sanitizedType = normalizedType.replace(/_/g, '-');
       return `reminder-${sanitizedType}-${normalizedId}`;
@@ -106,12 +113,13 @@ export function computeReminderTag(
 }
 
 /**
- * Computes target URL opening the application to the correct date.
+ * Computes target URL opening the application to the correct date or note.
  */
 export function computeReminderUrl(
   explicitUrl?: string,
   type?: string,
   targetDate?: string,
+  id?: string | number,
 ): string {
   if (explicitUrl && typeof explicitUrl === 'string' && explicitUrl.trim()) {
     return explicitUrl.trim();
@@ -120,6 +128,14 @@ export function computeReminderUrl(
   const normalizedType = typeof type === 'string' ? type.trim() : '';
   const normalizedDate =
     typeof targetDate === 'string' && targetDate.trim() ? targetDate.trim() : '';
+  const normalizedId = id !== undefined && id !== null ? String(id).trim() : '';
+
+  if (normalizedType === 'note') {
+    if (normalizedId) {
+      return `/notes?noteId=${encodeURIComponent(normalizedId)}`;
+    }
+    return '/notes';
+  }
 
   if (normalizedDate) {
     const encodedDate = encodeURIComponent(normalizedDate);
@@ -160,6 +176,9 @@ export function computeReminderTitle(
   if (type === 'class_session') {
     return titles.class_session;
   }
+  if (type === 'note') {
+    return titles.note;
+  }
   return titles.default;
 }
 
@@ -180,6 +199,9 @@ export function computeReminderBody(
   }
   if (type === 'class_session') {
     return bodies.class_session;
+  }
+  if (type === 'note') {
+    return bodies.note;
   }
   return bodies.default;
 }
@@ -233,7 +255,7 @@ export function formatPushNotification(rawPayload?: unknown): FormattedNotificat
 
   const title = computeReminderTitle(rawTitle, rawType, rawLocale);
   const body = computeReminderBody(rawBody, rawType, rawLocale);
-  const url = computeReminderUrl(rawUrl, rawType, rawDate);
+  const url = computeReminderUrl(rawUrl, rawType, rawDate, rawId);
   const tag = computeReminderTag(rawType, rawId, rawTag);
   const icon = rawIcon || DEFAULT_NOTIFICATION_ICON;
   const badge = rawBadge || DEFAULT_NOTIFICATION_BADGE;

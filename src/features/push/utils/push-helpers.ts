@@ -23,12 +23,38 @@ export function urlBase64ToUint8Array(base64String: string): Uint8Array<ArrayBuf
 }
 
 /**
- * Detects whether the current device is iOS (Safari on iPhone, iPad, iPod)
+ * Detects whether the current device is iOS/iPadOS (any browser on iPhone, iPad, iPod:
+ * Safari, Chrome CriOS, Firefox FxiOS, Edge EdgiOS, or iPadOS MacIntel with maxTouchPoints > 1)
  * where Web Push requires the app to be added to the Home Screen (standalone).
  */
-export function isIosDevice(userAgent?: string): boolean {
-  const ua = (userAgent ?? (typeof window !== 'undefined' ? window.navigator?.userAgent ?? '' : '')).toLowerCase();
-  return /iphone|ipad|ipod/.test(ua) && !/crios|fxios/.test(ua);
+export function isIosDevice(
+  userAgent?: string,
+  nav?: {
+    readonly userAgent?: string;
+    readonly platform?: string;
+    readonly maxTouchPoints?: number;
+  },
+): boolean {
+  const targetNav =
+    nav ?? (typeof window !== 'undefined' ? window.navigator : undefined);
+  const ua = (userAgent ?? targetNav?.userAgent ?? '').toLowerCase();
+
+  if (/iphone|ipad|ipod/i.test(ua)) {
+    return true;
+  }
+
+  const platform = targetNav?.platform ?? '';
+  const maxTouchPoints = targetNav?.maxTouchPoints ?? 0;
+
+  if (
+    maxTouchPoints > 1 &&
+    !/android|windows|linux/i.test(ua) &&
+    (/macintosh|mac os x/i.test(ua) || (!userAgent && platform === 'MacIntel'))
+  ) {
+    return true;
+  }
+
+  return false;
 }
 
 /**
@@ -66,11 +92,11 @@ export function evaluatePushDecision(options: {
   isStandalone: boolean;
   permission: NotificationPermission;
 }): PushDecision {
-  if (!options.isSupported) {
-    return 'unsupported';
-  }
   if (options.isIos && !options.isStandalone) {
     return 'ios_needs_pwa';
+  }
+  if (!options.isSupported) {
+    return 'unsupported';
   }
   if (options.permission === 'denied') {
     return 'permission_denied';
