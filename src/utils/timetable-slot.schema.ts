@@ -1,5 +1,8 @@
 import { z } from 'zod';
+import { SCHEDULE_CATEGORIES } from '@/types';
 import { isValidISODate, isValidTime } from './date-parse';
+
+export const SCHEDULE_CATEGORY_ENUM = SCHEDULE_CATEGORIES;
 
 export const timetableSlotSchema = z
   .object({
@@ -20,6 +23,7 @@ export const timetableSlotSchema = z
       .optional()
       .transform((val) => (val && val.length > 0 ? val : undefined)),
     tone: z.enum(['pink', 'blue', 'beige', 'lavender', 'rose', 'mint']),
+    category: z.enum(SCHEDULE_CATEGORY_ENUM).default('school_teaching'),
     effectiveFrom: z.string().refine(isValidISODate, 'validation.invalidDate'),
     effectiveTo: z
       .string()

@@ -5,7 +5,7 @@ import type { TimetableSlot } from '@/types';
 import { I18nProvider } from '@/lib/i18n';
 import { TimetableSlotCard } from './TimetableSlotCard';
 
-describe('TimetableSlotCard Component (S4-FE-02)', () => {
+describe('TimetableSlotCard Component (S4-FE-02 & S7-FE-01)', () => {
   const sampleSlot: TimetableSlot = {
     id: 'slot-1',
     weekday: 1,
@@ -15,6 +15,7 @@ describe('TimetableSlotCard Component (S4-FE-02)', () => {
     grade: 'Lớp 10A1',
     room: 'Phòng 302',
     tone: 'blue',
+    category: 'school_teaching',
     effectiveFrom: '2026-01-01',
     effectiveTo: '2026-12-31',
     updatedAt: '2026-09-01T00:00:00Z',
@@ -32,14 +33,29 @@ describe('TimetableSlotCard Component (S4-FE-02)', () => {
     );
   };
 
-  it('renders slot with time range, subject, grade, room and effective range', () => {
+  it('renders slot with time range, subject, grade, room, category badge and effective range', () => {
     const html = renderCard(sampleSlot, 'vi');
 
     expect(html).toContain('Sinh học đại cương');
     expect(html).toContain('08:00 – 09:30');
     expect(html).toContain('Lớp 10A1');
     expect(html).toContain('Phòng 302');
+    expect(html).toContain('Lịch trên lớp');
+    expect(html).toContain('data-testid="slot-category-badge-school_teaching"');
     expect(html).toContain('01/01/2026 – 31/12/2026');
+  });
+
+  it('renders distinct badges for extra_teaching and self_study categories', () => {
+    const extraHtml = renderCard({ ...sampleSlot, category: 'extra_teaching' }, 'vi');
+    expect(extraHtml).toContain('Lịch dạy thêm');
+    expect(extraHtml).toContain('data-testid="slot-category-badge-extra_teaching"');
+
+    const selfStudyHtml = renderCard({ ...sampleSlot, category: 'self_study' }, 'vi');
+    expect(selfStudyHtml).toContain('Lịch học thêm');
+    expect(selfStudyHtml).toContain('data-testid="slot-category-badge-self_study"');
+
+    const enStudyHtml = renderCard({ ...sampleSlot, category: 'self_study' }, 'en');
+    expect(enStudyHtml).toContain('Self study');
   });
 
   it('renders slot without grade or room cleanly', () => {

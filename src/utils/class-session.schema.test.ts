@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { validate } from './validate';
 import { adhocSessionSchema, sessionOverrideSchema } from './class-session.schema';
 
-describe('class-session schemas (SPEC-004)', () => {
+describe('class-session schemas (SPEC-004 & SPEC-007)', () => {
   describe('adhocSessionSchema', () => {
     const validAdhocInput = {
       subject: 'Toán học',
@@ -108,13 +108,33 @@ describe('class-session schemas (SPEC-004)', () => {
         expect(res.errors.prepItems?.key).toBe('classSession.prepItemsMax');
       }
     });
+
+    it('defaults category to school_teaching and accepts all 3 valid ScheduleCategory values', () => {
+      const defaultRes = validate(adhocSessionSchema, validAdhocInput);
+      expect(defaultRes.success).toBe(true);
+      if (defaultRes.success) {
+        expect(defaultRes.data.category).toBe('school_teaching');
+      }
+
+      for (const category of ['school_teaching', 'extra_teaching', 'self_study'] as const) {
+        const res = validate(adhocSessionSchema, { ...validAdhocInput, category });
+        expect(res.success).toBe(true);
+        if (res.success) {
+          expect(res.data.category).toBe(category);
+        }
+      }
+
+      const invalidRes = validate(adhocSessionSchema, { ...validAdhocInput, category: 'unknown' });
+      expect(invalidRes.success).toBe(false);
+    });
   });
 
   describe('sessionOverrideSchema', () => {
-    it('accepts topic, prepItems, cancelled updates', () => {
+    it('accepts topic, prepItems, cancelled, and category updates', () => {
       const res = validate(sessionOverrideSchema, {
         topic: 'Chủ đề mới',
         cancelled: true,
+        category: 'extra_teaching',
         prepItems: [
           { id: 'item-1', label: 'Soạn đề kiểm tra', done: true },
         ],
@@ -123,6 +143,7 @@ describe('class-session schemas (SPEC-004)', () => {
       if (res.success) {
         expect(res.data.topic).toBe('Chủ đề mới');
         expect(res.data.cancelled).toBe(true);
+        expect(res.data.category).toBe('extra_teaching');
         expect(res.data.prepItems?.[0]?.done).toBe(true);
       }
     });

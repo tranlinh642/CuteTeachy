@@ -1,5 +1,6 @@
 import type { ClassSession, Locale, Note, Task } from '@/types';
 import { DEFAULT_NOTIFICATION_BADGE, DEFAULT_NOTIFICATION_ICON } from '@/lib/push';
+import { formatClassSessionReminderNotification } from '@/utils';
 
 export const LOCAL_REMINDER_STORAGE_KEY = 'cuteteachy:fired-reminder-tags';
 export const REMINDER_WINDOW_MS = 2 * 60 * 1000;
@@ -199,37 +200,16 @@ function formatDueClassSessionItem(
   remindAtMs: number,
   locale: Locale,
 ): DueReminderItem {
-  const isEn = locale === 'en';
-  const prefix = isEn ? 'Class session' : 'Tiết dạy';
-  const grade = session.grade ? session.grade.trim() : '';
-  const title = grade
-    ? `${prefix}: ${session.subject} ${grade}`
-    : `${prefix}: ${session.subject}`;
-
-  const room = session.room ? session.room.trim() : '';
-  let body: string;
-  if (isEn) {
-    if (room) {
-      const roomStr = /^room\b/i.test(room) ? room : `Room ${room}`;
-      body = `Starts at ${session.startTime} in ${roomStr}`;
-    } else {
-      body = `Starts at ${session.startTime}`;
-    }
-  } else if (room) {
-    const roomStr = /^(phòng|p\.)\b/i.test(room) ? room : `Phòng ${room}`;
-    body = `Bắt đầu lúc ${session.startTime} tại ${roomStr}`;
-  } else {
-    body = `Bắt đầu lúc ${session.startTime}`;
-  }
+  const formatted = formatClassSessionReminderNotification(locale, session);
 
   return {
     tag: buildReminderTag('class_session', session.id, remindAtMs),
     type: 'class_session',
     targetId: session.id,
     remindAtMs,
-    title,
-    body,
-    url: `/timetable?date=${encodeURIComponent(session.date.slice(0, 10))}`,
+    title: formatted.title,
+    body: formatted.body,
+    url: formatted.url,
   };
 }
 

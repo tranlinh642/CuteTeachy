@@ -23,7 +23,14 @@ export const timetable = {
     6: 'Sat',
     7: 'Sun',
   },
+  categories: {
+    all: 'All',
+    school_teaching: 'School class',
+    extra_teaching: 'Extra tutoring',
+    self_study: 'Self study',
+  },
   fields: {
+    category: 'Schedule category',
     weekday: 'Weekday',
     startTime: 'Start time',
     endTime: 'End time',

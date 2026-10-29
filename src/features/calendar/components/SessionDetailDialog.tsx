@@ -1,8 +1,16 @@
 'use client';
 
 import React, { useEffect, useId, useState } from 'react';
-import type { ClassSession, ID, PrepItem, TimeOfDay, Tone } from '@/types';
-import { useTranslation } from '@/lib/i18n';
+import {
+  SCHEDULE_CATEGORIES,
+  type ClassSession,
+  type ID,
+  type PrepItem,
+  type ScheduleCategory,
+  type TimeOfDay,
+  type Tone,
+} from '@/types';
+import { useTranslation, type TranslationKey } from '@/lib/i18n';
 import {
   Button,
   Checkbox,
@@ -57,6 +65,7 @@ function SessionDetailDialogContent({
   const { t, localeTag } = useTranslation();
   const isGenerated = session.timetableSlotId !== null;
   const toneLabelId = useId();
+  const categoryLabelId = useId();
 
   const updateMutation = useUpdateClassSession();
   const deleteMutation = useDeleteClassSession();
@@ -65,6 +74,7 @@ function SessionDetailDialogContent({
   const [topic, setTopic] = useState(session.topic ?? '');
   const [prepItems, setPrepItems] = useState<PrepItem[]>(() => [...(session.prepItems ?? [])]);
   const [cancelled, setCancelled] = useState(session.cancelled ?? false);
+  const [category, setCategory] = useState<ScheduleCategory>(session.category ?? 'school_teaching');
   const [newPrepLabel, setNewPrepLabel] = useState('');
 
   // Adhoc-specific state
@@ -85,6 +95,7 @@ function SessionDetailDialogContent({
     setTopic(session.topic ?? '');
     setPrepItems([...(session.prepItems ?? [])]);
     setCancelled(session.cancelled ?? false);
+    setCategory(session.category ?? 'school_teaching');
     setSubject(session.subject ?? '');
     setGrade(session.grade ?? '');
     setRoom(session.room ?? '');
@@ -135,6 +146,7 @@ function SessionDetailDialogContent({
             topic: topic.trim() || undefined,
             prepItems,
             cancelled,
+            category,
           },
         });
         onClose();
@@ -181,6 +193,7 @@ function SessionDetailDialogContent({
           startTime,
           endTime,
           tone,
+          category,
           topic: topic.trim() || undefined,
           prepItems,
           cancelled,
@@ -214,6 +227,7 @@ function SessionDetailDialogContent({
 
   const isSubmitting = updateMutation.isPending || deleteMutation.isPending;
   const toneStyle = toneClasses[tone];
+  const resolvedCategory: ScheduleCategory = category ?? 'school_teaching';
 
   return (
     <>
@@ -261,6 +275,13 @@ function SessionDetailDialogContent({
           {/* Badge & Trạng thái huỷ */}
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-outline-variant/30 pb-4">
             <div className="flex flex-wrap items-center gap-2">
+              <span
+                data-testid={`session-category-badge-${resolvedCategory}`}
+                className="inline-flex items-center gap-1.5 rounded-full bg-primary-container px-3 py-1 text-label-md font-bold text-on-primary-container"
+              >
+                {t(`classSession.categories.${resolvedCategory}` as TranslationKey)}
+              </span>
+
               {isGenerated ? (
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary-container px-3 py-1 text-label-md font-bold text-on-secondary-container">
                   <Icon name="calendar" size={16} />
@@ -321,6 +342,43 @@ function SessionDetailDialogContent({
           ) : (
             /* Form chỉnh sửa buổi lẻ (mọi trường) */
             <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-2">
+                <span
+                  id={categoryLabelId}
+                  className="text-label-md text-on-surface-variant font-medium uppercase tracking-wider"
+                >
+                  {t('classSession.category')}
+                </span>
+                <div
+                  role="radiogroup"
+                  aria-labelledby={categoryLabelId}
+                  data-testid="schedule-category-selector"
+                  className="grid grid-cols-1 sm:grid-cols-3 gap-2"
+                >
+                  {SCHEDULE_CATEGORIES.map((cat) => {
+                    const selected = category === cat;
+                    return (
+                      <button
+                        key={cat}
+                        type="button"
+                        role="radio"
+                        aria-checked={selected}
+                        data-testid={`category-option-${cat}`}
+                        onClick={() => setCategory(cat)}
+                        className={cn(
+                          'flex min-h-11 items-center justify-center rounded-xl px-3 py-2 text-body-sm transition-all cursor-pointer',
+                          selected
+                            ? 'bg-primary text-on-primary font-bold shadow-xs'
+                            : 'bg-surface-container text-on-surface hover:bg-surface-container-high',
+                        )}
+                      >
+                        <span>{t(`classSession.categories.${cat}` as TranslationKey)}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
               <TextField
                 label={t('classSession.subject')}
                 value={subject}

@@ -1,8 +1,8 @@
 'use client';
 
 import { formatTimeRange, needsPreparation } from '@/utils';
-import { useTranslation } from '@/lib/i18n';
-import type { ClassSession } from '@/types';
+import { useTranslation, type TranslationKey } from '@/lib/i18n';
+import type { ClassSession, ScheduleCategory } from '@/types';
 import { Chip, Icon, toneClasses } from '@/components/ui';
 import { cn } from '@/utils/cn';
 
@@ -12,6 +12,12 @@ export interface ClassCardProps {
   readonly onClick?: (session: ClassSession) => void;
 }
 
+const CATEGORY_BADGE_STYLES: Readonly<Record<ScheduleCategory, string>> = {
+  school_teaching: 'bg-surface-container-lowest/90 text-on-surface',
+  extra_teaching: 'bg-primary-container/90 text-on-primary-container',
+  self_study: 'bg-secondary-container/90 text-on-secondary-container',
+};
+
 export function ClassCard({ session, className, onClick }: ClassCardProps) {
   const { t, localeTag } = useTranslation();
   const title = session.grade ? `${session.subject} – ${session.grade}` : session.subject;
@@ -19,6 +25,7 @@ export function ClassCard({ session, className, onClick }: ClassCardProps) {
   const isCancelled = session.cancelled;
   const isAdHoc = !session.timetableSlotId;
   const hasRoom = Boolean(session.room && session.room.trim().length > 0);
+  const resolvedCategory: ScheduleCategory = session.category ?? 'school_teaching';
 
   return (
     <article
@@ -50,6 +57,16 @@ export function ClassCard({ session, className, onClick }: ClassCardProps) {
         </span>
 
         <div className="flex flex-wrap items-center gap-1.5">
+          <span
+            data-testid="class-category-badge"
+            className={cn(
+              'rounded-full px-2.5 py-0.5 text-label-sm font-semibold',
+              CATEGORY_BADGE_STYLES[resolvedCategory],
+            )}
+          >
+            {t(`classSession.categories.${resolvedCategory}` as TranslationKey)}
+          </span>
+
           {isAdHoc && (
             <span className="rounded-full bg-surface-container-highest px-2.5 py-0.5 text-label-sm font-semibold text-on-surface-variant">
               {t('weekly.adHocBadge')}

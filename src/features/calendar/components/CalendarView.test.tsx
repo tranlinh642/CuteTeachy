@@ -1,6 +1,7 @@
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it, vi } from 'vitest';
+import type { ScheduleCategory } from '@/types';
 import { I18nProvider } from '@/lib/i18n';
 import { CalendarView } from './CalendarView';
 
@@ -51,7 +52,7 @@ vi.mock('../hooks/use-calendar-view', () => ({
     goToToday: vi.fn(),
     nextMonth: vi.fn(),
     previousMonth: vi.fn(),
-    markers: new Map([['2026-10-26', 1]]),
+    markers: new Map([['2026-10-26', 3]]),
     agenda: [
       {
         kind: 'class',
@@ -64,6 +65,41 @@ vi.mock('../hooks/use-calendar-view', () => ({
           startTime: '09:00',
           endTime: '10:30',
           tone: 'blue',
+          category: 'school_teaching',
+          prepItems: [],
+          cancelled: false,
+          updatedAt: '2026-10-26T00:00:00Z',
+        },
+      },
+      {
+        kind: 'class',
+        id: 'adhoc-extra-1',
+        item: {
+          id: 'adhoc-extra-1',
+          timetableSlotId: null,
+          subject: 'Phụ đạo Toán 9A',
+          date: '2026-10-26',
+          startTime: '18:00',
+          endTime: '19:30',
+          tone: 'mint',
+          category: 'extra_teaching',
+          prepItems: [],
+          cancelled: false,
+          updatedAt: '2026-10-26T00:00:00Z',
+        },
+      },
+      {
+        kind: 'class',
+        id: 'adhoc-study-1',
+        item: {
+          id: 'adhoc-study-1',
+          timetableSlotId: null,
+          subject: 'Học IELTS Speaking',
+          date: '2026-10-26',
+          startTime: '20:00',
+          endTime: '21:30',
+          tone: 'lavender',
+          category: 'self_study',
           prepItems: [],
           cancelled: false,
           updatedAt: '2026-10-26T00:00:00Z',
@@ -76,11 +112,11 @@ vi.mock('../hooks/use-calendar-view', () => ({
   }),
 }));
 
-describe('CalendarView Integration (S4-FE-03)', () => {
-  const renderView = () => {
+describe('CalendarView Integration (S4-FE-03 & S7-FE-01)', () => {
+  const renderView = (defaultCategoryFilter: ScheduleCategory | 'all' = 'all', locale: 'vi' | 'en' = 'vi') => {
     return renderToStaticMarkup(
-      <I18nProvider defaultLocale="vi">
-        <CalendarView />
+      <I18nProvider locale={locale}>
+        <CalendarView defaultCategoryFilter={defaultCategoryFilter} />
       </I18nProvider>,
     );
   };
@@ -93,6 +129,36 @@ describe('CalendarView Integration (S4-FE-03)', () => {
   it('renders ClassCard for class agenda entries with clickable role', () => {
     const html = renderView();
     expect(html).toContain('Sinh học');
+    expect(html).toContain('Phụ đạo Toán 9A');
+    expect(html).toContain('Học IELTS Speaking');
     expect(html).toContain('role="button"');
+  });
+
+  it('renders quick ScheduleCategory filter bar (Tất cả, Lịch trên lớp, Lịch dạy thêm, Lịch học thêm) and filters agenda items', () => {
+    const allHtml = renderView('all', 'vi');
+    expect(allHtml).toContain('data-testid="calendar-category-filter"');
+    expect(allHtml).toContain('data-testid="calendar-category-filter-all"');
+    expect(allHtml).toContain('data-testid="calendar-category-filter-school_teaching"');
+    expect(allHtml).toContain('data-testid="calendar-category-filter-extra_teaching"');
+    expect(allHtml).toContain('data-testid="calendar-category-filter-self_study"');
+    expect(allHtml).toContain('Tất cả');
+    expect(allHtml).toContain('Lịch trên lớp');
+    expect(allHtml).toContain('Lịch dạy thêm');
+    expect(allHtml).toContain('Lịch học thêm');
+
+    const schoolHtml = renderView('school_teaching', 'vi');
+    expect(schoolHtml).toContain('Sinh học');
+    expect(schoolHtml).not.toContain('Phụ đạo Toán 9A');
+    expect(schoolHtml).not.toContain('Học IELTS Speaking');
+
+    const extraHtml = renderView('extra_teaching', 'vi');
+    expect(extraHtml).toContain('Phụ đạo Toán 9A');
+    expect(extraHtml).not.toContain('Sinh học');
+    expect(extraHtml).not.toContain('Học IELTS Speaking');
+
+    const studyHtml = renderView('self_study', 'vi');
+    expect(studyHtml).toContain('Học IELTS Speaking');
+    expect(studyHtml).not.toContain('Sinh học');
+    expect(studyHtml).not.toContain('Phụ đạo Toán 9A');
   });
 });
