@@ -11,6 +11,7 @@ import { AppShell } from '@/components/layout';
 import {
   NotificationBell,
   activateNotificationItem,
+  sanitizeRedirectPath,
 } from './NotificationBell';
 
 const routerPushSpy = vi.fn();
@@ -175,6 +176,30 @@ describe('NotificationBell Component (SPEC-006 S6-FE-02)', () => {
     expect(markReadSpy).toHaveBeenCalledWith('notif-unread-1');
     expect(closeSpy).toHaveBeenCalledTimes(1);
     expect(routerPushSpy).toHaveBeenCalledWith('/timetable?date=2026-10-29');
+  });
+
+  it('sanitizes external or protocol-relative notification.url to prevent open redirects', async () => {
+    expect(sanitizeRedirectPath('/calendar?date=2026-10-29', '')).toBe('/calendar?date=2026-10-29');
+    expect(sanitizeRedirectPath('https://evil.com/phish', '')).toBe('');
+    expect(sanitizeRedirectPath('//evil.com/phish', '')).toBe('');
+    expect(sanitizeRedirectPath('/\\evil.com/phish', '')).toBe('');
+
+    const markReadSpy = vi.fn().mockResolvedValue(undefined);
+    const closeSpy = vi.fn();
+
+    await activateNotificationItem(
+      {
+        ...sampleNotifications[0],
+        url: 'https://evil.com/phish',
+      },
+      {
+        markRead: markReadSpy,
+        navigate: routerPushSpy,
+        close: closeSpy,
+      },
+    );
+
+    expect(routerPushSpy).toHaveBeenCalledWith('/');
   });
 
   it('renders NotificationBell inside AppShell Topbar', () => {

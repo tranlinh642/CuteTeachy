@@ -26,6 +26,22 @@ export interface ActivateNotificationCallbacks {
   readonly close: () => void;
 }
 
+export function sanitizeRedirectPath(
+  url?: string | null,
+  fallback = '/',
+): string {
+  if (!url || typeof url !== 'string') return fallback;
+  const trimmed = url.trim();
+  if (
+    trimmed.startsWith('/') &&
+    !trimmed.startsWith('//') &&
+    !trimmed.startsWith('/\\')
+  ) {
+    return trimmed;
+  }
+  return fallback;
+}
+
 export async function activateNotificationItem(
   notification: InAppNotification,
   callbacks: ActivateNotificationCallbacks,
@@ -38,7 +54,10 @@ export async function activateNotificationItem(
     }
   }
   callbacks.close();
-  callbacks.navigate(notification.url || '/');
+  const safeUrl = sanitizeRedirectPath(notification.url, '/');
+  if (safeUrl) {
+    callbacks.navigate(safeUrl);
+  }
 }
 
 function getNotificationIcon(type: InAppNotificationType): IconName {

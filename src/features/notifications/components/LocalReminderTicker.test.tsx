@@ -206,7 +206,7 @@ describe('LocalReminderTicker & Reminder Calculation (SPEC-006 S6-FE-02)', () =>
         buildReminderTag('class_session', 'cs-20', remindAtMs),
         buildReminderTag('note', 'note-30', remindAtMs),
       ]);
-      expect(firstRun[0].url).toBe('/tasks?date=2026-10-29');
+      expect(firstRun[0].url).toBe('/calendar?date=2026-10-29');
       expect(firstRun[1].url).toBe('/timetable?date=2026-10-29');
       expect(firstRun[2].url).toBe('/notes?noteId=note-30');
 
@@ -260,7 +260,7 @@ describe('LocalReminderTicker & Reminder Calculation (SPEC-006 S6-FE-02)', () =>
           body: '08:00',
           tag: `task-task-10-${remindAtMs}`,
           data: expect.objectContaining({
-            url: '/tasks?date=2026-10-29',
+            url: '/calendar?date=2026-10-29',
             type: 'task',
             id: 'task-10',
           }),

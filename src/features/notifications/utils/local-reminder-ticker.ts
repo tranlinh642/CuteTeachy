@@ -228,7 +228,7 @@ function formatDueTaskItem(
     remindAtMs,
     title: `${prefix}: ${task.title}`,
     body: task.time ?? '',
-    url: `/tasks?date=${encodeURIComponent(task.date.slice(0, 10))}`,
+    url: `/calendar?date=${encodeURIComponent(task.date.slice(0, 10))}`,
   };
 }
 

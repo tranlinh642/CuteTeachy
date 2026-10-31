@@ -86,7 +86,6 @@ export function usePushNotification(options: UsePushNotificationOptions = {}) {
   });
 
   const openDialog = useCallback(() => {
-    setError(null);
     const currentDecision = evaluatePushDecision({
       isSupported: isPushSupported(),
       isIos: isIosDevice(),
@@ -106,6 +105,7 @@ export function usePushNotification(options: UsePushNotificationOptions = {}) {
 
   const closeDialog = useCallback(() => {
     setIsDialogOpen(false);
+    setError(null);
   }, []);
 
   const confirmPermission = useCallback(async (): Promise<boolean> => {

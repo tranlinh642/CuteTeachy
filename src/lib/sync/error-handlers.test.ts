@@ -106,6 +106,50 @@ describe('sync error handlers', () => {
         pageParams: [null, 'cursor-2'],
       });
     });
+
+    it('removes entities from nested query keys when given prefix keys (tasks, notes, class-sessions)', () => {
+      const queryClient = new QueryClient();
+      const tasksNestedKey = ['tasks', 'list', { from: '2026-10-01', to: '2026-10-31' }];
+      const notesInfiniteKey = ['notes', 'infinite', { search: 'math' }];
+      const sessionsNestedKey = ['class-sessions', 'list', { from: '2026-10-01', to: '2026-10-07' }];
+
+      queryClient.setQueryData(tasksNestedKey, [
+        { id: 't-1', title: 'Task 1' },
+        { id: 't-2', title: 'Task 2' },
+      ]);
+      queryClient.setQueryData(notesInfiniteKey, {
+        pages: [
+          {
+            items: [
+              { id: 'n-1', title: 'Note 1' },
+              { id: 'n-2', title: 'Note 2' },
+            ],
+            nextCursor: null,
+          },
+        ],
+        pageParams: [undefined],
+      });
+      queryClient.setQueryData(sessionsNestedKey, [
+        { id: 'cs-1', subject: 'Math' },
+        { id: 'cs-2', subject: 'Science' },
+      ]);
+
+      removeEntityFromCache(queryClient, ['tasks'], 't-1');
+      removeEntityFromCache(queryClient, ['notes'], 'n-2');
+      removeEntityFromCache(queryClient, ['class-sessions'], 'cs-1');
+
+      expect(queryClient.getQueryData(tasksNestedKey)).toEqual([{ id: 't-2', title: 'Task 2' }]);
+      expect(queryClient.getQueryData(notesInfiniteKey)).toEqual({
+        pages: [
+          {
+            items: [{ id: 'n-1', title: 'Note 1' }],
+            nextCursor: null,
+          },
+        ],
+        pageParams: [undefined],
+      });
+      expect(queryClient.getQueryData(sessionsNestedKey)).toEqual([{ id: 'cs-2', subject: 'Science' }]);
+    });
   });
 
   describe('handleGoneError', () => {

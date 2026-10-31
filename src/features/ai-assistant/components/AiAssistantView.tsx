@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation, type TranslationKey } from '@/lib/i18n';
 import { Button, Card, EmptyState, Icon, IconButton } from '@/components/ui';
 import { cn } from '@/utils/cn';
@@ -50,6 +50,17 @@ export interface AiAssistantViewProps {
   readonly initialInputText?: string;
 }
 
+function revokeObjectUrlIfBlob(url: string | null) {
+  if (
+    url &&
+    url.startsWith('blob:') &&
+    typeof URL !== 'undefined' &&
+    typeof URL.revokeObjectURL === 'function'
+  ) {
+    URL.revokeObjectURL(url);
+  }
+}
+
 export function AiAssistantView({
   compact = false,
   initialImagePreviewUrl = null,
@@ -62,6 +73,7 @@ export function AiAssistantView({
   const clearMessages = useClearAiMessages();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const previewUrlRef = useRef<string | null>(initialImagePreviewUrl);
   const [inputText, setInputText] = useState(initialInputText);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(
@@ -70,6 +82,21 @@ export function AiAssistantView({
   const [imageErrorKey, setImageErrorKey] = useState<TranslationKey | null>(
     initialImageErrorKey,
   );
+  const [sendErrorKey, setSendErrorKey] = useState<TranslationKey | null>(null);
+
+  useEffect(() => {
+    return () => {
+      revokeObjectUrlIfBlob(previewUrlRef.current);
+    };
+  }, []);
+
+  const updateImagePreviewUrl = (nextUrl: string | null) => {
+    if (previewUrlRef.current && previewUrlRef.current !== nextUrl) {
+      revokeObjectUrlIfBlob(previewUrlRef.current);
+    }
+    previewUrlRef.current = nextUrl;
+    setImagePreviewUrl(nextUrl);
+  };
 
   const messages = messagesData?.items ?? [];
 
@@ -81,20 +108,20 @@ export function AiAssistantView({
     if (!validation.valid) {
       setImageErrorKey(validation.errorKey ?? 'aiAssistant.imageUnsupportedType');
       setSelectedImage(null);
-      setImagePreviewUrl(null);
+      updateImagePreviewUrl(null);
       return;
     }
 
     setImageErrorKey(null);
     setSelectedImage(file);
     if (typeof URL !== 'undefined' && typeof URL.createObjectURL === 'function') {
-      setImagePreviewUrl(URL.createObjectURL(file));
+      updateImagePreviewUrl(URL.createObjectURL(file));
     }
   };
 
   const handleRemoveImage = () => {
     setSelectedImage(null);
-    setImagePreviewUrl(null);
+    updateImagePreviewUrl(null);
     setImageErrorKey(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -107,19 +134,48 @@ export function AiAssistantView({
     if (!trimmed && !selectedImage && !imagePreviewUrl) return;
     if (sendMessage.isPending) return;
 
-    await sendMessage.mutateAsync({
-      message: trimmed || undefined,
-      image: selectedImage,
-    });
+    setSendErrorKey(null);
+    try {
+      await sendMessage.mutateAsync({
+        message: trimmed || undefined,
+        image: selectedImage,
+      });
 
-    setInputText('');
-    handleRemoveImage();
+      setInputText('');
+      handleRemoveImage();
+    } catch (err) {
+      const key =
+        err && typeof err === 'object' && 'messageKey' in err && typeof err.messageKey === 'string'
+          ? (err.messageKey as TranslationKey)
+          : ('errors.generic' as TranslationKey);
+      setSendErrorKey(key);
+    }
   };
 
   const handleQuickPrompt = async (promptText: string) => {
     if (sendMessage.isPending) return;
-    await sendMessage.mutateAsync({ message: promptText });
+    setSendErrorKey(null);
+    try {
+      await sendMessage.mutateAsync({ message: promptText });
+    } catch (err) {
+      const key =
+        err && typeof err === 'object' && 'messageKey' in err && typeof err.messageKey === 'string'
+          ? (err.messageKey as TranslationKey)
+          : ('errors.generic' as TranslationKey);
+      setSendErrorKey(key);
+    }
   };
+
+  const activeSendErrorKey: TranslationKey | null =
+    sendErrorKey ??
+    (sendMessage.isError
+      ? ((sendMessage.error &&
+        typeof sendMessage.error === 'object' &&
+        'messageKey' in sendMessage.error &&
+        typeof sendMessage.error.messageKey === 'string'
+          ? sendMessage.error.messageKey
+          : 'errors.generic') as TranslationKey)
+      : null);
 
   return (
     <div
@@ -233,6 +289,26 @@ export function AiAssistantView({
           })
         )}
       </Card>
+
+      {/* Send Message Error Banner */}
+      {activeSendErrorKey && (
+        <div
+          data-testid="ai-send-error"
+          role="alert"
+          className="flex items-center justify-between gap-2 rounded-xl bg-error-container px-4 py-2.5 text-body-sm font-medium text-on-error-container"
+        >
+          <span>{t(activeSendErrorKey)}</span>
+          <IconButton
+            icon="close"
+            size="sm"
+            aria-label={t('common.actions.close')}
+            onClick={() => {
+              setSendErrorKey(null);
+              sendMessage.reset();
+            }}
+          />
+        </div>
+      )}
 
       {/* Image Validation Error Banner */}
       {imageErrorKey && (

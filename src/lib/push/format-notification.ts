@@ -177,7 +177,7 @@ export function computeReminderUrl(
   if (normalizedDate) {
     const encodedDate = encodeURIComponent(normalizedDate);
     if (normalizedType === 'task') {
-      return `/tasks?date=${encodedDate}`;
+      return `/calendar?date=${encodedDate}`;
     }
     if (normalizedType === 'class_session') {
       return `/timetable?date=${encodedDate}`;
@@ -186,7 +186,7 @@ export function computeReminderUrl(
   }
 
   if (normalizedType === 'task') {
-    return '/tasks';
+    return '/calendar';
   }
   if (normalizedType === 'class_session') {
     return '/timetable';

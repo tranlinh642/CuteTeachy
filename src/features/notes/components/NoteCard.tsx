@@ -1,8 +1,8 @@
 "use client";
 
-import { checklistProgress, formatShortDate, formatTime } from "@/utils";
+import { checklistProgress, formatShortDate, formatTime, parseISODate } from "@/utils";
 import { useTranslation } from "@/lib/i18n";
-import type { ID, Note, Tag } from "@/types";
+import type { ID, ISODate, Note, Tag } from "@/types";
 import { Card, Checkbox, Chip, Icon, IconButton, TagChip } from "@/components/ui";
 import { cn } from "@/utils/cn";
 import { useUpdateNote } from "../api";
@@ -82,7 +82,10 @@ export function NoteCard({
                 {note.dueDate && (
                   <p className="text-label-md text-primary font-medium">
                     {t("weekly.dueAt", {
-                      time: formatShortDate(new Date(note.dueDate), localeTag),
+                      time: formatShortDate(
+                        parseISODate(note.dueDate.slice(0, 10) as ISODate),
+                        localeTag,
+                      ),
                     })}
                   </p>
                 )}

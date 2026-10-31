@@ -83,6 +83,7 @@ export function WeeklyDashboard({ defaultCategoryFilter = 'all' }: WeeklyDashboa
           </Button>
           <Avatar
             name={getAvatarName(user)}
+            src={user?.avatarUrl}
             size="md"
             label={getTeacherAvatarLabel(user, t)}
           />

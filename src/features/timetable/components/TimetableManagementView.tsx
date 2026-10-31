@@ -45,6 +45,7 @@ export function TimetableManagementView({
   const [createWeekday, setCreateWeekday] = useState<number>(1);
   const [slotToEdit, setSlotToEdit] = useState<TimetableSlot | null>(null);
   const [slotToDelete, setSlotToDelete] = useState<TimetableSlot | null>(null);
+  const [deleteErrorKey, setDeleteErrorKey] = useState<TranslationKey | null>(null);
 
   const today = toISODate(new Date());
 
@@ -78,8 +79,17 @@ export function TimetableManagementView({
 
   const handleConfirmDelete = async () => {
     if (!slotToDelete) return;
-    await deleteSlot.mutateAsync(slotToDelete.id);
-    setSlotToDelete(null);
+    setDeleteErrorKey(null);
+    try {
+      await deleteSlot.mutateAsync(slotToDelete.id);
+      setSlotToDelete(null);
+    } catch (err) {
+      const key =
+        err && typeof err === 'object' && 'messageKey' in err && typeof err.messageKey === 'string'
+          ? (err.messageKey as TranslationKey)
+          : ('errors.generic' as TranslationKey);
+      setDeleteErrorKey(key);
+    }
   };
 
   const isDeletingStartedSlot = Boolean(slotToDelete && slotToDelete.effectiveFrom < today);
@@ -201,6 +211,15 @@ export function TimetableManagementView({
         })}
       </div>
 
+      {deleteErrorKey && (
+        <div
+          role="alert"
+          className="rounded-xl bg-error-container px-4 py-2.5 text-body-sm font-medium text-on-error-container"
+        >
+          {t(deleteErrorKey)}
+        </div>
+      )}
+
       {/* Danh sách tiết theo từng thứ */}
       {!isLoading && filteredSlots.length === 0 ? (
         <EmptyState
@@ -286,7 +305,10 @@ export function TimetableManagementView({
       {/* Dialog xác nhận Ngừng / Xoá tiết dạy */}
       <ConfirmDialog
         open={Boolean(slotToDelete)}
-        onClose={() => setSlotToDelete(null)}
+        onClose={() => {
+          setSlotToDelete(null);
+          setDeleteErrorKey(null);
+        }}
         onConfirm={handleConfirmDelete}
         title={
           isDeletingStartedSlot

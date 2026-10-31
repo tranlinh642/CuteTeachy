@@ -9,7 +9,7 @@ import {
   type FieldErrors,
   type NoteFormValues,
 } from "@/utils";
-import { useTranslation } from "@/lib/i18n";
+import { useTranslation, type TranslationKey } from "@/lib/i18n";
 import type { ChecklistItem, ID, ISODate, Note, TimeOfDay } from "@/types";
 import { DateField, TimeField } from "@/components/pickers";
 import {
@@ -50,6 +50,9 @@ export function NoteDialog({ open, onClose, note }: NoteDialogProps) {
   );
   const [completed, setCompleted] = useState(Boolean(note?.completed));
   const [errors, setErrors] = useState<FieldErrors<NoteFormValues>>({});
+  const [submitErrorKey, setSubmitErrorKey] = useState<TranslationKey | null>(
+    null,
+  );
 
   useEffect(() => {
     if (note) {
@@ -71,6 +74,7 @@ export function NoteDialog({ open, onClose, note }: NoteDialogProps) {
     }
     setNewChecklistText("");
     setErrors({});
+    setSubmitErrorKey(null);
   }, [note, open]);
 
   const addChecklistItem = () => {
@@ -112,25 +116,37 @@ export function NoteDialog({ open, onClose, note }: NoteDialogProps) {
     }
 
     setErrors({});
-    if (note) {
-      const effectiveRemindTime = result.data.dueDate
-        ? (result.data.remindTime ?? (note.remindTime ? null : undefined))
-        : note.remindTime
-          ? null
-          : undefined;
-      await updateNote.mutateAsync({
-        id: note.id,
-        input: {
-          ...result.data,
-          ...(effectiveRemindTime !== undefined
-            ? { remindTime: effectiveRemindTime }
-            : {}),
-        },
-      });
-    } else {
-      await createNote.mutateAsync(result.data);
+    setSubmitErrorKey(null);
+    try {
+      if (note) {
+        const effectiveRemindTime = result.data.dueDate
+          ? (result.data.remindTime ?? (note.remindTime ? null : undefined))
+          : note.remindTime
+            ? null
+            : undefined;
+        await updateNote.mutateAsync({
+          id: note.id,
+          input: {
+            ...result.data,
+            ...(effectiveRemindTime !== undefined
+              ? { remindTime: effectiveRemindTime }
+              : {}),
+          },
+        });
+      } else {
+        await createNote.mutateAsync(result.data);
+      }
+      onClose();
+    } catch (err) {
+      const key =
+        err &&
+        typeof err === "object" &&
+        "messageKey" in err &&
+        typeof err.messageKey === "string"
+          ? (err.messageKey as TranslationKey)
+          : ("errors.generic" as TranslationKey);
+      setSubmitErrorKey(key);
     }
-    onClose();
   };
 
   const isSubmitting = createNote.isPending || updateNote.isPending;
@@ -272,6 +288,12 @@ export function NoteDialog({ open, onClose, note }: NoteDialogProps) {
             )}
           />
         </div>
+
+        {submitErrorKey && (
+          <p role="alert" className="text-body-sm text-error">
+            {t(submitErrorKey)}
+          </p>
+        )}
       </form>
     </Dialog>
   );

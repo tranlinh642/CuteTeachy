@@ -38,7 +38,7 @@ export const seedNotifications = ({ day, today }: SeedContext): InAppNotificatio
       targetId: 'task-1',
       title: 'Nhắc nhở công việc: Chấm bài kiểm tra',
       body: '16:00',
-      url: `/tasks?date=${day(-1)}`,
+      url: `/calendar?date=${day(-1)}`,
       data: { type: 'task', id: 'task-1', date: day(-1) },
       readAt: yesterdayIso,
       createdAt: yesterdayIso,

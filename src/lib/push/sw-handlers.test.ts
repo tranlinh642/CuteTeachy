@@ -46,7 +46,7 @@ describe('sw-handlers (S5-FE-02)', () => {
         data: expect.objectContaining({
           type: 'task',
           id: 't-123',
-          url: '/tasks?date=2026-10-27',
+          url: '/calendar?date=2026-10-27',
         }),
       });
     });
@@ -130,7 +130,7 @@ describe('sw-handlers (S5-FE-02)', () => {
         notification: {
           close: closeMock,
           data: {
-            url: '/tasks?date=2026-10-27',
+            url: '/calendar?date=2026-10-27',
           },
         },
         waitUntil: (p: Promise<unknown>) => {
@@ -142,7 +142,7 @@ describe('sw-handlers (S5-FE-02)', () => {
       const navigateMock = vi.fn().mockResolvedValue(undefined);
 
       const fakeClient = {
-        url: 'https://app.cuteteachy.com/tasks?date=2026-10-27',
+        url: 'https://app.cuteteachy.com/calendar?date=2026-10-27',
         focus: focusMock,
         navigate: navigateMock,
       } as unknown as WindowClient;
@@ -211,7 +211,7 @@ describe('sw-handlers (S5-FE-02)', () => {
         notification: {
           close: closeMock,
           data: {
-            url: '/tasks?date=2026-10-27',
+            url: '/calendar?date=2026-10-27',
           },
         },
         waitUntil: (p: Promise<unknown>) => {
@@ -230,7 +230,7 @@ describe('sw-handlers (S5-FE-02)', () => {
       expect(closeMock).toHaveBeenCalledTimes(1);
       await waitUntilPromises[0];
 
-      expect(openWindowMock).toHaveBeenCalledWith('https://app.cuteteachy.com/tasks?date=2026-10-27');
+      expect(openWindowMock).toHaveBeenCalledWith('https://app.cuteteachy.com/calendar?date=2026-10-27');
     });
 
     it('falls back to "/" when notification.data or url is missing', async () => {
@@ -259,6 +259,21 @@ describe('sw-handlers (S5-FE-02)', () => {
       expect(openWindowMock).toHaveBeenCalledWith('https://app.cuteteachy.com/');
     });
 
+    it('prevents open redirect to external origin by falling back to same-origin root', async () => {
+      const openWindowMock = vi.fn().mockResolvedValue(undefined);
+      const fakeClients = {
+        matchAll: vi.fn().mockResolvedValue([]),
+        openWindow: openWindowMock,
+      } as unknown as Clients;
+
+      await focusOrOpenClient('https://evil.example.com/phish', fakeClients, origin);
+      expect(openWindowMock).toHaveBeenCalledWith('https://app.cuteteachy.com/');
+
+      openWindowMock.mockClear();
+      await focusOrOpenClient('//evil.example.com/phish', fakeClients, origin);
+      expect(openWindowMock).toHaveBeenCalledWith('https://app.cuteteachy.com/');
+    });
+
     it('still focuses tab even if navigate throws an error', async () => {
       const focusMock = vi.fn().mockResolvedValue(undefined);
       const navigateMock = vi.fn().mockRejectedValue(new Error('Navigation failed'));
@@ -274,7 +289,7 @@ describe('sw-handlers (S5-FE-02)', () => {
         openWindow: vi.fn(),
       } as unknown as Clients;
 
-      await focusOrOpenClient('/tasks?date=2026-10-27', fakeClients, origin);
+      await focusOrOpenClient('/calendar?date=2026-10-27', fakeClients, origin);
 
       expect(navigateMock).toHaveBeenCalledTimes(1);
       expect(focusMock).toHaveBeenCalledTimes(1);

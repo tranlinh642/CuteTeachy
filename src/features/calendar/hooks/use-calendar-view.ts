@@ -11,16 +11,28 @@ import {
   daysInMonth,
   formatMonthYear,
   formatShortDate,
+  isValidISODate,
+  parseISODate,
   resolveTags,
   toISODate,
 } from '@/utils';
 import { useTranslation } from '@/lib/i18n';
 import type { ISODate, ScheduleCategory } from '@/types';
 
+function resolveInitialCalendarDate(): ISODate {
+  if (typeof window !== 'undefined' && window.location?.search) {
+    const rawDate = new URLSearchParams(window.location.search).get('date');
+    if (rawDate && isValidISODate(rawDate)) {
+      return rawDate;
+    }
+  }
+  return toISODate(new Date());
+}
+
 export function useCalendarView() {
   const { localeTag } = useTranslation();
-  const [currentDate, setCurrentDate] = useState<Date>(() => new Date());
-  const [selectedDate, setSelectedDate] = useState<ISODate>(() => toISODate(new Date()));
+  const [selectedDate, setSelectedDate] = useState<ISODate>(resolveInitialCalendarDate);
+  const [currentDate, setCurrentDate] = useState<Date>(() => parseISODate(selectedDate));
   const [selectedCategory, setSelectedCategory] = useState<ScheduleCategory | 'all'>('all');
 
   const year = currentDate.getFullYear();
@@ -68,7 +80,7 @@ export function useCalendarView() {
 
   const monthTitle = useMemo(() => formatMonthYear(currentDate, localeTag), [currentDate, localeTag]);
   const selectedDateLabel = useMemo(
-    () => formatShortDate(new Date(selectedDate), localeTag),
+    () => formatShortDate(parseISODate(selectedDate), localeTag),
     [selectedDate, localeTag],
   );
 

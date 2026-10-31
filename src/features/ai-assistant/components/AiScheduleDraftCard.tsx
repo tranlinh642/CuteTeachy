@@ -98,6 +98,7 @@ export function AiScheduleDraftCard({
   const [appliedState, setAppliedState] = useState<AiScheduleDraft | null>(
     draft.status === 'applied' ? draft : null,
   );
+  const [applyErrorKey, setApplyErrorKey] = useState<TranslationKey | null>(null);
 
   const effectiveDraft = appliedState ?? draft;
   const isApplied = effectiveDraft.status === 'applied';
@@ -123,18 +124,38 @@ export function AiScheduleDraftCard({
 
   const handleConfirmApply = async () => {
     if (isApplied || isApplying || selectedIds.size === 0) return;
-    const response = await submitAiScheduleDraft({
-      messageId,
-      items: editedItems,
-      selectedIds,
-      conflictStrategy,
-      applyDraftMutation: (vars) => applyDraftMutation.mutateAsync(vars),
-    });
-    if (response.message.draft) {
-      setAppliedState(response.message.draft);
+    setApplyErrorKey(null);
+    try {
+      const response = await submitAiScheduleDraft({
+        messageId,
+        items: editedItems,
+        selectedIds,
+        conflictStrategy,
+        applyDraftMutation: (vars) => applyDraftMutation.mutateAsync(vars),
+      });
+      if (response.message.draft) {
+        setAppliedState(response.message.draft);
+      }
+      onApplied?.(response);
+    } catch (err) {
+      const key =
+        err && typeof err === 'object' && 'messageKey' in err && typeof err.messageKey === 'string'
+          ? (err.messageKey as TranslationKey)
+          : ('errors.generic' as TranslationKey);
+      setApplyErrorKey(key);
     }
-    onApplied?.(response);
   };
+
+  const activeErrorKey: TranslationKey | null =
+    applyErrorKey ??
+    (applyDraftMutation.isError
+      ? ((applyDraftMutation.error &&
+        typeof applyDraftMutation.error === 'object' &&
+        'messageKey' in applyDraftMutation.error &&
+        typeof applyDraftMutation.error.messageKey === 'string'
+          ? applyDraftMutation.error.messageKey
+          : 'errors.generic') as TranslationKey)
+      : null);
 
   return (
     <Card
@@ -428,6 +449,17 @@ export function AiScheduleDraftCard({
           </button>
         </div>
       </div>
+
+      {/* Apply error alert */}
+      {activeErrorKey && (
+        <div
+          data-testid={`draft-apply-error-${messageId}`}
+          role="alert"
+          className="rounded-xl bg-error-container px-3.5 py-2.5 text-body-sm font-medium text-on-error-container"
+        >
+          {t(activeErrorKey)}
+        </div>
+      )}
 
       {/* Applied summary */}
       {isApplied && effectiveDraft.summary && (
