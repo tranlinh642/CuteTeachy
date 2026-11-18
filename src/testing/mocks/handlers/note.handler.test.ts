@@ -147,12 +147,15 @@ describe('Note Mock Handler (SPEC-003 & S3-FE-04 & S6-FE-01 Contract)', () => {
   describe('GET /notes — Delta Sync via updatedSince', () => {
     it('returns modified notes and soft-deleted notes in deletedIds', async () => {
       const { services, db } = setupTest();
-      const checkpoint = '2026-10-20T00:00:00.000Z';
+      const nowMs = Date.now();
+      const beforeCheckpoint = new Date(nowMs - 10 * 24 * 60 * 60 * 1000).toISOString();
+      const checkpoint = new Date(nowMs - 5 * 24 * 60 * 60 * 1000).toISOString();
+      const afterCheckpoint = new Date(nowMs - 2 * 24 * 60 * 60 * 1000).toISOString();
 
       // Update note-1 after checkpoint
-      db.notes[0] = { ...db.notes[0]!, updatedAt: '2026-10-22T00:00:00.000Z' };
+      db.notes[0] = { ...db.notes[0]!, updatedAt: afterCheckpoint };
       // Keep note-2 before checkpoint
-      db.notes[1] = { ...db.notes[1]!, updatedAt: '2026-10-15T00:00:00.000Z' };
+      db.notes[1] = { ...db.notes[1]!, updatedAt: beforeCheckpoint };
 
       // Soft delete note-3
       const deletedId = db.notes[2]!.id;
@@ -177,7 +180,7 @@ describe('Note Mock Handler (SPEC-003 & S3-FE-04 & S6-FE-01 Contract)', () => {
 
     it('rejects updatedSince combined with cursor, q, or tagId', async () => {
       const { services } = setupTest();
-      const validSince = '2026-10-20T00:00:00.000Z';
+      const validSince = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString();
 
       const errQ = await services.notes.list({ updatedSince: validSince, q: 'test' }).catch((e: unknown) => e);
       expect((errQ as ApiError).status).toBe(400);

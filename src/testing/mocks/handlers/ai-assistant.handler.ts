@@ -122,6 +122,51 @@ const attachConflict = (
   };
 };
 
+const isCrossAccountOrInjection = (message: string): boolean => {
+  const lower = message.toLowerCase();
+  return (
+    /(?:ignore\s+(?:all\s+)?(?:previous|prior|above|system)\s+instructions?|system\s+prompt|bypass|bỏ\s+qua\s+(?:hướng\s+dẫn|quy\s+tắc))/i.test(
+      lower,
+    ) ||
+    /(?:lịch|thời\s+khóa\s+biểu|tkb|công\s+việc|ghi\s+chú|dữ\s+liệu|schedule|timetable|tasks?|notes?)\s+(?:của|of|for)\s+(?:user|account|tài\s+khoản|người\s+khác|giáo\s+viên\s+khác|another|other)/i.test(
+      lower,
+    ) ||
+    /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i.test(lower)
+  );
+};
+
+const isScheduleDomainRelevant = (message: string, hasImage: boolean): boolean => {
+  if (hasImage) return true;
+  const lower = message.toLowerCase();
+  const domainKeywords = [
+    'lịch',
+    'tkb',
+    'thời khóa biểu',
+    'tiết',
+    'dạy',
+    'học',
+    'việc',
+    'task',
+    'công việc',
+    'ghi chú',
+    'note',
+    'hôm nay',
+    'ngày mai',
+    'tuần',
+    'thứ ',
+    'lớp',
+    'phòng',
+    'schedule',
+    'timetable',
+    'class',
+    'today',
+    'tomorrow',
+    'week',
+    'ielts',
+  ];
+  return domainKeywords.some((kw) => lower.includes(kw));
+};
+
 const isScheduleAddIntent = (message: string, hasImage: boolean): boolean => {
   if (hasImage) return true;
   const lower = message.toLowerCase();
@@ -293,10 +338,33 @@ export const aiAssistantRoutes = [
 
     db.aiMessages.push(userMessage);
 
-    const isAddIntent = isScheduleAddIntent(message, Boolean(image));
     let assistantMessage: AiChatMessage;
 
-    if (isAddIntent) {
+    if (isCrossAccountOrInjection(message)) {
+      assistantMessage = {
+        id: nextId('ai-assistant-msg'),
+        accountId: db.user.id,
+        role: 'assistant',
+        content:
+          'Vì lý do bảo mật và phân quyền, tôi chỉ được phép truy cập dữ liệu thời khóa biểu, công việc và ghi chú của riêng tài khoản hiện tại. Tôi không có quyền xem dữ liệu của tài khoản hoặc giáo viên khác.',
+        imageUrl: null,
+        imageExpiresAt: null,
+        draft: null,
+        createdAt: new Date(now.getTime() + 100).toISOString(),
+      };
+    } else if (!isScheduleDomainRelevant(message, Boolean(image))) {
+      assistantMessage = {
+        id: nextId('ai-assistant-msg'),
+        accountId: db.user.id,
+        role: 'assistant',
+        content:
+          'Xin lỗi, tôi là Trợ lý AI chuyên biệt về quản lý lịch dạy, thời khóa biểu, công việc và ghi chú trên CuteTeachy. Thầy/cô vui lòng hỏi hoặc gửi ảnh liên quan đến lịch trình giảng dạy và công việc nhé.',
+        imageUrl: null,
+        imageExpiresAt: null,
+        draft: null,
+        createdAt: new Date(now.getTime() + 100).toISOString(),
+      };
+    } else if (isScheduleAddIntent(message, Boolean(image))) {
       const items = buildDraftItemsForRequest(message, Boolean(image), db, today);
       const conflictCount = items.filter((item) => Boolean(item.conflict)).length;
       const draft: AiScheduleDraft = {

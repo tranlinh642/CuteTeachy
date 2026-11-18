@@ -78,7 +78,9 @@ describe('class-session mock routes (SPEC-004 & SPEC-007)', () => {
     });
 
     it('handles updatedSince delta sync: returns full list if a slot changed', () => {
-      const nowIso = new Date('2026-10-27T12:00:00.000Z').toISOString();
+      const nowMs = Date.now();
+      const checkpoint = new Date(nowMs - 2 * 24 * 60 * 60 * 1000).toISOString();
+      const nowIso = new Date(nowMs - 1 * 24 * 60 * 60 * 1000).toISOString();
       db.timetableSlots[0] = {
         ...db.timetableSlots[0]!,
         updatedAt: nowIso,
@@ -87,7 +89,7 @@ describe('class-session mock routes (SPEC-004 & SPEC-007)', () => {
       const res = callRoute('GET', '/class-sessions', undefined, {
         from: '2026-10-26',
         to: '2026-11-01',
-        updatedSince: '2026-10-27T00:00:00.000Z',
+        updatedSince: checkpoint,
       });
 
       expect(res.status).toBe(200);

@@ -33,13 +33,16 @@ describe('Tag Mock Handler (SPEC-003 & S3-FE-02)', () => {
 
     it('returns only modified tags and deletedIds when updatedSince is provided', async () => {
       const { services, db } = setupTest();
-      const checkpoint = '2026-10-15T00:00:00.000Z';
+      const nowMs = Date.now();
+      const beforeCheckpoint = new Date(nowMs - 10 * 24 * 60 * 60 * 1000).toISOString();
+      const checkpoint = new Date(nowMs - 5 * 24 * 60 * 60 * 1000).toISOString();
+      const afterCheckpoint = new Date(nowMs - 2 * 24 * 60 * 60 * 1000).toISOString();
 
       // Modify one tag after checkpoint
-      db.tags[0] = { ...db.tags[0]!, name: 'Modified Tag', updatedAt: '2026-10-20T10:00:00.000Z' };
+      db.tags[0] = { ...db.tags[0]!, name: 'Modified Tag', updatedAt: afterCheckpoint };
 
       // Leave another tag before checkpoint
-      db.tags[1] = { ...db.tags[1]!, updatedAt: '2026-10-10T10:00:00.000Z' };
+      db.tags[1] = { ...db.tags[1]!, updatedAt: beforeCheckpoint };
 
       // Soft delete a tag after checkpoint
       const deletedId = db.tags[2]!.id;

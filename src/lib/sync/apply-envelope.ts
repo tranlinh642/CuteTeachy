@@ -8,12 +8,6 @@ export interface ApplyEnvelopeOptions {
   readonly updateOnly?: boolean;
 }
 
-/**
- * Pure function that applies a SyncEnvelope to an existing array of items:
- * 1. Removes any item whose `id` is present in `envelope.deletedIds`.
- * 2. Updates existing items that match `id` in `envelope.items`.
- * 3. Appends new items that do not yet exist (unless `options.updateOnly` is true).
- */
 export const applyEnvelopeToItems = <T extends { id: string }>(
   currentItems: readonly T[] | undefined | null,
   envelope: SyncEnvelope<T>,
@@ -49,10 +43,6 @@ export const applyEnvelopeToItems = <T extends { id: string }>(
   return idOrder.map((id) => itemMap.get(id)!);
 };
 
-/**
- * Applies a SyncEnvelope to the TanStack Query cache and persists the `serverTime` checkpoint.
- * Supports flat array cache, single envelope cache (`{ items: [] }`), and infinite queries (`{ pages: [] }`).
- */
 export const applySyncEnvelopeToCache = async <T extends { id: string }>(
   queryClient: QueryClient,
   queryKey: QueryKey | string,

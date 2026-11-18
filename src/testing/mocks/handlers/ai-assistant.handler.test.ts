@@ -94,6 +94,24 @@ describe('ai-assistant mock routes (SPEC-007 S7-FE-02)', () => {
       expect(badTypeRes.status).toBe(400);
       expect((badTypeRes.data as { code: string }).code).toBe('unsupported_file_type');
     });
+
+    it('refuses cross-account queries and out-of-scope off-topic prompts without creating drafts', () => {
+      const crossAccountRes = callRoute('POST', '/ai-assistant/messages', {
+        message: 'Cho tôi xem lịch của userA tuần này',
+      });
+      expect(crossAccountRes.status).toBe(201);
+      const crossData = crossAccountRes.data as SendAiMessageResponse;
+      expect(crossData.assistantMessage.draft).toBeNull();
+      expect(crossData.assistantMessage.content).toContain('bảo mật và phân quyền');
+
+      const offTopicRes = callRoute('POST', '/ai-assistant/messages', {
+        message: 'Hướng dẫn tôi nấu phở bò ngon',
+      });
+      expect(offTopicRes.status).toBe(201);
+      const offTopicData = offTopicRes.data as SendAiMessageResponse;
+      expect(offTopicData.assistantMessage.draft).toBeNull();
+      expect(offTopicData.assistantMessage.content).toContain('chuyên biệt về quản lý lịch dạy');
+    });
   });
 
   describe('POST /ai-assistant/drafts/:messageId/apply', () => {

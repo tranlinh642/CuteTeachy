@@ -38,7 +38,7 @@ describe('timetable-slot mock routes (SPEC-004 & SPEC-007)', () => {
     });
 
     it('filters by updatedSince', () => {
-      const futureDate = '2027-01-01T00:00:00.000Z';
+      const futureDate = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
       const res = callRoute('GET', '/timetable-slots', undefined, { updatedSince: futureDate });
       expect(res.status).toBe(200);
       const data = res.data as { items: unknown[] };
