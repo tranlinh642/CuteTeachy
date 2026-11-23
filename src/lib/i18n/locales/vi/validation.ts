@@ -28,4 +28,5 @@ export const errors = {
   aiDraftAlreadyApplied: 'Bản nháp lịch này đã được áp dụng trước đó',
   aiProviderNotConfigured: 'Trợ lý AI chưa được cấu hình trên máy chủ',
   aiProviderError: 'Không thể kết nối tới dịch vụ AI, vui lòng thử lại sau',
+  serviceUnavailable: 'Dịch vụ lưu trữ tạm thời chưa sẵn sàng, vui lòng thử lại sau',
 };

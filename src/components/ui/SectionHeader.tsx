@@ -28,7 +28,7 @@ export function SectionHeader({
   className,
 }: SectionHeaderProps) {
   return (
-    <div className={cn('flex items-end justify-between gap-4', className)}>
+    <div className={cn('flex flex-wrap items-center justify-between gap-2 sm:gap-4', className)}>
       <div className="min-w-0">
         <Heading id={id} className="text-title-lg text-on-surface flex items-center gap-2">
           {icon && <Icon name={icon} filled className={iconClassName} />}
@@ -36,7 +36,7 @@ export function SectionHeader({
         </Heading>
         {subtitle && <p className="text-body-sm text-on-surface-variant mt-0.5">{subtitle}</p>}
       </div>
-      {action && <div className="flex shrink-0 items-center gap-2">{action}</div>}
+      {action && <div className="flex flex-wrap shrink-0 items-center gap-2">{action}</div>}
     </div>
   );
 }

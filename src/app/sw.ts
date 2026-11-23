@@ -1,4 +1,3 @@
-import { APP_VERSION } from '@/config';
 import { handleNotificationClickEvent, handlePushEvent } from '@/lib/push';
 import { defaultCache } from '@serwist/next/worker';
 import type { PrecacheEntry, SerwistGlobalConfig } from 'serwist';
@@ -12,28 +11,26 @@ declare global {
 
 declare const self: ServiceWorkerGlobalScope;
 
-const APP_SHELL_ROUTES: (PrecacheEntry | string)[] = [
-  { url: '/', revision: APP_VERSION },
-  { url: '/login', revision: APP_VERSION },
-  { url: '/calendar', revision: APP_VERSION },
-  { url: '/notes', revision: APP_VERSION },
-  { url: '/profile', revision: APP_VERSION },
-];
-
 const serwist = new Serwist({
-  precacheEntries: [...(self.__SW_MANIFEST ?? []), ...APP_SHELL_ROUTES],
+  precacheEntries: [...(self.__SW_MANIFEST ?? [])],
   precacheOptions: {
-    navigateFallback: '/',
-    navigateFallbackDenylist: [/^\/api\//],
     cleanupOutdatedCaches: true,
   },
-  skipWaiting: true,
+  skipWaiting: false,
   clientsClaim: true,
   navigationPreload: true,
   runtimeCaching: defaultCache,
 });
 
 serwist.addEventListeners();
+
+// Cho phép client kích hoạt bản Service Worker mới ngay khi người dùng bấm "Cập nhật ngay"
+self.addEventListener('message', (event: ExtendableMessageEvent) => {
+  const payload = event.data as { type?: string } | null | undefined;
+  if (payload?.type === 'SKIP_WAITING') {
+    void self.skipWaiting();
+  }
+});
 
 // Background Sync: thông báo client tiếp tục gửi các tác vụ ngoại tuyến khi có kết nối
 self.addEventListener('sync', (event: Event) => {

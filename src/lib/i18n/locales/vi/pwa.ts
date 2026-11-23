@@ -7,4 +7,13 @@ export const pwa = {
   closeBanner: 'Đóng banner cài đặt',
   iosGuide: 'Nhấn nút Chia sẻ trên Safari, sau đó chọn "Thêm vào MH chính" (Add to Home Screen).',
   offlineNotice: 'Chế độ ngoại tuyến: Bạn vẫn có thể xem lịch và ghi chú. Dữ liệu sẽ tự động đồng bộ khi có mạng.',
+  updateTitle: 'Đã có phiên bản mới',
+  updateDescription: 'Bấm cập nhật để tải giao diện và tính năng mới nhất (không mất dữ liệu).',
+  updateButton: 'Cập nhật ngay',
+  updatingButton: 'Đang cập nhật…',
+  checkUpdateButton: 'Kiểm tra cập nhật',
+  checkingUpdate: 'Đang kiểm tra…',
+  upToDate: 'Bạn đang dùng phiên bản mới nhất',
+  updateUnsupported: 'Trình duyệt hiện tại không hỗ trợ tự cập nhật PWA',
+  closeUpdateBanner: 'Đóng thông báo cập nhật',
 };

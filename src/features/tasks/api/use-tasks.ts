@@ -49,8 +49,17 @@ export function useCreateTask() {
     mutationFn: (input) => {
       return tasks.create(input);
     },
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: queryKeys.tasks.all }),
+    onSuccess: (createdTask) => {
+      queryClient.setQueriesData<Task[]>(
+        { queryKey: queryKeys.tasks.all },
+        (list) => {
+          if (!list) return list;
+          const exists = list.some((item) => item.id === createdTask.id);
+          return exists ? list : [...list, createdTask];
+        },
+      );
+      void queryClient.invalidateQueries({ queryKey: queryKeys.tasks.all });
+    },
     onError: (error, variables) => {
       if (variables.id) {
         handleGoneError(error, {
@@ -101,8 +110,9 @@ export function useUpdateTask() {
         queryClient.setQueryData(key, data),
       );
     },
-    onSettled: () =>
-      queryClient.invalidateQueries({ queryKey: queryKeys.tasks.all }),
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.tasks.all });
+    },
   });
 }
 
@@ -138,7 +148,8 @@ export function useDeleteTask() {
         queryClient.setQueryData(key, data),
       );
     },
-    onSettled: () =>
-      queryClient.invalidateQueries({ queryKey: queryKeys.tasks.all }),
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.tasks.all });
+    },
   });
 }

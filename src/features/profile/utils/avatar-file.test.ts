@@ -3,6 +3,7 @@ import {
   ALLOWED_AVATAR_TYPES,
   MAX_AVATAR_BYTES,
   validateAvatarFile,
+  validateAvatarSourceFile,
 } from './avatar-file';
 
 describe('avatar-file: validateAvatarFile', () => {
@@ -46,5 +47,17 @@ describe('avatar-file: validateAvatarFile', () => {
     const result = validateAvatarFile(file);
     expect(result.valid).toBe(false);
     expect(result.error).toBe('file_too_large');
+  });
+
+  it('validateAvatarSourceFile accepts large phone photos (e.g. 5MB) for client-side resize while rejecting non-images and >20MB', () => {
+    expect(validateAvatarSourceFile({ size: 5 * 1024 * 1024, type: 'image/jpeg' }).valid).toBe(
+      true,
+    );
+    expect(validateAvatarSourceFile({ size: 25 * 1024 * 1024, type: 'image/jpeg' }).error).toBe(
+      'file_too_large',
+    );
+    expect(validateAvatarSourceFile({ size: 1024, type: 'application/pdf' }).error).toBe(
+      'unsupported_file_type',
+    );
   });
 });

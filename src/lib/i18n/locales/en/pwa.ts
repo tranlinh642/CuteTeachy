@@ -9,4 +9,13 @@ export const pwa: typeof Schema = {
   closeBanner: 'Dismiss install banner',
   iosGuide: 'Tap the Share button in Safari, then tap "Add to Home Screen".',
   offlineNotice: 'Offline Mode: You can still view your schedule and notes. Changes will sync once back online.',
+  updateTitle: 'New version available',
+  updateDescription: 'Tap update to load the latest interface and fixes without losing your data.',
+  updateButton: 'Update now',
+  updatingButton: 'Updating…',
+  checkUpdateButton: 'Check for updates',
+  checkingUpdate: 'Checking…',
+  upToDate: 'You are on the latest version',
+  updateUnsupported: 'Automatic PWA updates are not available in this browser',
+  closeUpdateBanner: 'Dismiss update banner',
 };

@@ -2,7 +2,12 @@ import type { ID, ISODate, ISODateTime, ScheduleCategory, TimeOfDay, Tone } from
 
 export type AiDraftItemKind = 'timetable_slot' | 'class_session' | 'task';
 
-export type AiConflictStrategy = 'replace_conflicts' | 'skip_conflicts';
+export type AiDraftItemAction = 'create' | 'update' | 'delete' | 'cancel';
+
+export type AiConflictStrategy =
+  | 'replace_conflicts'
+  | 'skip_conflicts'
+  | 'replace_all_timetable';
 
 export interface AiScheduleDraftConflict {
   readonly slotId: ID;
@@ -14,6 +19,10 @@ export interface AiScheduleDraftConflict {
 export interface AiScheduleDraftItem {
   readonly id: ID;
   readonly kind: AiDraftItemKind;
+  readonly action?: AiDraftItemAction;
+  readonly targetSlotId?: ID | null;
+  readonly targetSessionId?: ID | null;
+  readonly targetSummary?: string | null;
   readonly category: ScheduleCategory;
   readonly titleOrSubject: string;
   readonly grade?: string | null;
@@ -33,6 +42,9 @@ export interface AiScheduleDraftSummary {
   readonly createdCount: number;
   readonly replacedCount: number;
   readonly skippedCount: number;
+  readonly updatedCount?: number;
+  readonly deletedCount?: number;
+  readonly cancelledCount?: number;
 }
 
 export interface AiScheduleDraft {

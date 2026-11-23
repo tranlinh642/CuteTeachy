@@ -5,6 +5,7 @@ import { useCreateNote, useUpdateNote } from "../api";
 import {
   createId,
   noteSchema,
+  toISODate,
   validate,
   type FieldErrors,
   type NoteFormValues,
@@ -198,7 +199,7 @@ export function NoteDialog({ open, onClose, note }: NoteDialogProps) {
             {t("notes.editor.checklistLabel")}
           </label>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 min-w-0">
             <input
               type="text"
               value={newChecklistText}
@@ -210,13 +211,14 @@ export function NoteDialog({ open, onClose, note }: NoteDialogProps) {
                 }
               }}
               placeholder={t("notes.editor.addChecklistItem")}
-              className="flex-1 rounded-lg border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-primary"
+              className="min-w-0 flex-1 rounded-lg border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-primary"
             />
             <Button
               type="button"
               variant="secondary"
               size="sm"
               icon="add"
+              className="shrink-0 whitespace-nowrap"
               onClick={addChecklistItem}
             >
               {t("notes.editor.addChecklistItem")}
@@ -281,7 +283,12 @@ export function NoteDialog({ open, onClose, note }: NoteDialogProps) {
           <TimeField
             label={t("notes.editor.remindTimeLabel")}
             value={remindTime}
-            onChange={setRemindTime}
+            onChange={(nextTime) => {
+              setRemindTime(nextTime);
+              if (nextTime && !dueDate) {
+                setDueDate(toISODate(new Date()));
+              }
+            }}
             error={formatError(
               errors.remindTime,
               t("notes.editor.remindTimeLabel"),

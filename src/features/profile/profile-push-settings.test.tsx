@@ -198,4 +198,14 @@ describe('ProfileView Push Notifications Switch & Mobile/Test Push Controls (SPE
     capturedSwitchOnChange?.(true);
     expect(mockPushNotification.confirmPermission).toHaveBeenCalledTimes(1);
   });
+
+  it('displays clear device push status when not yet enabled or when connected', () => {
+    mockPushNotification.decision = 'can_prompt';
+    mockPushNotification.isSubscribed = false;
+    expect(renderProfile()).toContain('Thiết bị này chưa bật thông báo đẩy');
+
+    mockPushNotification.decision = 'already_granted';
+    mockPushNotification.isSubscribed = true;
+    expect(renderProfile()).toContain('Thiết bị này đã sẵn sàng nhận thông báo');
+  });
 });

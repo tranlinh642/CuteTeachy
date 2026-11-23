@@ -12,6 +12,7 @@ export const pickers = {
     pm: 'CH',
     increase: 'Tăng {{unit}}',
     decrease: 'Giảm {{unit}}',
+    swipeHint: 'Vuốt lên hoặc xuống để chọn nhanh giờ, phút',
   },
   month: {
     title: 'Chọn tháng',

@@ -69,42 +69,30 @@ export function CalendarView({ defaultCategoryFilter = 'all' }: CalendarViewProp
 
   const weeks = getMonthGrid(year, monthIndex);
   const weekdays = getWeekDays(new Date(year, monthIndex, 1));
+  const todayDate = new Date();
+  const todayIso = toISODate(todayDate);
+  const isViewingToday =
+    selectedDate === todayIso &&
+    year === todayDate.getFullYear() &&
+    monthIndex === todayDate.getMonth();
+  const formattedMonthTitle = monthTitle
+    ? monthTitle.charAt(0).toLocaleUpperCase(localeTag) + monthTitle.slice(1)
+    : '';
 
   return (
-    <div className="flex flex-col gap-8">
-      {/* Tiêu đề & Điều hướng tháng */}
-      <header className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-display-lg text-on-surface">{t('calendar.title')}</h1>
-          <p className="text-body-lg text-on-surface-variant mt-1">{monthTitle}</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            icon="clock"
-            onClick={() => router.push('/timetable')}
-          >
-            {t('timetable.title')}
-          </Button>
-          <IconButton
-            icon="chevronLeft"
-            aria-label={t('calendar.previousMonth')}
-            onClick={previousMonth}
-          />
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={goToToday}
-          >
-            {t('calendar.today')}
-          </Button>
-          <IconButton
-            icon="chevronRight"
-            aria-label={t('calendar.nextMonth')}
-            onClick={nextMonth}
-          />
-        </div>
+    <div className="flex flex-col gap-6 sm:gap-8">
+      {/* Tiêu đề trang & Lối tắt quản lý Thời khoá biểu */}
+      <header className="flex items-center justify-between gap-3">
+        <h1 className="text-display-lg text-on-surface">{t('calendar.title')}</h1>
+        <Button
+          variant="secondary"
+          size="sm"
+          icon="clock"
+          className="whitespace-nowrap shrink-0"
+          onClick={() => router.push('/timetable')}
+        >
+          {t('timetable.title')}
+        </Button>
       </header>
 
       {/* Bộ lọc nhanh theo Loại lịch (ScheduleCategory) */}
@@ -137,12 +125,54 @@ export function CalendarView({ defaultCategoryFilter = 'all' }: CalendarViewProp
       {/* Bố cục 2 phần: Lưới lịch tháng (trái) và Lịch trình ngày chọn (phải) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Lưới lịch tháng */}
-        <Card className="lg:col-span-7 p-6 flex flex-col gap-4">
+        <Card className="lg:col-span-7 p-3 sm:p-6 flex flex-col gap-3 sm:gap-4">
+          {/* Thanh điều hướng tháng gắn trực tiếp với lưới lịch + nút Hôm nay tách biệt */}
+          <div
+            data-testid="calendar-month-toolbar"
+            className="flex items-center justify-between gap-2 pb-1"
+          >
+            <div className="flex items-center gap-0.5 sm:gap-1 min-w-0">
+              <IconButton
+                icon="chevronLeft"
+                size="sm"
+                aria-label={t('calendar.previousMonth')}
+                onClick={previousMonth}
+              />
+              <h2
+                data-testid="calendar-month-title"
+                className="text-title-md sm:text-headline-sm font-bold text-on-surface truncate px-1 tabular-nums"
+              >
+                {formattedMonthTitle}
+              </h2>
+              <IconButton
+                icon="chevronRight"
+                size="sm"
+                aria-label={t('calendar.nextMonth')}
+                onClick={nextMonth}
+              />
+            </div>
+
+            <Button
+              type="button"
+              variant={isViewingToday ? 'ghost' : 'primary'}
+              size="sm"
+              data-testid="calendar-today-button"
+              aria-current={isViewingToday ? 'date' : undefined}
+              className={cn(
+                'whitespace-nowrap shrink-0',
+                isViewingToday && 'bg-surface-container text-on-surface-variant',
+              )}
+              onClick={goToToday}
+            >
+              {t('calendar.today')}
+            </Button>
+          </div>
+
           <div className="grid grid-cols-7 gap-1 text-center pb-2 border-b border-outline-variant/30">
             {weekdays.map((day) => (
               <span
                 key={day.toISOString()}
-                className="text-label-md font-bold text-on-surface-variant uppercase tracking-wider"
+                className="text-label-xs sm:text-label-md font-bold text-on-surface-variant uppercase tracking-wider"
               >
                 {formatWeekdayNarrow(day, localeTag)}
               </span>
@@ -152,7 +182,7 @@ export function CalendarView({ defaultCategoryFilter = 'all' }: CalendarViewProp
           <div className="grid grid-cols-7 gap-1">
             {weeks.map((week, wIdx) =>
               week.map((day, dIdx) => {
-                if (!day) return <div key={`empty-${wIdx}-${dIdx}`} className="min-h-14" />;
+                if (!day) return <div key={`empty-${wIdx}-${dIdx}`} className="min-h-12 sm:min-h-14" />;
 
                 const iso = toISODate(day);
                 const selected = iso === selectedDate;
@@ -167,7 +197,7 @@ export function CalendarView({ defaultCategoryFilter = 'all' }: CalendarViewProp
                     aria-pressed={selected}
                     aria-label={`${formatShortDate(day, localeTag)}, ${t('calendar.eventsCount', { count })}`}
                     className={cn(
-                      'group relative flex flex-col items-center justify-start min-h-16 p-2 rounded-xl transition-all cursor-pointer',
+                      'group relative flex flex-col items-center justify-start min-h-12 sm:min-h-16 p-1 sm:p-2 rounded-xl transition-all cursor-pointer',
                       selected
                         ? 'bg-primary text-on-primary shadow-xs'
                         : today
@@ -175,7 +205,7 @@ export function CalendarView({ defaultCategoryFilter = 'all' }: CalendarViewProp
                           : 'hover:bg-surface-container text-on-surface',
                     )}
                   >
-                    <span className="text-body-lg font-bold tabular-nums">
+                    <span className="text-body-sm sm:text-body-lg font-bold tabular-nums">
                       {day.getDate()}
                     </span>
 
