@@ -70,8 +70,16 @@ export function useCalendarView() {
     [filteredClasses, tasks, selectedDate],
   );
 
-  const nextMonth = () => setCurrentDate((d) => addMonths(d, 1));
-  const previousMonth = () => setCurrentDate((d) => addMonths(d, -1));
+  const shiftMonth = (delta: number) => {
+    const nextDate = addMonths(currentDate, delta);
+    setCurrentDate(nextDate);
+    const maxDay = daysInMonth(nextDate.getFullYear(), nextDate.getMonth());
+    const currentDay = parseISODate(selectedDate).getDate();
+    const clampedDay = Math.min(currentDay, maxDay);
+    setSelectedDate(toISODate(new Date(nextDate.getFullYear(), nextDate.getMonth(), clampedDay)));
+  };
+  const nextMonth = () => shiftMonth(1);
+  const previousMonth = () => shiftMonth(-1);
   const goToToday = () => {
     const today = new Date();
     setCurrentDate(today);

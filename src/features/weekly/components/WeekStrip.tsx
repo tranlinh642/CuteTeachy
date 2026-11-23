@@ -16,7 +16,7 @@ export function WeekStrip({ days, selectedDate, onSelect, className }: WeekStrip
   const { localeTag } = useTranslation();
 
   return (
-    <div className={cn('grid grid-cols-7 gap-2', className)}>
+    <div className={cn('grid grid-cols-7 gap-1 sm:gap-2', className)}>
       {days.map((day) => {
         const iso = toISODate(day);
         const selected = iso === selectedDate;
@@ -30,7 +30,7 @@ export function WeekStrip({ days, selectedDate, onSelect, className }: WeekStrip
             aria-pressed={selected}
             aria-label={formatShortDate(day, localeTag)}
             className={cn(
-              'flex flex-col items-center justify-center gap-1 rounded-xl p-3 text-center transition-all duration-200 cursor-pointer min-h-16',
+              'flex flex-col items-center justify-center gap-0.5 sm:gap-1 rounded-xl px-1 py-2 sm:p-3 text-center transition-all duration-200 cursor-pointer min-h-14 sm:min-h-16 min-w-0',
               selected
                 ? 'bg-primary text-on-primary shadow-sm scale-102'
                 : today
@@ -40,13 +40,13 @@ export function WeekStrip({ days, selectedDate, onSelect, className }: WeekStrip
           >
             <span
               className={cn(
-                'text-label-md uppercase tracking-wider',
+                'text-label-xs sm:text-label-md uppercase tracking-normal sm:tracking-wider whitespace-nowrap',
                 selected ? 'text-on-primary/90' : 'text-on-surface-variant',
               )}
             >
               {formatWeekdayShort(day, localeTag)}
             </span>
-            <span className="text-headline-md font-bold leading-none">
+            <span className="text-title-md sm:text-headline-md font-bold leading-none tabular-nums">
               {day.getDate()}
             </span>
           </button>

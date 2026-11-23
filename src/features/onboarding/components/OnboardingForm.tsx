@@ -7,7 +7,13 @@ import { useFieldErrorText } from '@/hooks';
 import { selectCurrentUser, useSessionStore } from '@/stores';
 import { getTeacherAvatarLabel } from '@/utils';
 import { toApiError } from '@/lib/api';
-import { useUploadAvatar, useDeleteAvatar, validateAvatarFile } from '@/features/profile';
+import {
+  useUploadAvatar,
+  useDeleteAvatar,
+  validateAvatarFile,
+  validateAvatarSourceFile,
+} from '@/features/profile';
+import { compressAvatarImage } from '@/utils/image-resize';
 import { useOnboardingForm } from '../hooks/use-onboarding-form';
 import { GenderSelector, type GenderOption } from './GenderSelector';
 
@@ -48,15 +54,23 @@ export function OnboardingForm({ onSuccess }: OnboardingFormProps) {
 
     setAvatarError(null);
 
-    // Kiểm tra trước khi gửi: <= 2 MB, jpeg/png/webp; sai -> báo lỗi ngay, không gọi API
-    const validation = validateAvatarFile(file);
+    const sourceValidation = validateAvatarSourceFile(file);
+    if (!sourceValidation.valid && sourceValidation.errorKey) {
+      setAvatarError(t(sourceValidation.errorKey));
+      return;
+    }
+
+    const optimizedFile = await compressAvatarImage(file);
+
+    // Kiểm tra lại sau khi nén: <= 2 MB, jpeg/png/webp; sai -> báo lỗi ngay, không gọi API
+    const validation = validateAvatarFile(optimizedFile);
     if (!validation.valid && validation.errorKey) {
       setAvatarError(t(validation.errorKey));
       return;
     }
 
     try {
-      await uploadAvatar.mutateAsync(file);
+      await uploadAvatar.mutateAsync(optimizedFile);
     } catch (err) {
       const apiErr = toApiError(err);
       setAvatarError(t(apiErr.messageKey));

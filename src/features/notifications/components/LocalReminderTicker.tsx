@@ -14,7 +14,7 @@ import { useClasses } from '@/features/calendar';
 import { useNotes } from '@/features/notes';
 import { useSettings } from '@/features/settings';
 import { useTasks } from '@/features/tasks';
-import { addDays, toISODate } from '@/utils';
+import { getWeekDays, toISODate } from '@/utils';
 import {
   DEFAULT_TIME_ZONE,
   TICKER_INTERVAL_MS,
@@ -48,10 +48,11 @@ function getReminderIcon(type: LocalReminderType): IconName {
 }
 
 function getNearTermRange() {
-  const today = new Date();
+  // Dùng chung khoảng tuần hiện tại với WeeklyDashboard để chia sẻ cache React Query, tránh gọi trùng API.
+  const weekDays = getWeekDays(new Date());
   return {
-    from: toISODate(addDays(today, -1)),
-    to: toISODate(addDays(today, 2)),
+    from: toISODate(weekDays[0] ?? new Date()),
+    to: toISODate(weekDays[weekDays.length - 1] ?? new Date()),
   };
 }
 

@@ -116,19 +116,21 @@ export function TimetableManagementView({
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2">
           <Button
             variant="secondary"
-            size="md"
+            size="sm"
             icon="calendar"
+            className="whitespace-nowrap sm:min-h-12 sm:px-6 sm:text-body-lg"
             onClick={() => router.push('/calendar')}
           >
             {t('timetable.viewInCalendar')}
           </Button>
           <Button
             variant="primary"
-            size="md"
+            size="sm"
             icon="add"
+            className="whitespace-nowrap sm:min-h-12 sm:px-6 sm:text-body-lg"
             onClick={() => openCreateForDay(selectedDayFilter === 'all' ? 1 : selectedDayFilter)}
           >
             {t('timetable.addSlot')}

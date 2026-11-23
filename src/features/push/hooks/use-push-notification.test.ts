@@ -1,5 +1,9 @@
 import { describe, expect, it, vi, afterEach } from 'vitest';
 import { evaluatePushDecision } from '../utils/push-helpers';
+import {
+  resetPushSyncStateForTest,
+  syncGrantedPushSubscription,
+} from './use-push-notification';
 
 describe('usePushNotification logic and decision flows (S5-FE-01)', () => {
   afterEach(() => {
@@ -150,6 +154,110 @@ describe('usePushNotification logic and decision flows (S5-FE-01)', () => {
       expect(pushService.getVapidPublicKey).not.toHaveBeenCalled();
       expect(subscribeSpy).not.toHaveBeenCalled();
       expect(pushService.createPushSubscription).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('syncGrantedPushSubscription (auto re-sync for already-granted devices)', () => {
+    afterEach(() => {
+      resetPushSyncStateForTest();
+    });
+
+    it('syncs an existing browser subscription to backend and deduplicates repeat calls for same account + endpoint', async () => {
+      const mockSub = {
+        endpoint: 'https://web.push.apple.com/mock-endpoint-1',
+        toJSON: () => ({
+          endpoint: 'https://web.push.apple.com/mock-endpoint-1',
+          keys: { p256dh: 'p256dh-1', auth: 'auth-1' },
+        }),
+      } as unknown as PushSubscription;
+
+      const reg = {
+        pushManager: {
+          getSubscription: vi.fn().mockResolvedValue(mockSub),
+          subscribe: vi.fn(),
+        },
+      } as unknown as ServiceWorkerRegistration;
+
+      const createPushSubscription = vi.fn().mockResolvedValue({});
+      const getVapidPublicKey = vi.fn();
+
+      const first = await syncGrantedPushSubscription({
+        accountId: 'acc-1',
+        getRegistration: async () => reg,
+        getVapidPublicKey,
+        createPushSubscription,
+      });
+      const second = await syncGrantedPushSubscription({
+        accountId: 'acc-1',
+        getRegistration: async () => reg,
+        getVapidPublicKey,
+        createPushSubscription,
+      });
+
+      expect(first).toBe(true);
+      expect(second).toBe(true);
+      expect(getVapidPublicKey).not.toHaveBeenCalled();
+      expect(createPushSubscription).toHaveBeenCalledTimes(1);
+      expect(createPushSubscription).toHaveBeenCalledWith({
+        endpoint: 'https://web.push.apple.com/mock-endpoint-1',
+        keys: { p256dh: 'p256dh-1', auth: 'auth-1' },
+      });
+    });
+
+    it('silently re-subscribes when OS permission is already granted but browser subscription was cleared (e.g. after logout/login)', async () => {
+      const newSub = {
+        endpoint: 'https://web.push.apple.com/mock-endpoint-2',
+        toJSON: () => ({
+          endpoint: 'https://web.push.apple.com/mock-endpoint-2',
+          keys: { p256dh: 'p256dh-2', auth: 'auth-2' },
+        }),
+      } as unknown as PushSubscription;
+
+      const subscribe = vi.fn().mockResolvedValue(newSub);
+      const reg = {
+        pushManager: {
+          getSubscription: vi.fn().mockResolvedValue(null),
+          subscribe,
+        },
+      } as unknown as ServiceWorkerRegistration;
+
+      const getVapidPublicKey = vi.fn().mockResolvedValue({ publicKey: 'BAECAwQFBgcICQoLDA0ODw' });
+      const createPushSubscription = vi.fn().mockResolvedValue({});
+
+      const ok = await syncGrantedPushSubscription({
+        accountId: 'acc-2',
+        getRegistration: async () => reg,
+        getVapidPublicKey,
+        createPushSubscription,
+      });
+
+      expect(ok).toBe(true);
+      expect(getVapidPublicKey).toHaveBeenCalledTimes(1);
+      expect(subscribe).toHaveBeenCalledWith(
+        expect.objectContaining({ userVisibleOnly: true }),
+      );
+      expect(createPushSubscription).toHaveBeenCalledWith({
+        endpoint: 'https://web.push.apple.com/mock-endpoint-2',
+        keys: { p256dh: 'p256dh-2', auth: 'auth-2' },
+      });
+    });
+
+    it('returns false gracefully when browser blocks silent subscribe without user gesture', async () => {
+      const reg = {
+        pushManager: {
+          getSubscription: vi.fn().mockResolvedValue(null),
+          subscribe: vi.fn().mockRejectedValue(new Error('User gesture required')),
+        },
+      } as unknown as ServiceWorkerRegistration;
+
+      const ok = await syncGrantedPushSubscription({
+        accountId: 'acc-3',
+        getRegistration: async () => reg,
+        getVapidPublicKey: vi.fn().mockResolvedValue({ publicKey: 'BAECAwQFBgcICQoLDA0ODw' }),
+        createPushSubscription: vi.fn(),
+      });
+
+      expect(ok).toBe(false);
     });
   });
 });

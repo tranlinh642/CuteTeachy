@@ -103,6 +103,16 @@ export function AiScheduleDraftCard({
   const effectiveDraft = appliedState ?? draft;
   const isApplied = effectiveDraft.status === 'applied';
   const isApplying = applyDraftMutation.isPending;
+  const hasNewTimetableSlots = editedItems.some(
+    (item) => item.kind === 'timetable_slot' && (item.action ?? 'create') === 'create',
+  );
+  const hasModifications = editedItems.some((item) => (item.action ?? 'create') !== 'create');
+  const hasDetailedSummary = Boolean(
+    effectiveDraft.summary &&
+      ((effectiveDraft.summary.updatedCount ?? 0) > 0 ||
+        (effectiveDraft.summary.deletedCount ?? 0) > 0 ||
+        (effectiveDraft.summary.cancelledCount ?? 0) > 0),
+  );
 
   const toggleSelectItem = (itemId: ID) => {
     if (isApplied) return;
@@ -198,22 +208,33 @@ export function AiScheduleDraftCard({
         {editedItems.map((item) => {
           const isSelected = selectedIds.has(item.id);
           const hasConflict = Boolean(item.conflict);
+          const action = item.action ?? 'create';
+          const isDestructiveAction = action === 'delete' || action === 'cancel';
+          const actionBadgeClass =
+            action === 'update'
+              ? 'bg-secondary-container text-on-secondary-container'
+              : isDestructiveAction
+                ? 'bg-error-container text-on-error-container'
+                : 'bg-primary-container/70 text-on-primary-container';
 
           return (
             <div
               key={item.id}
               data-testid={`draft-item-${item.id}`}
+              data-action={action}
               className={cn(
                 'flex flex-col gap-2.5 rounded-xl border p-3 transition-colors',
-                hasConflict
-                  ? 'border-error/50 bg-error-container/10'
-                  : 'border-outline-variant/30 bg-surface-container-low',
+                isDestructiveAction
+                  ? 'border-error/40 bg-error-container/10'
+                  : hasConflict
+                    ? 'border-error/50 bg-error-container/10'
+                    : 'border-outline-variant/30 bg-surface-container-low',
                 !isSelected && 'opacity-60',
               )}
             >
-              {/* Top row: Checkbox + Kind badge + Conflict warning badge */}
+              {/* Top row: Checkbox + Action badge + Kind badge + Conflict warning badge */}
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <label className="inline-flex items-center gap-2 cursor-pointer">
+                <label className="inline-flex flex-wrap items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
                     data-testid={`draft-item-checkbox-${item.id}`}
@@ -225,6 +246,12 @@ export function AiScheduleDraftCard({
                     })}
                     className="size-4 rounded accent-primary cursor-pointer"
                   />
+                  <span
+                    data-testid={`draft-item-action-${item.id}`}
+                    className={cn('rounded-md px-2 py-0.5 text-label-xs font-bold', actionBadgeClass)}
+                  >
+                    {t(`aiAssistant.draft.actions.${action}` as TranslationKey)}
+                  </span>
                   <span className="rounded-md bg-surface-container-highest px-2 py-0.5 text-label-xs font-bold text-on-surface">
                     {t(`aiAssistant.draft.kinds.${item.kind}` as TranslationKey)}
                   </span>
@@ -248,8 +275,38 @@ export function AiScheduleDraftCard({
                 )}
               </div>
 
-              {/* Quick edit fields grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+              {item.targetSummary && (
+                <p
+                  data-testid={`draft-item-target-${item.id}`}
+                  className="text-body-xs font-medium text-on-surface-variant"
+                >
+                  {t('aiAssistant.draft.targetLabel', { summary: item.targetSummary })}
+                </p>
+              )}
+
+              {/* Quick edit fields grid (read-only concise summary for delete/cancel actions) */}
+              {isDestructiveAction ? (
+                <div className="flex flex-wrap items-center gap-2 text-body-sm text-on-surface">
+                  <span className="font-semibold">{item.titleOrSubject}</span>
+                  {item.date && <span className="text-on-surface-variant">• {item.date}</span>}
+                  {item.weekday && !item.date && (
+                    <span className="text-on-surface-variant">
+                      •{' '}
+                      {t(
+                        (WEEKDAY_OPTIONS.find((w) => w.value === item.weekday)?.key ??
+                          'timetable.weekdays.mon') as TranslationKey,
+                      )}
+                    </span>
+                  )}
+                  {item.startTime && (
+                    <span className="text-on-surface-variant">
+                      • {item.startTime}
+                      {item.endTime ? `–${item.endTime}` : ''}
+                    </span>
+                  )}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
                 {/* Title or Subject */}
                 <label className="flex flex-col gap-1 sm:col-span-2">
                   <span className="text-label-xs font-medium text-on-surface-variant">
@@ -400,7 +457,8 @@ export function AiScheduleDraftCard({
                     </label>
                   </>
                 )}
-              </div>
+                </div>
+              )}
             </div>
           );
         })}
@@ -409,45 +467,70 @@ export function AiScheduleDraftCard({
       {/* Conflict strategy selector */}
       <div
         data-testid="draft-conflict-strategy"
-        className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-xl bg-surface-container p-3"
+        className="flex flex-col gap-2 rounded-xl bg-surface-container p-3"
       >
-        <span className="text-label-md font-semibold text-on-surface">
-          {t('aiAssistant.draft.conflictStrategyLabel')}:
-        </span>
-        <div className="flex flex-wrap items-center gap-2" role="radiogroup">
-          <button
-            type="button"
-            role="radio"
-            aria-checked={conflictStrategy === 'replace_conflicts'}
-            disabled={isApplied}
-            data-testid="conflict-strategy-replace_conflicts"
-            onClick={() => setConflictStrategy('replace_conflicts')}
-            className={cn(
-              'rounded-full px-3.5 py-1.5 text-label-sm font-medium transition-all cursor-pointer',
-              conflictStrategy === 'replace_conflicts'
-                ? 'bg-primary text-on-primary font-bold shadow-xs'
-                : 'bg-surface text-on-surface-variant hover:bg-surface-container-high',
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <span className="text-label-md font-semibold text-on-surface">
+            {t('aiAssistant.draft.conflictStrategyLabel')}:
+          </span>
+          <div className="flex flex-wrap items-center gap-2" role="radiogroup">
+            <button
+              type="button"
+              role="radio"
+              aria-checked={conflictStrategy === 'replace_conflicts'}
+              disabled={isApplied}
+              data-testid="conflict-strategy-replace_conflicts"
+              onClick={() => setConflictStrategy('replace_conflicts')}
+              className={cn(
+                'rounded-full px-3.5 py-1.5 text-label-sm font-medium transition-all cursor-pointer',
+                conflictStrategy === 'replace_conflicts'
+                  ? 'bg-primary text-on-primary font-bold shadow-xs'
+                  : 'bg-surface text-on-surface-variant hover:bg-surface-container-high',
+              )}
+            >
+              {t('aiAssistant.draft.replaceConflicts')}
+            </button>
+            <button
+              type="button"
+              role="radio"
+              aria-checked={conflictStrategy === 'skip_conflicts'}
+              disabled={isApplied}
+              data-testid="conflict-strategy-skip_conflicts"
+              onClick={() => setConflictStrategy('skip_conflicts')}
+              className={cn(
+                'rounded-full px-3.5 py-1.5 text-label-sm font-medium transition-all cursor-pointer',
+                conflictStrategy === 'skip_conflicts'
+                  ? 'bg-primary text-on-primary font-bold shadow-xs'
+                  : 'bg-surface text-on-surface-variant hover:bg-surface-container-high',
+              )}
+            >
+              {t('aiAssistant.draft.skipConflicts')}
+            </button>
+            {hasNewTimetableSlots && (
+              <button
+                type="button"
+                role="radio"
+                aria-checked={conflictStrategy === 'replace_all_timetable'}
+                disabled={isApplied}
+                data-testid="conflict-strategy-replace_all_timetable"
+                onClick={() => setConflictStrategy('replace_all_timetable')}
+                className={cn(
+                  'rounded-full px-3.5 py-1.5 text-label-sm font-medium transition-all cursor-pointer',
+                  conflictStrategy === 'replace_all_timetable'
+                    ? 'bg-primary text-on-primary font-bold shadow-xs'
+                    : 'bg-surface text-on-surface-variant hover:bg-surface-container-high',
+                )}
+              >
+                {t('aiAssistant.draft.replaceAllTimetable')}
+              </button>
             )}
-          >
-            {t('aiAssistant.draft.replaceConflicts')}
-          </button>
-          <button
-            type="button"
-            role="radio"
-            aria-checked={conflictStrategy === 'skip_conflicts'}
-            disabled={isApplied}
-            data-testid="conflict-strategy-skip_conflicts"
-            onClick={() => setConflictStrategy('skip_conflicts')}
-            className={cn(
-              'rounded-full px-3.5 py-1.5 text-label-sm font-medium transition-all cursor-pointer',
-              conflictStrategy === 'skip_conflicts'
-                ? 'bg-primary text-on-primary font-bold shadow-xs'
-                : 'bg-surface text-on-surface-variant hover:bg-surface-container-high',
-            )}
-          >
-            {t('aiAssistant.draft.skipConflicts')}
-          </button>
+          </div>
         </div>
+        {conflictStrategy === 'replace_all_timetable' && (
+          <p className="text-body-xs text-on-surface-variant">
+            {t('aiAssistant.draft.replaceAllHint')}
+          </p>
+        )}
       </div>
 
       {/* Apply error alert */}
@@ -469,11 +552,20 @@ export function AiScheduleDraftCard({
         >
           <Icon name="check" size={18} />
           <span>
-            {t('aiAssistant.draft.summary', {
-              created: effectiveDraft.summary.createdCount,
-              replaced: effectiveDraft.summary.replacedCount,
-              skipped: effectiveDraft.summary.skippedCount,
-            })}
+            {hasDetailedSummary
+              ? t('aiAssistant.draft.summaryDetailed', {
+                  created: effectiveDraft.summary.createdCount,
+                  updated: effectiveDraft.summary.updatedCount ?? 0,
+                  replaced: effectiveDraft.summary.replacedCount,
+                  deleted: effectiveDraft.summary.deletedCount ?? 0,
+                  cancelled: effectiveDraft.summary.cancelledCount ?? 0,
+                  skipped: effectiveDraft.summary.skippedCount,
+                })
+              : t('aiAssistant.draft.summary', {
+                  created: effectiveDraft.summary.createdCount,
+                  replaced: effectiveDraft.summary.replacedCount,
+                  skipped: effectiveDraft.summary.skippedCount,
+                })}
           </span>
         </div>
       )}
@@ -493,7 +585,9 @@ export function AiScheduleDraftCard({
             ? t('aiAssistant.draft.appliedButton')
             : isApplying
               ? t('aiAssistant.draft.applying')
-              : t('aiAssistant.draft.confirmApply')}
+              : hasModifications
+                ? t('aiAssistant.draft.confirmUpdate')
+                : t('aiAssistant.draft.confirmApply')}
         </Button>
       </div>
     </Card>

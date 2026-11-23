@@ -32,7 +32,7 @@ export function TaskItem({
       className={cn(
         'group flex items-start gap-3 rounded-xl p-3.5 transition-all shadow-xs',
         isHigh
-          ? 'bg-rose-50 border border-rose-200/60'
+          ? 'bg-tone-rose/45 border border-tone-rose-accent/30'
           : 'bg-primary-container/30 border border-primary-container/40',
         task.completed && 'opacity-60',
         className,

@@ -63,8 +63,28 @@ export function useCreateNote() {
   const queryClient = useQueryClient();
   return useMutation<Note, ApiError, CreateNoteInput>({
     mutationFn: (input) => notes.create(input),
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: queryKeys.notes.all }),
+    onSuccess: (createdNote) => {
+      queryClient.setQueriesData<InfiniteData<SyncEnvelope<Note>>>(
+        { queryKey: queryKeys.notes.infinite() },
+        (oldData) => {
+          if (!oldData?.pages?.length) return oldData;
+          const [firstPage, ...restPages] = oldData.pages;
+          if (!firstPage) return oldData;
+          const exists = firstPage.items.some((item) => item.id === createdNote.id);
+          return {
+            ...oldData,
+            pages: [
+              {
+                ...firstPage,
+                items: exists ? firstPage.items : [createdNote, ...firstPage.items],
+              },
+              ...restPages,
+            ],
+          };
+        },
+      );
+      void queryClient.invalidateQueries({ queryKey: queryKeys.notes.all });
+    },
     onError: (error, variables) => {
       if (variables.id) {
         handleGoneError(error, {
@@ -106,8 +126,9 @@ export function useUpdateNote() {
         removeEntityFromCache(queryClient, queryKeys.notes.all, id);
       }
     },
-    onSettled: () =>
-      queryClient.invalidateQueries({ queryKey: queryKeys.notes.all }),
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.notes.all });
+    },
   });
 }
 
@@ -120,8 +141,9 @@ export function useDeleteNote() {
       await queryClient.cancelQueries({ queryKey: queryKeys.notes.all });
       removeEntityFromCache(queryClient, queryKeys.notes.all, id);
     },
-    onSettled: () =>
-      queryClient.invalidateQueries({ queryKey: queryKeys.notes.all }),
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.notes.all });
+    },
   });
 }
 

@@ -43,7 +43,7 @@ export const profile = {
     deleting: 'Đang xóa ảnh…',
     uploadSuccess: 'Cập nhật ảnh đại diện thành công',
     deleteSuccess: 'Đã xóa ảnh đại diện',
-    hint: 'Tối đa 2MB. Hỗ trợ định dạng JPEG, PNG, WebP',
+    hint: 'Hỗ trợ JPEG, PNG, WebP (ảnh lớn sẽ tự động thu gọn trước khi tải lên)',
     chooseFile: 'Chọn ảnh từ thiết bị',
   },
   edit: {

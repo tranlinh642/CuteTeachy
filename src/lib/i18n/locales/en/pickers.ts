@@ -14,6 +14,7 @@ export const pickers: typeof Schema = {
     pm: 'PM',
     increase: 'Increase {{unit}}',
     decrease: 'Decrease {{unit}}',
+    swipeHint: 'Swipe up or down to quickly pick hour and minute',
   },
   month: {
     title: 'Select month',

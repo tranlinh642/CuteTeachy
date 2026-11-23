@@ -6,8 +6,23 @@ const NO_RETRY_CODES = new Set([
   'not_found',
   'validation',
   'invalid_credentials',
+  'invalid_code',
+  'email_taken',
+  'email_not_verified',
+  'onboarding_required',
+  'file_too_large',
+  'unsupported_file_type',
+  'rate_limited',
   'gone',
   'id_conflict',
+  'tag_name_taken',
+  'timetable_conflict',
+  'cannot_delete_generated_session',
+  'ai_draft_already_applied',
+  'ai_provider_not_configured',
+  'ai_provider_error',
+  'service_unavailable',
+  'conflict',
 ]);
 
 export const createQueryClient = (): QueryClient =>

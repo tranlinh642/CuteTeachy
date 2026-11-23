@@ -17,10 +17,12 @@ import { HtmlLangSync } from './html-lang-sync';
 import { ThemeSync } from '@/lib/theme';
 import { SettingsSync } from '@/features/settings';
 import { clearAuthSessionState } from '@/features/auth';
+import { pwaUpdateManager } from '@/lib/pwa/pwa-update-manager';
 
 export const createApiConfig = (queryClient?: QueryClient): ApiConfig => ({
   baseURL: env.apiUrl,
   mode: env.apiMode,
+  timeoutMs: 90_000,
   getAccessToken,
   getLocale: () => useI18nStore.getState().locale,
   // 401 -> xóa phiên + xóa serverTime sync checkpoint + xóa query cache; AuthGuard sẽ tự chuyển về /login.
@@ -62,9 +64,7 @@ export function Providers({ children }: ProvidersProps) {
 
     if (typeof window !== 'undefined' && 'serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
       const registerSw = () => {
-        navigator.serviceWorker.register('/sw.js').catch((err) => {
-          console.warn('[PWA] Service worker registration failed:', err);
-        });
+        void pwaUpdateManager.init({ register: true });
       };
 
       if (document.readyState === 'complete') {

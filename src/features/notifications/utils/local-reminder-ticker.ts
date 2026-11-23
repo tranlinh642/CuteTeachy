@@ -3,7 +3,7 @@ import { DEFAULT_NOTIFICATION_BADGE, DEFAULT_NOTIFICATION_ICON } from '@/lib/pus
 import { formatClassSessionReminderNotification } from '@/utils';
 
 export const LOCAL_REMINDER_STORAGE_KEY = 'cuteteachy:fired-reminder-tags';
-export const REMINDER_WINDOW_MS = 2 * 60 * 1000;
+export const REMINDER_WINDOW_MS = 10 * 60 * 1000;
 export const TICKER_INTERVAL_MS = 15 * 1000;
 export const DEFAULT_TIME_ZONE = 'Asia/Ho_Chi_Minh';
 

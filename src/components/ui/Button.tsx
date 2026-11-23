@@ -25,9 +25,9 @@ const VARIANT_CLASS: Readonly<Record<ButtonVariant, string>> = {
 };
 
 const SIZE_CLASS: Readonly<Record<ButtonSize, string>> = {
-  sm: 'min-h-touch px-4 text-body-sm gap-1.5',
-  md: 'min-h-12 px-6 text-body-lg gap-2',
-  lg: 'min-h-14 px-8 text-body-lg gap-2',
+  sm: 'min-h-touch px-3 sm:px-4 text-body-sm gap-1.5',
+  md: 'min-h-touch sm:min-h-12 px-4 sm:px-6 text-body-sm sm:text-body-lg gap-1.5 sm:gap-2',
+  lg: 'min-h-12 sm:min-h-14 px-5 sm:px-8 text-body-md sm:text-body-lg gap-2',
 };
 
 const ICON_SIZE: Readonly<Record<ButtonSize, number>> = { sm: 18, md: 20, lg: 22 };
@@ -58,7 +58,7 @@ export function Button({
       disabled={disabled || loading}
       aria-busy={loading || undefined}
       className={cn(
-        'inline-flex items-center justify-center rounded-full font-bold transition-colors duration-200',
+        'inline-flex items-center justify-center rounded-full font-bold leading-snug text-center transition-colors duration-200',
         'disabled:cursor-not-allowed disabled:opacity-60',
         VARIANT_CLASS[variant],
         SIZE_CLASS[size],

@@ -62,7 +62,7 @@ export function PushNotificationPrompt({
 
   return (
     <>
-      {shouldShow && (
+      {shouldShow && !pushNotification.isDialogOpen && (
         <PushPromptBanner
           onEnable={handleEnable}
           onDismiss={() => setIsDismissed(true)}

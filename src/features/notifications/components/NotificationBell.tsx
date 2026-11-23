@@ -93,7 +93,7 @@ function NotificationBellConnected({ defaultOpen = false, className }: Notificat
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const { data } = useNotifications({ limit: 30 });
+  const { data, refetch: refetchNotifications } = useNotifications({ limit: 30 });
   const markRead = useMarkNotificationRead();
   const markAllRead = useMarkAllNotificationsRead();
   const pushNotification = usePushNotification();
@@ -162,7 +162,15 @@ function NotificationBellConnected({ defaultOpen = false, className }: Notificat
         }
         aria-expanded={isOpen}
         aria-haspopup="dialog"
-        onClick={() => setIsOpen((prev) => !prev)}
+        onClick={() => {
+          setIsOpen((prev) => {
+            const next = !prev;
+            if (next) {
+              void refetchNotifications();
+            }
+            return next;
+          });
+        }}
         className={cn(
           'relative inline-flex size-10 items-center justify-center rounded-full transition-colors cursor-pointer',
           'text-on-surface-variant hover:bg-surface-container hover:text-on-surface',
