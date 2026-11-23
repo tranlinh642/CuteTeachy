@@ -2,6 +2,7 @@ export const navigation = {
   home: 'Trang chủ',
   calendar: 'Lịch',
   timetable: 'Thời khoá biểu',
+  timetableShort: 'TKB',
   assistant: 'Trợ lý AI',
   notes: 'Ghi chú',
   profile: 'Cá nhân',

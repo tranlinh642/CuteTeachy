@@ -30,4 +30,5 @@ export const errors: typeof ErrorsSchema = {
   aiDraftAlreadyApplied: 'This AI schedule draft has already been applied',
   aiProviderNotConfigured: 'AI Assistant is not configured on the server',
   aiProviderError: 'Failed to connect to the AI service, please try again later',
+  serviceUnavailable: 'Storage service is temporarily unavailable, please try again later',
 };

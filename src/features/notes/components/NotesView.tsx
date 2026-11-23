@@ -98,7 +98,7 @@ export function NotesView({ initialNoteId }: NotesViewProps = {}) {
               type="button"
               onClick={() => setSelectedTagId(selectedTagId === tag.id ? null : tag.id)}
               aria-pressed={selectedTagId === tag.id}
-              className="focus:outline-none"
+              className="min-h-touch inline-flex items-center focus:outline-none"
             >
               <TagChip
                 name={tag.name}

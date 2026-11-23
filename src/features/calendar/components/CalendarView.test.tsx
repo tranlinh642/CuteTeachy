@@ -193,6 +193,23 @@ describe('CalendarView & WeeklyDashboard ScheduleCategory Filtering (S4-FE-03 & 
     expect(html).toContain('Thêm buổi lẻ');
   });
 
+  it('groups previous/next month arrows around month title inside calendar toolbar and separates Today button', () => {
+    const html = renderView();
+    expect(html).toContain('data-testid="calendar-month-toolbar"');
+    expect(html).toContain('data-testid="calendar-month-title"');
+    expect(html).toContain('Tháng 10 năm 2026');
+    expect(html).toContain('data-testid="calendar-today-button"');
+
+    const prevIdx = html.indexOf('aria-label="Tháng trước"');
+    const titleIdx = html.indexOf('data-testid="calendar-month-title"');
+    const nextIdx = html.indexOf('aria-label="Tháng sau"');
+    const todayIdx = html.indexOf('data-testid="calendar-today-button"');
+    expect(prevIdx).toBeGreaterThan(-1);
+    expect(prevIdx).toBeLessThan(titleIdx);
+    expect(titleIdx).toBeLessThan(nextIdx);
+    expect(nextIdx).toBeLessThan(todayIdx);
+  });
+
   it('renders ClassCard for class agenda entries with clickable role', () => {
     const html = renderView();
     expect(html).toContain('Sinh học');

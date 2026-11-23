@@ -166,8 +166,25 @@ export async function unsubscribeDevice(options?: UnsubscribeDeviceOptions): Pro
   }
 
   try {
-    const reg = await nav.serviceWorker.ready;
-    const sub = await reg?.pushManager?.getSubscription();
+    // Check getRegistration() first so logout never hangs forever when no SW is registered
+    if (typeof nav.serviceWorker.getRegistration === 'function') {
+      const existingReg = await nav.serviceWorker.getRegistration();
+      if (!existingReg) {
+        return false;
+      }
+    }
+
+    const reg = await Promise.race<ServiceWorkerRegistration | null>([
+      nav.serviceWorker.ready,
+      new Promise<null>((resolve) => {
+        setTimeout(() => resolve(null), 3_000);
+      }),
+    ]);
+    if (!reg) {
+      return false;
+    }
+
+    const sub = await reg.pushManager?.getSubscription();
     if (!sub) {
       return false;
     }

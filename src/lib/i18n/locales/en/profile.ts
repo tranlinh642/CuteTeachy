@@ -45,7 +45,7 @@ export const profile: typeof Schema = {
     deleting: 'Removing photo…',
     uploadSuccess: 'Profile picture updated successfully',
     deleteSuccess: 'Profile picture removed',
-    hint: 'Max 2MB. Supported formats: JPEG, PNG, WebP',
+    hint: 'Supports JPEG, PNG, WebP (large photos are automatically resized before upload)',
     chooseFile: 'Choose photo from device',
   },
   edit: {

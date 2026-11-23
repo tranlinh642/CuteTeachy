@@ -32,7 +32,9 @@ import {
 import { LogoutButton } from '@/features/auth';
 import { EditProfileDialog } from './EditProfileDialog';
 import { useUploadAvatar, useDeleteAvatar } from '../api';
-import { validateAvatarFile } from '../utils/avatar-file';
+import { validateAvatarFile, validateAvatarSourceFile } from '../utils/avatar-file';
+import { compressAvatarImage } from '@/utils/image-resize';
+import { usePwaUpdate } from '@/hooks/use-pwa-update';
 import { usePushNotification, PushPermissionDialog } from '@/features/push';
 
 export function ProfileView() {
@@ -46,6 +48,7 @@ export function ProfileView() {
   const { data: settings } = useSettings();
   const updateSettings = useUpdateSettings();
   const pushNotification = usePushNotification();
+  const pwaUpdate = usePwaUpdate();
 
   const locale = settings?.locale ?? currentLocale;
   const pushEnabled = settings?.pushEnabled ?? true;
@@ -81,15 +84,24 @@ export function ProfileView() {
 
     setAvatarError(null);
 
-    // Kiểm tra trước khi gửi: <= 2 MB, jpeg/png/webp; sai -> báo lỗi ngay, không gọi API
-    const validation = validateAvatarFile(file);
+    // Kiểm tra định dạng và trần dung lượng thô trước khi tự động thu nhỏ ảnh về 512x512
+    const sourceValidation = validateAvatarSourceFile(file);
+    if (!sourceValidation.valid && sourceValidation.errorKey) {
+      setAvatarError(t(sourceValidation.errorKey));
+      return;
+    }
+
+    const optimizedFile = await compressAvatarImage(file);
+
+    // Kiểm tra lại sau khi nén: <= 2 MB, jpeg/png/webp
+    const validation = validateAvatarFile(optimizedFile);
     if (!validation.valid && validation.errorKey) {
       setAvatarError(t(validation.errorKey));
       return;
     }
 
     try {
-      await uploadAvatar.mutateAsync(file);
+      await uploadAvatar.mutateAsync(optimizedFile);
       setSuccessMessage(t('profile.avatar.uploadSuccess'));
     } catch (err) {
       const apiErr = toApiError(err);
@@ -123,6 +135,12 @@ export function ProfileView() {
     );
   };
 
+  useEffect(() => {
+    if (pushNotification.error) {
+      setSettingsError(pushNotification.error);
+    }
+  }, [pushNotification.error]);
+
   const handlePushNotificationsChange = (enabled: boolean) => {
     setSettingsError(null);
     if (!enabled) {
@@ -143,11 +161,6 @@ export function ProfileView() {
       // Re-register push subscription with BE to ensure active endpoint
       void pushNotification
         .confirmPermission()
-        .then((success) => {
-          if (!success && pushNotification.error) {
-            setSettingsError(pushNotification.error);
-          }
-        })
         .catch((err: unknown) => {
           const apiErr = toApiError(err);
           setSettingsError(t(apiErr.messageKey));
@@ -165,8 +178,6 @@ export function ProfileView() {
       .then((success) => {
         if (success) {
           setSuccessMessage(t('push.dialog.successMessage'));
-        } else if (pushNotification.error) {
-          setSettingsError(pushNotification.error);
         }
       })
       .catch((err: unknown) => {
@@ -181,11 +192,25 @@ export function ProfileView() {
     setIsTestingPush(true);
 
     try {
+      // Nếu thiết bị đã cấp quyền trên OS nhưng chưa đăng ký subscription, tự kết nối trước khi gửi thử
+      if (pushNotification.decision === 'already_granted' && !pushNotification.isSubscribed) {
+        await pushNotification.confirmPermission().catch(() => false);
+      }
+
       const sendFn =
         typeof pushNotification.sendTestNotification === 'function'
           ? () => pushNotification.sendTestNotification()
           : () => pushService.sendTestNotification();
-      const res = await sendFn();
+      let res = await sendFn();
+
+      // Tự phục hồi nếu trình duyệt còn subscription cũ nhưng server không còn bản ghi (sent === 0)
+      if (res.sent === 0 && pushNotification.decision === 'already_granted') {
+        const resynced = await pushNotification.confirmPermission().catch(() => false);
+        if (resynced) {
+          res = await sendFn();
+        }
+      }
+
       void queryClient.invalidateQueries({ queryKey: queryKeys.notifications.all });
       if (res.sent > 0) {
         setTestPushMessage(t('push.settings.testSuccessSent', { sent: res.sent }));
@@ -295,8 +320,12 @@ export function ProfileView() {
       )}
 
       {/* Thông tin tài khoản */}
-      <Card variant="tonalSubtle" padding="lg" className="flex items-center justify-between gap-5">
-        <div className="flex items-center gap-5 min-w-0">
+      <Card
+        variant="tonalSubtle"
+        padding="md"
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-5 sm:p-8"
+      >
+        <div className="flex items-center gap-4 sm:gap-5 min-w-0">
           <div className="flex flex-col items-center gap-2 shrink-0">
             <div className="relative">
               <Avatar
@@ -329,7 +358,7 @@ export function ProfileView() {
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploadAvatar.isPending || deleteAvatar.isPending}
-                className="text-label-sm text-primary hover:text-primary-fixed-dim hover:underline font-bold disabled:opacity-50 cursor-pointer min-h-touch inline-flex items-center px-1"
+                className="text-label-sm text-primary hover:text-primary-fixed-dim hover:underline font-bold disabled:opacity-50 cursor-pointer min-h-touch inline-flex items-center px-1 whitespace-nowrap"
               >
                 {user?.avatarUrl ? t('profile.avatar.change') : t('profile.avatar.upload')}
               </button>
@@ -340,7 +369,7 @@ export function ProfileView() {
                     type="button"
                     onClick={() => setConfirmDeleteAvatarOpen(true)}
                     disabled={uploadAvatar.isPending || deleteAvatar.isPending}
-                    className="text-label-sm text-error hover:underline font-medium disabled:opacity-50 cursor-pointer min-h-touch inline-flex items-center px-1"
+                    className="text-label-sm text-error hover:underline font-medium disabled:opacity-50 cursor-pointer min-h-touch inline-flex items-center px-1 whitespace-nowrap"
                   >
                     {t('profile.avatar.delete')}
                   </button>
@@ -349,21 +378,21 @@ export function ProfileView() {
             </div>
           </div>
 
-          <div className="flex flex-col gap-1 min-w-0">
-            <h2 className="text-headline-md font-bold text-on-primary-container truncate">
+          <div className="flex flex-col gap-1 min-w-0 flex-1">
+            <h2 className="text-headline-md font-bold text-on-primary-container break-words">
               {formatTeacherDisplayName(user, t)}
             </h2>
             {showFullNameSubtitle ? (
-              <p className="text-body-sm font-medium text-on-surface">
+              <p className="text-body-sm font-medium text-on-surface break-words">
                 {user?.fullName}
               </p>
             ) : null}
-            <p className="text-body-sm text-on-surface-variant">
+            <p className="text-body-sm text-on-surface-variant break-all">
               {user?.email ?? ''}
             </p>
-            <div className="mt-1 inline-flex items-center gap-1.5 rounded-full bg-primary-container px-3 py-0.5 text-label-md font-bold text-on-primary-container self-start">
+            <div className="mt-1 inline-flex items-center gap-1.5 rounded-full bg-primary-container px-3 py-1 text-label-md font-bold text-on-primary-container self-start max-w-full">
               <Icon name="school" size={16} />
-              <span>{user?.title ?? getTeacherRole(user?.gender, t)}</span>
+              <span className="truncate">{user?.title ?? getTeacherRole(user?.gender, t)}</span>
             </div>
           </div>
         </div>
@@ -372,6 +401,7 @@ export function ProfileView() {
           variant="secondary"
           size="sm"
           icon="edit"
+          className="self-start sm:self-center shrink-0 whitespace-nowrap"
           onClick={() => setIsEditDialogOpen(true)}
         >
           {t('profile.edit.button')}
@@ -432,6 +462,12 @@ export function ProfileView() {
                 {pushNotification.decision === 'ios_needs_pwa' && (
                   <p className="text-body-xs text-on-surface-variant mt-0.5">{t('push.settings.statusIosNeedsPwa')}</p>
                 )}
+                {pushNotification.decision === 'can_prompt' && (
+                  <p className="text-body-xs text-on-surface-variant mt-0.5">{t('push.settings.statusNotEnabledOnDevice')}</p>
+                )}
+                {pushNotification.decision === 'already_granted' && pushNotification.isSubscribed && pushEnabled && (
+                  <p className="text-body-xs text-primary mt-0.5">{t('push.settings.statusConnected')}</p>
+                )}
               </div>
             </div>
             <Switch
@@ -490,6 +526,25 @@ export function ProfileView() {
             </div>
           )}
 
+          {/* Khi đã cấp quyền trên thiết bị nhưng PushSubscription chưa lưu lên server */}
+          {pushNotification.decision === 'already_granted' && !pushNotification.isSubscribed && (
+            <div className="rounded-xl bg-secondary-container/35 border border-secondary/20 p-4 flex flex-wrap items-center justify-between gap-3">
+              <p className="text-body-sm text-on-surface flex-1 min-w-48">
+                {t('push.settings.reconnectDeviceHint')}
+              </p>
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                icon="bell"
+                loading={pushNotification.isSubscribing}
+                onClick={handleDirectPermissionRequest}
+              >
+                {t('push.settings.reconnectDeviceButton')}
+              </Button>
+            </div>
+          )}
+
           <div className="border-t border-outline-variant/40 pt-4 flex flex-col gap-3">
             <div className="flex items-center gap-3">
               <Icon name="clock" size={24} className="text-primary" />
@@ -542,12 +597,53 @@ export function ProfileView() {
       {/* Thông tin phần mềm */}
       <section className="flex flex-col gap-3">
         <SectionHeader title={t('profile.accountDetails')} />
-        <Card padding="md" className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Icon name="spa" size={24} className="text-primary" />
-            <span className="text-title-md font-medium text-on-surface">{t('common.appName')}</span>
+        <Card padding="md" className="flex flex-col gap-3">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <Icon name="spa" size={24} className="text-primary" />
+              <span className="text-title-md font-medium text-on-surface">{t('common.appName')}</span>
+            </div>
+            <span className="text-label-md font-bold text-on-surface-variant">{APP_VERSION}</span>
           </div>
-          <span className="text-label-md font-bold text-on-surface-variant">{APP_VERSION}</span>
+
+          <div className="border-t border-outline-variant/40 pt-3 flex flex-wrap items-center justify-between gap-3">
+            <p className="text-body-xs text-on-surface-variant">
+              {pwaUpdate.hasUpdate
+                ? t('pwa.updateTitle')
+                : pwaUpdate.checkStatus === 'up_to_date'
+                  ? t('pwa.upToDate')
+                  : pwaUpdate.checkStatus === 'unsupported'
+                    ? t('pwa.updateUnsupported')
+                    : t('pwa.updateDescription')}
+            </p>
+            {pwaUpdate.hasUpdate ? (
+              <Button
+                type="button"
+                variant="primary"
+                size="sm"
+                icon="check"
+                data-testid="profile-pwa-update-button"
+                loading={pwaUpdate.isUpdating}
+                onClick={() => void pwaUpdate.applyUpdate()}
+              >
+                {pwaUpdate.isUpdating ? t('pwa.updatingButton') : t('pwa.updateButton')}
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                icon="spa"
+                data-testid="profile-check-update-button"
+                loading={pwaUpdate.checkStatus === 'checking'}
+                onClick={() => void pwaUpdate.checkForUpdate()}
+              >
+                {pwaUpdate.checkStatus === 'checking'
+                  ? t('pwa.checkingUpdate')
+                  : t('pwa.checkUpdateButton')}
+              </Button>
+            )}
+          </div>
         </Card>
       </section>
 

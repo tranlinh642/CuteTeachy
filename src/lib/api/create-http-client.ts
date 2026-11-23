@@ -54,7 +54,8 @@ export const createHttpClient = (config: ApiConfig = {}): AxiosInstance => {
     (response) => response,
     async (error: unknown) => {
       if (isAxiosError(error)) {
-        if (error.response?.status === 401) {
+        const errorCode = (error.response?.data as { code?: string } | undefined)?.code;
+        if (error.response?.status === 401 && errorCode !== 'invalid_code') {
           const originalRequest = error.config as (InternalAxiosRequestConfig & { _retry?: boolean }) | undefined;
           const authHeader = originalRequest?.headers
             ? typeof originalRequest.headers.get === 'function'

@@ -3,7 +3,7 @@ import { feminineColors } from '@/lib/theme';
 import type { Metadata, Viewport } from 'next';
 import { Quicksand } from 'next/font/google';
 import type { ReactNode } from 'react';
-import { PwaInstallBanner } from '@/components/pwa';
+import { PwaInstallBanner, PwaUpdateBanner } from '@/components/pwa';
 import { THEME_ANTI_FLASH_SCRIPT } from '@/lib/theme';
 import { Providers } from './providers';
 import './globals.css';
@@ -17,7 +17,7 @@ const quicksand = Quicksand({
 });
 
 const MATERIAL_SYMBOLS_URL =
-  'https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400..700,0..1,0&display=block';
+  'https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,500,0..1,0&icon_names=add,arrow_back,calendar_today,check,checklist,chevron_left,chevron_right,close,delete,description,edit,expand_more,flag,format_quote,home,image,language,lock,logout,mail,menu,notifications,palette,person,print,schedule,school,search,sell,settings,spa,task_alt,visibility,visibility_off&display=block';
 
 export const metadata: Metadata = {
   title: 'CuteTeachy – Serene Educator',
@@ -45,6 +45,12 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
+  interactiveWidget: 'resizes-content',
   themeColor: feminineColors.background,
 };
 
@@ -72,6 +78,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
       <body>
         <Providers>
           {children}
+          <PwaUpdateBanner />
           <PwaInstallBanner />
         </Providers>
       </body>

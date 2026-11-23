@@ -219,4 +219,60 @@ describe('AiScheduleDraftCard Component (SPEC-007 S7-FE-02)', () => {
     expect(html).toContain('Đã xác nhận thêm lịch');
     expect(html).toMatch(/<button[^>]*disabled[^>]*data-testid="apply-draft-button"/);
   });
+
+  it('renders replace_all_timetable option for new timetable drafts and action badges/target summaries for update, delete, and cancel items', () => {
+    const pendingWithSlotsHtml = renderCard(pendingDraft);
+    expect(pendingWithSlotsHtml).toContain('data-testid="conflict-strategy-replace_all_timetable"');
+    expect(pendingWithSlotsHtml).toContain('Thay toàn bộ TKB cũ');
+
+    const detailedDraft: AiScheduleDraft = {
+      status: 'pending',
+      items: [
+        {
+          id: 'upd-1',
+          kind: 'timetable_slot',
+          action: 'update',
+          targetSlotId: 'slot-old-1',
+          targetSummary: 'Toán 6A10 (08:50–09:35)',
+          category: 'school_teaching',
+          titleOrSubject: 'Toán 6A10',
+          weekday: 4,
+          startTime: '07:00',
+          endTime: '07:45',
+        },
+        {
+          id: 'del-1',
+          kind: 'timetable_slot',
+          action: 'delete',
+          targetSlotId: 'slot-old-2',
+          targetSummary: 'L9 (13:30–14:15)',
+          category: 'extra_teaching',
+          titleOrSubject: 'L9',
+          weekday: 5,
+          startTime: '13:30',
+          endTime: '14:15',
+        },
+        {
+          id: 'can-1',
+          kind: 'class_session',
+          action: 'cancel',
+          targetSessionId: 'slot-old-3:2026-10-29',
+          targetSummary: 'L7 (13:30–14:15)',
+          category: 'extra_teaching',
+          titleOrSubject: 'L7',
+          date: '2026-10-29',
+          startTime: '13:30',
+          endTime: '14:15',
+        },
+      ],
+    };
+
+    const html = renderCard(detailedDraft);
+    expect(html).toContain('data-testid="draft-item-action-upd-1"');
+    expect(html).toContain('Cập nhật');
+    expect(html).toContain('Xóa tiết');
+    expect(html).toContain('Hủy buổi');
+    expect(html).toContain('Áp dụng lên: Toán 6A10 (08:50–09:35)');
+    expect(html).toContain('Xác nhận áp dụng thay đổi');
+  });
 });

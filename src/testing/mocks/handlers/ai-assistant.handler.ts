@@ -420,9 +420,13 @@ export const aiAssistantRoutes = [
     const conflictStrategy = body.conflictStrategy as AiConflictStrategy | undefined;
     if (
       conflictStrategy !== 'replace_conflicts' &&
-      conflictStrategy !== 'skip_conflicts'
+      conflictStrategy !== 'skip_conflicts' &&
+      conflictStrategy !== 'replace_all_timetable'
     ) {
-      return badRequest('conflictStrategy must be replace_conflicts or skip_conflicts', 'validation');
+      return badRequest(
+        'conflictStrategy must be replace_conflicts, skip_conflicts, or replace_all_timetable',
+        'validation',
+      );
     }
 
     const messages = db.aiMessages ?? [];
@@ -446,9 +450,60 @@ export const aiAssistantRoutes = [
     let createdCount = 0;
     let replacedCount = 0;
     let skippedCount = 0;
+    let updatedCount = 0;
+    let deletedCount = 0;
+    let cancelledCount = 0;
+
+    if (conflictStrategy === 'replace_all_timetable') {
+      const remaining: TimetableSlot[] = [];
+      for (const existing of db.timetableSlots) {
+        if (existing.effectiveTo && existing.effectiveTo < today) {
+          remaining.push(existing);
+          continue;
+        }
+        if (existing.effectiveFrom < today) {
+          remaining.push({ ...existing, effectiveTo: yesterday, updatedAt: timestamp });
+        }
+        replacedCount += 1;
+      }
+      db.timetableSlots = remaining;
+    }
 
     for (const item of itemsToApply) {
+      const action = item.action ?? 'create';
       if (item.kind === 'timetable_slot') {
+        if (action === 'delete' && item.targetSlotId) {
+          const idx = db.timetableSlots.findIndex((s) => s.id === item.targetSlotId);
+          if (idx !== -1) {
+            db.timetableSlots.splice(idx, 1);
+            deletedCount += 1;
+          } else {
+            skippedCount += 1;
+          }
+          continue;
+        }
+        if (action === 'update' && item.targetSlotId) {
+          const idx = db.timetableSlots.findIndex((s) => s.id === item.targetSlotId);
+          if (idx !== -1) {
+            const old = db.timetableSlots[idx]!;
+            db.timetableSlots[idx] = {
+              ...old,
+              weekday: item.weekday ?? old.weekday,
+              startTime: item.startTime ?? old.startTime,
+              endTime: item.endTime ?? old.endTime,
+              subject: item.titleOrSubject.trim(),
+              grade: item.grade?.trim() || undefined,
+              room: item.room?.trim() || null,
+              category: item.category ?? old.category,
+              updatedAt: timestamp,
+            };
+            updatedCount += 1;
+          } else {
+            skippedCount += 1;
+          }
+          continue;
+        }
+
         const weekday = item.weekday ?? 1;
         const startTime = item.startTime ?? '07:00';
         const endTime = item.endTime ?? '07:45';
@@ -530,6 +585,14 @@ export const aiAssistantRoutes = [
           createdCount += 1;
         }
       } else if (item.kind === 'class_session') {
+        if (action === 'cancel' || action === 'delete') {
+          if (action === 'cancel') {
+            cancelledCount += 1;
+          } else {
+            deletedCount += 1;
+          }
+          continue;
+        }
         const newSession: ClassSession = {
           id: nextId('adhoc'),
           timetableSlotId: null,
@@ -571,6 +634,9 @@ export const aiAssistantRoutes = [
       createdCount,
       replacedCount,
       skippedCount,
+      ...(updatedCount > 0 ? { updatedCount } : {}),
+      ...(deletedCount > 0 ? { deletedCount } : {}),
+      ...(cancelledCount > 0 ? { cancelledCount } : {}),
     };
 
     const updatedMessage: AiChatMessage = {

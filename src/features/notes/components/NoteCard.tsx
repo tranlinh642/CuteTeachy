@@ -142,9 +142,9 @@ export function NoteCard({
       {total > 0 && (
         <div className="flex flex-col gap-1.5 pt-1">
           {note.checklist.map((item) => (
-            <label
+            <div
               key={item.id}
-              className="flex items-center gap-2 cursor-pointer text-body-sm hover:opacity-80"
+              className="flex items-center gap-2 text-body-sm hover:opacity-80"
             >
               <Checkbox
                 checked={item.done}
@@ -152,15 +152,17 @@ export function NoteCard({
                 label={item.text}
                 hideLabel
               />
-              <span
+              <button
+                type="button"
+                onClick={() => onToggleItem?.(note, item.id)}
                 className={cn(
-                  "flex-1 text-on-surface",
-                  item.done && "line-through text-on-surface-variant",
+                  'flex-1 text-left cursor-pointer text-on-surface',
+                  item.done && 'line-through text-on-surface-variant',
                 )}
               >
                 {item.text}
-              </span>
-            </label>
+              </button>
+            </div>
           ))}
         </div>
       )}
