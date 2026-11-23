@@ -1,11 +1,11 @@
 'use client';
 
+import type { QueryClient } from '@tanstack/react-query';
 import { ApiProvider } from '@/lib/api';
-import { createIdbPersister } from '@/lib/query';
+import { createIdbPersister, createQueryClient } from '@/lib/query';
 import {
   initClientStores,
   useI18nStore,
-  useSessionStore,
   getAccessToken,
   createLocalStorageAdapter,
 } from '@/stores';
@@ -16,14 +16,17 @@ import { env } from '@/config';
 import { HtmlLangSync } from './html-lang-sync';
 import { ThemeSync } from '@/lib/theme';
 import { SettingsSync } from '@/features/settings';
+import { clearAuthSessionState } from '@/features/auth';
 
-const createApiConfig = (): ApiConfig => ({
+export const createApiConfig = (queryClient?: QueryClient): ApiConfig => ({
   baseURL: env.apiUrl,
   mode: env.apiMode,
   getAccessToken,
   getLocale: () => useI18nStore.getState().locale,
-  // 401 -> xóa phiên; AuthGuard sẽ tự chuyển về /login.
-  onUnauthorized: () => useSessionStore.getState().clearSession(),
+  // 401 -> xóa phiên + xóa serverTime sync checkpoint + xóa query cache; AuthGuard sẽ tự chuyển về /login.
+  onUnauthorized: () => {
+    void clearAuthSessionState(queryClient);
+  },
   // 403 onboarding_required -> chuyển về /onboarding.
   onOnboardingRequired: () => {
     if (typeof window !== 'undefined' && window.location.pathname !== '/onboarding') {
@@ -47,7 +50,8 @@ export interface ProvidersProps {
 export function Providers({ children }: ProvidersProps) {
   const locale = useI18nStore((state) => state.locale);
   const setLocale = useI18nStore((state) => state.setLocale);
-  const [apiConfig] = useState(createApiConfig);
+  const [queryClient] = useState(createQueryClient);
+  const [apiConfig] = useState(() => createApiConfig(queryClient));
   const [persistOptions] = useState(() => {
     const persister = createIdbPersister();
     return persister ? { persister, maxAge: 1000 * 60 * 60 * 24 * 7 } : undefined;
@@ -67,13 +71,15 @@ export function Providers({ children }: ProvidersProps) {
         registerSw();
       } else {
         window.addEventListener('load', registerSw);
+        return () => window.removeEventListener('load', registerSw);
       }
     }
+    return undefined;
   }, []);
 
   return (
     <I18nProvider locale={locale} onLocaleChange={setLocale}>
-      <ApiProvider config={apiConfig} persistOptions={persistOptions}>
+      <ApiProvider config={apiConfig} queryClient={queryClient} persistOptions={persistOptions}>
         <HtmlLangSync />
         <ThemeSync />
         <SettingsSync />

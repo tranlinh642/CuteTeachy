@@ -1,12 +1,20 @@
 'use client';
 
 import React, { useId, useState } from 'react';
-import type { ISODate, PrepItem, TimeOfDay, Tone } from '@/types';
-import { useTranslation } from '@/lib/i18n';
+import {
+  SCHEDULE_CATEGORIES,
+  type ISODate,
+  type PrepItem,
+  type ScheduleCategory,
+  type TimeOfDay,
+  type Tone,
+} from '@/types';
+import { useTranslation, type TranslationKey } from '@/lib/i18n';
 import {
   Button,
   Checkbox,
   Dialog,
+  FormField,
   Icon,
   IconButton,
   TextField,
@@ -25,17 +33,20 @@ import {
 import { useFieldErrorText } from '@/hooks';
 import { useCreateAdHocSession } from '../api';
 import { ApiError } from '@/lib/api';
+import { cn } from '@/utils/cn';
 
 export interface AdHocSessionDialogProps {
   readonly open: boolean;
   readonly onClose: () => void;
   readonly defaultDate?: ISODate;
+  readonly defaultCategory?: ScheduleCategory;
 }
 
 export function AdHocSessionDialog({
   open,
   onClose,
   defaultDate,
+  defaultCategory,
 }: AdHocSessionDialogProps) {
   if (!open) return null;
 
@@ -44,6 +55,7 @@ export function AdHocSessionDialog({
       open={open}
       onClose={onClose}
       defaultDate={defaultDate}
+      defaultCategory={defaultCategory}
     />
   );
 }
@@ -52,16 +64,20 @@ function AdHocSessionDialogContent({
   open,
   onClose,
   defaultDate,
+  defaultCategory = 'school_teaching',
 }: {
   readonly open: boolean;
   readonly onClose: () => void;
   readonly defaultDate?: ISODate;
+  readonly defaultCategory?: ScheduleCategory;
 }) {
   const { t } = useTranslation();
   const formatError = useFieldErrorText();
+  const categoryControlId = useId();
   const toneLabelId = useId();
   const createMutation = useCreateAdHocSession();
 
+  const [category, setCategory] = useState<ScheduleCategory>(defaultCategory);
   const [subject, setSubject] = useState('');
   const [grade, setGrade] = useState('');
   const [room, setRoom] = useState('');
@@ -104,6 +120,7 @@ function AdHocSessionDialogContent({
     setApiError(null);
 
     const validationResult = validate(adhocSessionSchema, {
+      category,
       subject,
       grade: grade || undefined,
       room: room || undefined,
@@ -166,6 +183,44 @@ function AdHocSessionDialogContent({
             <p className="text-body-sm font-semibold">{apiError}</p>
           </div>
         )}
+
+        {/* Chọn Loại lịch (ScheduleCategory) */}
+        <FormField
+          controlId={categoryControlId}
+          label={t('classSession.category')}
+          error={formatError(errors.category, t('classSession.category'))}
+        >
+          <div
+            id={categoryControlId}
+            role="radiogroup"
+            aria-label={t('classSession.category')}
+            data-testid="schedule-category-selector"
+            className="grid grid-cols-1 sm:grid-cols-3 gap-2"
+          >
+            {SCHEDULE_CATEGORIES.map((cat) => {
+              const selected = category === cat;
+              return (
+                <button
+                  key={cat}
+                  type="button"
+                  role="radio"
+                  aria-checked={selected}
+                  data-testid={`category-option-${cat}`}
+                  onClick={() => setCategory(cat)}
+                  className={cn(
+                    'flex min-h-11 items-center justify-center rounded-xl px-3 py-2 text-body-sm transition-all cursor-pointer',
+                    selected
+                      ? 'bg-primary text-on-primary font-bold shadow-xs'
+                      : 'bg-surface-container text-on-surface hover:bg-surface-container-high',
+                  )}
+                >
+                  <span>{t(`classSession.categories.${cat}` as TranslationKey)}</span>
+                </button>
+              );
+            })}
+          </div>
+        </FormField>
+
         <TextField
           label={t('classSession.subject')}
           value={subject}

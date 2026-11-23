@@ -78,13 +78,21 @@ vi.mock('@/features/push', async () => {
   };
 });
 
-describe('ProfileView Push Notifications Switch (SPEC-005 & S5-FE-01)', () => {
+describe('ProfileView Push Notifications Switch & Mobile/Test Push Controls (SPEC-005 & SPEC-006)', () => {
   let queryClient: QueryClient;
   let mockServices: Services;
 
   beforeEach(() => {
     vi.clearAllMocks();
     capturedSwitchOnChange = undefined;
+    mockPushNotification.isSupported = true;
+    mockPushNotification.isIos = false;
+    mockPushNotification.isStandalone = true;
+    mockPushNotification.permission = 'default';
+    mockPushNotification.decision = 'can_prompt';
+    mockPushNotification.isSubscribed = false;
+    mockPushNotification.isDialogOpen = false;
+
     queryClient = new QueryClient({
       defaultOptions: {
         queries: { retry: false },
@@ -106,6 +114,7 @@ describe('ProfileView Push Notifications Switch (SPEC-005 & S5-FE-01)', () => {
         getVapidPublicKey: vi.fn().mockResolvedValue({ publicKey: 'mock-key' }),
         createPushSubscription: vi.fn().mockResolvedValue({}),
         deletePushSubscription: vi.fn().mockResolvedValue(undefined),
+        sendTestNotification: vi.fn().mockResolvedValue({ sent: 1, failed: 0, inAppCreated: true }),
       },
     } as unknown as Services;
 
@@ -151,10 +160,26 @@ describe('ProfileView Push Notifications Switch (SPEC-005 & S5-FE-01)', () => {
     expect(html).toContain('Đã bị chặn trong trình duyệt');
   });
 
-  it('displays iOS Home Screen requirement badge when on iOS non-standalone', () => {
+  it('displays iOS Home Screen requirement badge and 3-step PWA guide when on iOS non-standalone (S6-FE-01)', () => {
+    mockPushNotification.isIos = true;
+    mockPushNotification.isStandalone = false;
     mockPushNotification.decision = 'ios_needs_pwa';
     const html = renderProfile();
     expect(html).toContain('Cần thêm vào màn hình chính');
+    expect(html).toContain('Thêm vào Màn hình chính');
+  });
+
+  it('renders 1-tap iOS standalone permission button when on iOS PWA in standalone mode (S6-FE-01)', () => {
+    mockPushNotification.isIos = true;
+    mockPushNotification.isStandalone = true;
+    mockPushNotification.decision = 'can_prompt';
+    const html = renderProfile();
+    expect(html).toContain('Bật thông báo trên iPhone/iPad');
+  });
+
+  it('renders Send Test Notification button ("Gửi thông báo thử") in ProfileView (S6-FE-01)', () => {
+    const html = renderProfile();
+    expect(html).toContain('Gửi thông báo thử');
   });
 
   it('renders push permission dialog when isDialogOpen is true', () => {

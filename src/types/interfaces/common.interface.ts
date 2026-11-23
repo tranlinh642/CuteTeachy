@@ -9,6 +9,11 @@
 /** Semantic pastel color of tags / classes – never a raw hex value. */
 export type Tone = 'pink' | 'blue' | 'beige' | 'lavender' | 'rose' | 'mint';
 
+/** Schedule Category (SPEC-007): school_teaching, extra_teaching, self_study. */
+export const SCHEDULE_CATEGORIES = ['school_teaching', 'extra_teaching', 'self_study'] as const;
+export type ScheduleCategory = (typeof SCHEDULE_CATEGORIES)[number];
+export const DEFAULT_SCHEDULE_CATEGORY: ScheduleCategory = 'school_teaching';
+
 export type ID = string;
 export type ISODate = string;
 export type TimeOfDay = string;

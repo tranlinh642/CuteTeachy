@@ -12,6 +12,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { href: '/', labelKey: 'navigation.home', icon: 'home' },
   { href: '/calendar', labelKey: 'navigation.calendar', icon: 'calendar' },
   { href: '/timetable', labelKey: 'navigation.timetable', icon: 'clock' },
+  { href: '/assistant', labelKey: 'navigation.assistant', icon: 'spa' },
   { href: '/notes', labelKey: 'navigation.notes', icon: 'notes' },
   { href: '/profile', labelKey: 'navigation.profile', icon: 'person' },
 ];

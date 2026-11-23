@@ -55,7 +55,9 @@ export async function focusOrOpenClient(
 ): Promise<void> {
   let targetUrl: string;
   try {
-    targetUrl = new URL(url, origin).href;
+    const baseOrigin = new URL(origin).origin;
+    const parsed = new URL(url, origin);
+    targetUrl = parsed.origin === baseOrigin ? parsed.href : new URL('/', origin).href;
   } catch {
     targetUrl = new URL('/', origin).href;
   }
@@ -111,3 +113,5 @@ export function handleNotificationClickEvent(
   const rawUrl = (event.notification.data?.url as string | undefined) || '/';
   event.waitUntil(focusOrOpenClient(rawUrl, clients, origin));
 }
+
+export const handleNotificationClick = handleNotificationClickEvent;

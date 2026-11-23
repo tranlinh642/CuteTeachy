@@ -21,4 +21,5 @@ export * from './task.selectors';
 export * from './note.selectors';
 export * from './class.selectors';
 export * from './session-generator';
+export * from './format-notification';
 export * from './user.selectors';

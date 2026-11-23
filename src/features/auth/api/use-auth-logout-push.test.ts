@@ -1,8 +1,18 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
+import { QueryClient } from '@tanstack/react-query';
+import * as idbKeyval from 'idb-keyval';
 import { useSessionStore } from '@/stores';
 import { unsubscribeDevice } from '@/features/push';
+import { getStoredServerTime, setStoredServerTime } from '@/lib/sync';
+import { clearAuthSessionState, resetClientSyncAndCache } from './use-auth';
 
-describe('useLogout push unsubscription integration (SPEC-005 & S5-FE-01)', () => {
+vi.mock('idb-keyval', () => ({
+  get: vi.fn(),
+  set: vi.fn(),
+  del: vi.fn().mockResolvedValue(undefined),
+}));
+
+describe('useLogout push unsubscription & session/cache cleanup (SPEC-005 & FE-01)', () => {
   beforeEach(() => {
     useSessionStore.getState().setSession({
       user: {
@@ -118,5 +128,31 @@ describe('useLogout push unsubscription integration (SPEC-005 & S5-FE-01)', () =
     expect(mockSubscription.unsubscribe).toHaveBeenCalled();
     expect(mockAuth.logout).toHaveBeenCalledWith('refresh-456');
     expect(warnSpy).toHaveBeenCalled();
+  });
+
+  it('clearAuthSessionState clears session, serverTime checkpoints, in-memory query cache, and IndexedDB query cache', async () => {
+    const queryClient = new QueryClient();
+    queryClient.setQueryData(['tasks', 'list'], [{ id: 't1' }]);
+    await setStoredServerTime(['tasks', 'list'], '2026-10-31T00:00:00Z');
+    expect(await getStoredServerTime(['tasks', 'list'])).toBe('2026-10-31T00:00:00Z');
+
+    await clearAuthSessionState(queryClient);
+
+    expect(useSessionStore.getState().session).toBeNull();
+    expect(queryClient.getQueryData(['tasks', 'list'])).toBeUndefined();
+    expect(await getStoredServerTime(['tasks', 'list'])).toBeNull();
+    expect(idbKeyval.del).toHaveBeenCalledWith('cute-teachy-query-cache');
+  });
+
+  it('resetClientSyncAndCache clears serverTime checkpoints, in-memory query cache, and IndexedDB query cache', async () => {
+    const queryClient = new QueryClient();
+    queryClient.setQueryData(['notes', 'infinite'], { pages: [] });
+    await setStoredServerTime(['notes', 'infinite'], '2026-10-31T00:00:00Z');
+
+    await resetClientSyncAndCache(queryClient);
+
+    expect(queryClient.getQueryData(['notes', 'infinite'])).toBeUndefined();
+    expect(await getStoredServerTime(['notes', 'infinite'])).toBeNull();
+    expect(idbKeyval.del).toHaveBeenCalledWith('cute-teachy-query-cache');
   });
 });

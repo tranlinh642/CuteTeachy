@@ -1,9 +1,9 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useState } from 'react';
 import { useCreateTask, useUpdateTask } from '../api';
 import { taskSchema, toISODate, validate, type FieldErrors, type TaskFormValues } from '@/utils';
-import { useTranslation } from '@/lib/i18n';
+import { useTranslation, type TranslationKey } from '@/lib/i18n';
 import type { ID, ISODate, Task, TaskCategory, TaskPriority, TimeOfDay } from '@/types';
 import { DateField, TimeField } from '@/components/pickers';
 import { Button, Dialog, SegmentedControl, Switch, TextArea, TextField } from '@/components/ui';
@@ -31,6 +31,7 @@ export function TaskDialog({ open, onClose, task, defaultDate }: TaskDialogProps
   const [tagIds, setTagIds] = useState<ID[]>([]);
   const [notes, setNotes] = useState('');
   const [errors, setErrors] = useState<FieldErrors<TaskFormValues>>({});
+  const [submitErrorKey, setSubmitErrorKey] = useState<TranslationKey | null>(null);
 
   useEffect(() => {
     if (task) {
@@ -51,6 +52,7 @@ export function TaskDialog({ open, onClose, task, defaultDate }: TaskDialogProps
       setNotes('');
     }
     setErrors({});
+    setSubmitErrorKey(null);
   }, [task, defaultDate, open]);
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -72,12 +74,21 @@ export function TaskDialog({ open, onClose, task, defaultDate }: TaskDialogProps
     }
 
     setErrors({});
-    if (task) {
-      await updateTask.mutateAsync({ id: task.id, input: result.data });
-    } else {
-      await createTask.mutateAsync(result.data);
+    setSubmitErrorKey(null);
+    try {
+      if (task) {
+        await updateTask.mutateAsync({ id: task.id, input: result.data });
+      } else {
+        await createTask.mutateAsync(result.data);
+      }
+      onClose();
+    } catch (err) {
+      const key =
+        err && typeof err === 'object' && 'messageKey' in err && typeof err.messageKey === 'string'
+          ? (err.messageKey as TranslationKey)
+          : ('errors.generic' as TranslationKey);
+      setSubmitErrorKey(key);
     }
-    onClose();
   };
 
   const isSubmitting = createTask.isPending || updateTask.isPending;
@@ -166,6 +177,12 @@ export function TaskDialog({ open, onClose, task, defaultDate }: TaskDialogProps
           rows={3}
           error={formatError(errors.notes, t('tasks.editor.notesLabel'))}
         />
+
+        {submitErrorKey && (
+          <p role="alert" className="text-body-sm text-error">
+            {t(submitErrorKey)}
+          </p>
+        )}
       </form>
     </Dialog>
   );

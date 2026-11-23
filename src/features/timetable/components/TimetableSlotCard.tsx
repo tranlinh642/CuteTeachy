@@ -1,9 +1,9 @@
 'use client';
 
-import { useTranslation } from '@/lib/i18n';
+import { useTranslation, type TranslationKey } from '@/lib/i18n';
 import { toneClasses } from '@/components/ui';
 import { Card, Icon, IconButton } from '@/components/ui';
-import type { TimetableSlot } from '@/types';
+import type { ScheduleCategory, TimetableSlot } from '@/types';
 import { formatNumericDate } from '@/components/pickers/picker-format';
 import { formatTimeRange, parseISODate, toISODate } from '@/utils';
 import { cn } from '@/utils/cn';
@@ -15,6 +15,12 @@ export interface TimetableSlotCardProps {
   readonly className?: string;
 }
 
+const CATEGORY_BADGE_STYLES: Readonly<Record<ScheduleCategory, string>> = {
+  school_teaching: 'bg-secondary-container/70 text-on-secondary-container',
+  extra_teaching: 'bg-primary-container/70 text-on-primary-container',
+  self_study: 'bg-surface-container-highest text-on-surface',
+};
+
 export function TimetableSlotCard({ slot, onEdit, onDelete, className }: TimetableSlotCardProps) {
   const { t, localeTag } = useTranslation();
   const today = toISODate(new Date());
@@ -24,6 +30,7 @@ export function TimetableSlotCard({ slot, onEdit, onDelete, className }: Timetab
   const isFuture = slot.effectiveFrom > today;
 
   const tone = toneClasses[slot.tone] ?? toneClasses.blue;
+  const resolvedCategory: ScheduleCategory = slot.category ?? 'school_teaching';
 
   const fromFormatted = formatNumericDate(parseISODate(slot.effectiveFrom), localeTag);
   const toFormatted = slot.effectiveTo
@@ -44,10 +51,20 @@ export function TimetableSlotCard({ slot, onEdit, onDelete, className }: Timetab
 
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
-          {/* Giờ học & Trạng thái hiệu lực */}
+          {/* Giờ học, Loại lịch & Trạng thái hiệu lực */}
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-label-md font-bold text-on-surface tabular-nums">
               {formatTimeRange(slot.startTime, slot.endTime, localeTag)}
+            </span>
+
+            <span
+              data-testid={`slot-category-badge-${resolvedCategory}`}
+              className={cn(
+                'rounded-full px-2 py-0.5 text-label-xs font-semibold',
+                CATEGORY_BADGE_STYLES[resolvedCategory],
+              )}
+            >
+              {t(`timetable.categories.${resolvedCategory}` as TranslationKey)}
             </span>
 
             {isExpired && (

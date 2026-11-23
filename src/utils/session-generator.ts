@@ -1,4 +1,12 @@
-import type { ClassSession, ID, ISODate, ISODateTime, PrepItem, TimetableSlot } from '@/types';
+import type {
+  ClassSession,
+  ID,
+  ISODate,
+  ISODateTime,
+  PrepItem,
+  ScheduleCategory,
+  TimetableSlot,
+} from '@/types';
 import { addDays, parseISODate, timeToMinutes, toISODate } from '@/utils';
 
 export interface SessionOverride {
@@ -7,6 +15,7 @@ export interface SessionOverride {
   readonly topic?: string;
   readonly prepItems?: readonly PrepItem[];
   readonly cancelled?: boolean;
+  readonly category?: ScheduleCategory;
   readonly updatedAt: ISODateTime;
 }
 
@@ -132,6 +141,7 @@ export const generateClassSessions = (
         startTime: slot.startTime,
         endTime: slot.endTime,
         tone: slot.tone,
+        category: override?.category ?? slot.category ?? 'school_teaching',
         topic: override?.topic,
         prepItems: override?.prepItems ?? [],
         cancelled: override?.cancelled ?? false,
@@ -147,7 +157,10 @@ export const generateClassSessions = (
   // Append adhoc sessions within the range
   for (const adhoc of adhocSessions) {
     if (adhoc.date >= from && adhoc.date <= to) {
-      result.push(adhoc);
+      result.push({
+        ...adhoc,
+        category: adhoc.category ?? 'school_teaching',
+      });
     }
   }
 

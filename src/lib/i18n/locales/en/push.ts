@@ -12,6 +12,9 @@ export const push: typeof Schema = {
       'On iOS devices (iPhone/iPad), Apple requires CuteTeachy to be added to your Home Screen before it can receive push notifications.',
     iosGuideInstruction:
       'Tap the Share button (the square with an arrow) in Safari, then select "Add to Home Screen". Open CuteTeachy from your Home Screen to enable notifications.',
+    iosStep1: 'Step 1: Tap the Share button (square with an upward arrow) in your browser.',
+    iosStep2: 'Step 2: Scroll down and select "Add to Home Screen".',
+    iosStep3: 'Step 3: Open CuteTeachy from your Home Screen and tap Enable Notifications.',
     deniedTitle: 'Notifications are blocked',
     deniedDescription:
       'Your browser has blocked notifications for CuteTeachy. Please enable them in your browser settings to receive reminders.',
@@ -36,5 +39,13 @@ export const push: typeof Schema = {
     statusDenied: 'Blocked in browser settings',
     statusNotSupported: 'Not supported by browser',
     statusIosNeedsPwa: 'Requires Home Screen app',
+    enableIosButton: 'Enable notifications on iPhone/iPad',
+    enableDeviceButton: 'Enable notifications on this device',
+    openIosGuideButton: 'View PWA install guide',
+    testButton: 'Send Test Notification',
+    testSending: 'Sending test...',
+    testSuccessSent: 'Test notification sent successfully ({{sent}} device(s))!',
+    testSuccessInAppOnly: 'Created in-app test notification (no active push device).',
+    testError: 'Failed to send test notification. Please try again.',
   },
 };

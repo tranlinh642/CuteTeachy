@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { SCHEDULE_CATEGORIES } from '@/types';
 import { isValidISODate, isValidTime } from './date-parse';
 import { LIMITS } from './limits';
 
@@ -27,6 +28,7 @@ export const adhocSessionSchema = z
     startTime: z.string().refine(isValidTime, 'validation.invalidTime'),
     endTime: z.string().refine(isValidTime, 'validation.invalidTime'),
     tone: z.enum(TONE_ENUM).default('mint'),
+    category: z.enum(SCHEDULE_CATEGORIES).default('school_teaching'),
     topic: optionalText(200),
     prepItems: z.array(prepItemSchema).max(100, 'classSession.prepItemsMax').default([]),
   })
@@ -43,6 +45,7 @@ export const sessionOverrideSchema = z.object({
   topic: optionalText(200),
   prepItems: z.array(prepItemSchema).max(100, 'classSession.prepItemsMax').optional(),
   cancelled: z.boolean().optional(),
+  category: z.enum(SCHEDULE_CATEGORIES).optional(),
 });
 
 export type SessionOverrideInput = z.input<typeof sessionOverrideSchema>;

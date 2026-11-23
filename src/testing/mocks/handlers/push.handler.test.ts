@@ -22,7 +22,7 @@ const setupTest = (options: { token?: string | null } = {}) => {
   return { services, db, httpClient, setToken: (t: string | null) => (token = t) };
 };
 
-describe('Push Mock Handler (SPEC-005 & S5-FE-01)', () => {
+describe('Push Mock Handler (SPEC-005 & SPEC-006)', () => {
   describe('GET /push/vapid-public-key', () => {
     it('returns 200 with publicKey without requiring auth token (public route)', async () => {
       const { services } = setupTest({ token: null });
@@ -125,6 +125,37 @@ describe('Push Mock Handler (SPEC-005 & S5-FE-01)', () => {
       expect(err).toBeInstanceOf(ApiError);
       expect((err as ApiError).status).toBe(400);
       expect((err as ApiError).code).toBe('validation');
+    });
+  });
+
+  describe('POST /push/subscriptions/test (S6-FE-01)', () => {
+    it('requires authentication token', async () => {
+      const { services } = setupTest({ token: null });
+      const pushSvc = services.push as typeof services.push & {
+        sendTestNotification: () => Promise<{ sent: number; failed: number; inAppCreated: boolean }>;
+      };
+
+      const err = await pushSvc.sendTestNotification().catch((e: unknown) => e);
+      expect(err).toBeInstanceOf(ApiError);
+      expect((err as ApiError).code).toBe('unauthorized');
+    });
+
+    it('returns { sent, failed: 0, inAppCreated: true } based on active subscriptions', async () => {
+      const { services } = setupTest();
+      const pushSvc = services.push as typeof services.push & {
+        sendTestNotification: () => Promise<{ sent: number; failed: number; inAppCreated: boolean }>;
+      };
+
+      const resNoSub = await pushSvc.sendTestNotification();
+      expect(resNoSub).toEqual({ sent: 0, failed: 0, inAppCreated: true });
+
+      await services.push.createPushSubscription({
+        endpoint: 'https://push.example.com/sub/test-1',
+        keys: { p256dh: 'p256dh-1', auth: 'auth-1' },
+      });
+
+      const resWithSub = await pushSvc.sendTestNotification();
+      expect(resWithSub).toEqual({ sent: 1, failed: 0, inAppCreated: true });
     });
   });
 });

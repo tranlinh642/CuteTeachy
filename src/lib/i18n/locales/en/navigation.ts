@@ -4,6 +4,7 @@ export const navigation: typeof Schema = {
   home: 'Home',
   calendar: 'Calendar',
   timetable: 'Timetable',
+  assistant: 'AI Assistant',
   notes: 'Notes',
   profile: 'Profile',
   logout: 'Log out',

@@ -66,10 +66,10 @@ describe('Verification and Password Reset Schemas', () => {
     });
 
     it('accepts valid email and trims whitespace', () => {
-      const valid = validate(forgotPasswordSchema, { email: '  linh@cuteteachy.vn ' });
+      const valid = validate(forgotPasswordSchema, { email: '  teacher@example.com ' });
       expect(valid.success).toBe(true);
       if (valid.success) {
-        expect(valid.data.email).toBe('linh@cuteteachy.vn');
+        expect(valid.data.email).toBe('teacher@example.com');
       }
     });
   });
@@ -130,3 +130,4 @@ describe('Verification and Password Reset Schemas', () => {
     });
   });
 });
+

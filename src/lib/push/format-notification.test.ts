@@ -10,7 +10,7 @@ import {
   formatPushNotification,
 } from './format-notification';
 
-describe('formatPushNotification (S5-FE-02)', () => {
+describe('formatPushNotification (S5-FE-02 & S6-FE-02)', () => {
   describe('Full payload cases', () => {
     it('formats a complete task reminder payload correctly', () => {
       const payload = {
@@ -18,7 +18,7 @@ describe('formatPushNotification (S5-FE-02)', () => {
         id: 'task-101',
         title: 'Soạn giáo án Ngữ văn 10',
         body: 'Bắt đầu lúc 08:30 sáng mai',
-        url: '/tasks?date=2026-10-27',
+        url: '/calendar?date=2026-10-27',
         targetDate: '2026-10-27',
         icon: '/custom/icon.png',
         badge: '/custom/badge.png',
@@ -29,13 +29,13 @@ describe('formatPushNotification (S5-FE-02)', () => {
       expect(result).toEqual({
         title: 'Soạn giáo án Ngữ văn 10',
         body: 'Bắt đầu lúc 08:30 sáng mai',
-        url: '/tasks?date=2026-10-27',
+        url: '/calendar?date=2026-10-27',
         tag: 'reminder-task-task-101',
         icon: '/custom/icon.png',
         badge: '/custom/badge.png',
         data: {
           ...payload,
-          url: '/tasks?date=2026-10-27',
+          url: '/calendar?date=2026-10-27',
           id: 'task-101',
           type: 'task',
           targetDate: '2026-10-27',
@@ -120,6 +120,51 @@ describe('formatPushNotification (S5-FE-02)', () => {
       const result = formatPushNotification({});
       expect(result.tag).toBe('reminder-general');
     });
+
+    it('synchronizes tag format (${type}-${targetId}-${remindAtMs}) with LocalReminderTicker when remindAt is provided', () => {
+      const remindAtIso = '2026-10-29T00:45:00.000Z';
+      const remindAtMs = new Date(remindAtIso).getTime();
+
+      const taskPush = formatPushNotification({
+        title: 'Nhắc nhở công việc: Chấm bài',
+        body: '08:00',
+        data: {
+          type: 'task',
+          targetId: 'task-10',
+          remindAt: remindAtIso,
+          url: '/calendar?date=2026-10-29',
+        },
+      });
+      expect(taskPush.tag).toBe(`task-task-10-${remindAtMs}`);
+
+      const sessionPush = formatPushNotification({
+        type: 'class_session',
+        sessionId: 'cs-20',
+        remindAt: remindAtIso,
+      });
+      expect(sessionPush.tag).toBe(`class_session-cs-20-${remindAtMs}`);
+
+      const notePush = formatPushNotification({
+        data: {
+          type: 'note',
+          noteId: 'note-30',
+          remindAt: remindAtMs,
+        },
+      });
+      expect(notePush.tag).toBe(`note-note-30-${remindAtMs}`);
+    });
+
+    it('prioritizes explicit payload.tag even when remindAt is present', () => {
+      const result = formatPushNotification({
+        tag: 'server-explicit-tag',
+        type: 'task',
+        id: 'task-10',
+        data: {
+          remindAt: '2026-10-29T00:45:00.000Z',
+        },
+      });
+      expect(result.tag).toBe('server-explicit-tag');
+    });
   });
 
   describe('URL navigation to target date', () => {
@@ -131,14 +176,14 @@ describe('formatPushNotification (S5-FE-02)', () => {
       expect(result.data.url).toBe('/calendar?date=2026-10-27#session-1');
     });
 
-    it('constructs /tasks?date=YYYY-MM-DD for task when url is omitted but targetDate is provided', () => {
+    it('constructs /calendar?date=YYYY-MM-DD for task when url is omitted but targetDate is provided', () => {
       const result = formatPushNotification({
         type: 'task',
         id: 'task-1',
         targetDate: '2026-10-27',
       });
-      expect(result.url).toBe('/tasks?date=2026-10-27');
-      expect(result.data.url).toBe('/tasks?date=2026-10-27');
+      expect(result.url).toBe('/calendar?date=2026-10-27');
+      expect(result.data.url).toBe('/calendar?date=2026-10-27');
     });
 
     it('constructs /timetable?date=YYYY-MM-DD for class_session when url is omitted but targetDate is provided', () => {
@@ -157,7 +202,7 @@ describe('formatPushNotification (S5-FE-02)', () => {
         id: 'task-1',
         date: '2026-10-28',
       });
-      expect(result.url).toBe('/tasks?date=2026-10-28');
+      expect(result.url).toBe('/calendar?date=2026-10-28');
     });
 
     it('constructs /?date=YYYY-MM-DD when type is unknown but targetDate is provided', () => {
@@ -167,12 +212,12 @@ describe('formatPushNotification (S5-FE-02)', () => {
       expect(result.url).toBe('/?date=2026-10-27');
     });
 
-    it('falls back to /tasks when type is task without date or url', () => {
+    it('falls back to /calendar when type is task without date or url', () => {
       const result = formatPushNotification({
         type: 'task',
         id: 'task-1',
       });
-      expect(result.url).toBe('/tasks');
+      expect(result.url).toBe('/calendar');
     });
 
     it('falls back to /timetable when type is class_session without date or url', () => {
@@ -271,13 +316,13 @@ describe('formatPushNotification (S5-FE-02)', () => {
         id: 'json-123',
         title: 'Chuẩn bị đề thi',
         body: 'Trước 14:00',
-        url: '/tasks?date=2026-10-30',
+        url: '/calendar?date=2026-10-30',
       });
 
       const result = formatPushNotification(rawJson);
       expect(result.title).toBe('Chuẩn bị đề thi');
       expect(result.body).toBe('Trước 14:00');
-      expect(result.url).toBe('/tasks?date=2026-10-30');
+      expect(result.url).toBe('/calendar?date=2026-10-30');
       expect(result.tag).toBe('reminder-task-json-123');
       expect(result.data.id).toBe('json-123');
     });
@@ -308,16 +353,19 @@ describe('formatPushNotification (S5-FE-02)', () => {
       expect(computeReminderTag('', '30')).toBe('reminder-30');
       expect(computeReminderTag(undefined, undefined, 'explicit-tag')).toBe('explicit-tag');
       expect(computeReminderTag(undefined, undefined, undefined)).toBe('reminder-general');
+      expect(computeReminderTag('task', '10', undefined, 1761698700000)).toBe(
+        'task-10-1761698700000',
+      );
     });
 
     it('computeReminderUrl works as expected across edge cases', () => {
       expect(computeReminderUrl('https://example.com')).toBe('https://example.com');
-      expect(computeReminderUrl(undefined, 'task', '2026-10-27')).toBe('/tasks?date=2026-10-27');
+      expect(computeReminderUrl(undefined, 'task', '2026-10-27')).toBe('/calendar?date=2026-10-27');
       expect(computeReminderUrl(undefined, 'class_session', '2026-10-27')).toBe(
         '/timetable?date=2026-10-27',
       );
       expect(computeReminderUrl(undefined, undefined, '2026-10-27')).toBe('/?date=2026-10-27');
-      expect(computeReminderUrl(undefined, 'task', undefined)).toBe('/tasks');
+      expect(computeReminderUrl(undefined, 'task', undefined)).toBe('/calendar');
       expect(computeReminderUrl(undefined, 'class_session', undefined)).toBe('/timetable');
       expect(computeReminderUrl(undefined, undefined, undefined)).toBe('/');
     });

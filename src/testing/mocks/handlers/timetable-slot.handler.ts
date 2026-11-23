@@ -1,4 +1,11 @@
-import type { CreateTimetableSlotInput, PatchTimetableSlotResult, TimetableSlot, UpdateTimetableSlotInput } from '@/types';
+import {
+  SCHEDULE_CATEGORIES,
+  type CreateTimetableSlotInput,
+  type PatchTimetableSlotResult,
+  type ScheduleCategory,
+  type TimetableSlot,
+  type UpdateTimetableSlotInput,
+} from '@/types';
 import { ENDPOINTS } from '@/lib/api/endpoints';
 import { addDays, checkSlotConflict, isValidISODate, isValidTime, parseISODate, toISODate } from '@/utils';
 import {
@@ -15,6 +22,9 @@ import { nextId, nowISO } from './handler.utils';
 
 const TIMETABLE_SLOT_BY_ID = ENDPOINTS.timetableSlots.byId(':id');
 
+const isValidCategory = (value: unknown): value is ScheduleCategory =>
+  typeof value === 'string' && (SCHEDULE_CATEGORIES as readonly string[]).includes(value);
+
 export const timetableSlotRoutes = [
   route('GET', ENDPOINTS.timetableSlots.root, (request, db) => {
     const { updatedSince } = request.query;
@@ -24,9 +34,14 @@ export const timetableSlotRoutes = [
       return updatedSinceVal.response;
     }
 
-    const items = db.timetableSlots.filter((slot) => {
-      return !updatedSince || slot.updatedAt > updatedSince;
-    });
+    const items = db.timetableSlots
+      .filter((slot) => {
+        return !updatedSince || slot.updatedAt > updatedSince;
+      })
+      .map((slot) => ({
+        ...slot,
+        category: slot.category ?? 'school_teaching',
+      }));
 
     const deletedIds = updatedSince
       ? (db.tombstones?.timetableSlots ?? [])
@@ -52,6 +67,7 @@ export const timetableSlotRoutes = [
       grade,
       room,
       tone,
+      category,
       effectiveFrom,
       effectiveTo,
     } = body;
@@ -70,6 +86,10 @@ export const timetableSlotRoutes = [
 
     if (!subject || subject.trim().length === 0 || subject.length > 120) {
       return badRequest('subject must be between 1 and 120 characters', 'validation');
+    }
+
+    if (category !== undefined && !isValidCategory(category)) {
+      return badRequest('category must be school_teaching, extra_teaching, or self_study', 'validation');
     }
 
     if (!effectiveFrom || !isValidISODate(effectiveFrom)) {
@@ -112,6 +132,7 @@ export const timetableSlotRoutes = [
       grade: grade?.trim() || undefined,
       room: room?.trim() || null,
       tone: tone ?? 'blue',
+      category: category ?? 'school_teaching',
       effectiveFrom,
       effectiveTo: effectiveTo ?? null,
       updatedAt: nowISO(),
@@ -144,6 +165,9 @@ export const timetableSlotRoutes = [
     }
     if (body.endTime !== undefined && !isValidTime(body.endTime)) {
       return badRequest('endTime must be valid HH:mm', 'validation');
+    }
+    if (body.category !== undefined && !isValidCategory(body.category)) {
+      return badRequest('category must be school_teaching, extra_teaching, or self_study', 'validation');
     }
 
     const newStartTime = body.startTime ?? currentSlot.startTime;
@@ -183,6 +207,7 @@ export const timetableSlotRoutes = [
 
       const previousSlot: TimetableSlot = {
         ...currentSlot,
+        category: currentSlot.category ?? 'school_teaching',
         effectiveTo: yesterday,
         updatedAt: nowISO(),
       };
@@ -198,6 +223,7 @@ export const timetableSlotRoutes = [
         grade: body.grade !== undefined ? (body.grade?.trim() || undefined) : currentSlot.grade,
         room: body.room !== undefined ? (body.room?.trim() || null) : currentSlot.room,
         tone: body.tone ?? currentSlot.tone,
+        category: body.category ?? currentSlot.category ?? 'school_teaching',
         effectiveFrom: today,
         effectiveTo: candidate.effectiveTo ?? null,
         updatedAt: nowISO(),
@@ -255,6 +281,7 @@ export const timetableSlotRoutes = [
       subject: body.subject !== undefined ? body.subject.trim() : currentSlot.subject,
       grade: body.grade !== undefined ? (body.grade?.trim() || undefined) : currentSlot.grade,
       room: body.room !== undefined ? (body.room?.trim() || null) : currentSlot.room,
+      category: body.category ?? currentSlot.category ?? 'school_teaching',
       updatedAt: nowISO(),
     };
 

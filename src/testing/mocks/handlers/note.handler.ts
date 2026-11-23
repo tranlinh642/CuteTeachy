@@ -20,6 +20,7 @@ import { nowISO } from './handler.utils';
 
 const NOTE_BY_ID = ENDPOINTS.notes.byId(':id');
 const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+const TIME_REGEX = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
 
 export interface NoteCursor {
   readonly updatedAt: string;
@@ -247,6 +248,16 @@ export const noteRoutes = [
       dueDate = body.dueDate;
     }
 
+    let remindTime: string | null | undefined;
+    if (body.remindTime !== undefined && body.remindTime !== null && body.remindTime !== '') {
+      if (typeof body.remindTime !== 'string' || !TIME_REGEX.test(body.remindTime)) {
+        return badRequest('remindTime must be in HH:mm format', 'validation');
+      }
+      remindTime = body.remindTime;
+    } else if (body.remindTime === null) {
+      remindTime = null;
+    }
+
     let tagIds: string[] = [];
     if (body.tagIds !== undefined && body.tagIds !== null) {
       if (!Array.isArray(body.tagIds)) {
@@ -326,6 +337,7 @@ export const noteRoutes = [
       updatedAt: timestamp,
       ...(content !== undefined ? { content } : {}),
       ...(dueDate !== undefined ? { dueDate } : {}),
+      ...(remindTime !== undefined ? { remindTime } : {}),
       ...(typeof body.imageUrl === 'string' ? { imageUrl: body.imageUrl } : {}),
     };
 
@@ -389,6 +401,18 @@ export const noteRoutes = [
         updates.dueDate = body.dueDate;
       } else {
         updates.dueDate = undefined;
+        updates.remindTime = null;
+      }
+    }
+
+    if (body.remindTime !== undefined) {
+      if (body.remindTime !== null && body.remindTime !== '') {
+        if (typeof body.remindTime !== 'string' || !TIME_REGEX.test(body.remindTime)) {
+          return badRequest('remindTime must be in HH:mm format', 'validation');
+        }
+        updates.remindTime = body.remindTime;
+      } else {
+        updates.remindTime = null;
       }
     }
 

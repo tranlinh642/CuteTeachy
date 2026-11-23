@@ -1,15 +1,16 @@
 "use client";
 
-import { checklistProgress, formatShortDate } from "@/utils";
+import { checklistProgress, formatShortDate, formatTime, parseISODate } from "@/utils";
 import { useTranslation } from "@/lib/i18n";
-import type { ID, Note, Tag } from "@/types";
-import { Card, Checkbox, Chip, IconButton, TagChip } from "@/components/ui";
+import type { ID, ISODate, Note, Tag } from "@/types";
+import { Card, Checkbox, Chip, Icon, IconButton, TagChip } from "@/components/ui";
 import { cn } from "@/utils/cn";
 import { useUpdateNote } from "../api";
 
 export interface NoteCardProps {
   readonly note: Note;
   readonly tags?: readonly Tag[];
+  readonly highlighted?: boolean;
   readonly onToggleItem?: (note: Note, itemId: ID) => void;
   readonly onEdit?: (note: Note) => void;
   readonly onDelete?: (note: Note) => void;
@@ -19,6 +20,7 @@ export interface NoteCardProps {
 export function NoteCard({
   note,
   tags = [],
+  highlighted = false,
   onToggleItem,
   onEdit,
   onDelete,
@@ -38,8 +40,11 @@ export function NoteCard({
       as="article"
       variant="elevated"
       padding="md"
+      data-note-id={note.id}
+      data-highlighted={highlighted ? "true" : undefined}
       className={cn(
         "group flex flex-col gap-3 transition-all hover:shadow-md",
+        highlighted && "ring-2 ring-primary",
         isCompleted && "opacity-60",
         className,
       )}
@@ -72,12 +77,28 @@ export function NoteCard({
             >
               {note.title}
             </h3>
-            {note.dueDate && (
-              <p className="text-label-md text-primary font-medium mt-0.5">
-                {t("weekly.dueAt", {
-                  time: formatShortDate(new Date(note.dueDate), localeTag),
-                })}
-              </p>
+            {(note.dueDate || note.remindTime) && (
+              <div className="flex flex-wrap items-center gap-2 mt-0.5">
+                {note.dueDate && (
+                  <p className="text-label-md text-primary font-medium">
+                    {t("weekly.dueAt", {
+                      time: formatShortDate(
+                        parseISODate(note.dueDate.slice(0, 10) as ISODate),
+                        localeTag,
+                      ),
+                    })}
+                  </p>
+                )}
+                {note.remindTime && (
+                  <span
+                    data-testid="note-remind-time"
+                    className="inline-flex items-center gap-1 rounded-full bg-primary-container/60 px-2 py-0.5 text-label-sm font-medium text-on-primary-container"
+                  >
+                    <Icon name="clock" size={14} />
+                    <span>{formatTime(note.remindTime, localeTag)}</span>
+                  </span>
+                )}
+              </div>
             )}
           </div>
         </div>

@@ -23,7 +23,14 @@ export const timetable = {
     6: 'T7',
     7: 'CN',
   },
+  categories: {
+    all: 'Tất cả',
+    school_teaching: 'Lịch trên lớp',
+    extra_teaching: 'Lịch dạy thêm',
+    self_study: 'Lịch học thêm',
+  },
   fields: {
+    category: 'Loại lịch',
     weekday: 'Thứ trong tuần',
     startTime: 'Giờ bắt đầu',
     endTime: 'Giờ kết thúc',

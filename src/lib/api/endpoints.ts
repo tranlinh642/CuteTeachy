@@ -50,5 +50,15 @@ export const ENDPOINTS = {
   push: {
     vapidPublicKey: '/push/vapid-public-key',
     subscriptions: '/push/subscriptions',
+    testSubscription: '/push/subscriptions/test',
+  },
+  notifications: {
+    root: '/notifications',
+    markRead: (id: string) => `/notifications/${id}/read`,
+    readAll: '/notifications/read-all',
+  },
+  aiAssistant: {
+    messages: '/ai-assistant/messages',
+    applyDraft: (messageId: string) => `/ai-assistant/drafts/${messageId}/apply`,
   },
 } as const;

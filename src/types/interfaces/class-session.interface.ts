@@ -1,4 +1,4 @@
-import type { ID, ISODate, ISODateTime, TimeOfDay, Tone } from './common.interface';
+import type { ID, ISODate, ISODateTime, ScheduleCategory, TimeOfDay, Tone } from './common.interface';
 
 /** Preparation checklist item attached to a class ("Print Worksheets"). */
 export interface PrepItem {
@@ -20,6 +20,7 @@ export interface ClassSession {
   readonly topic?: string;
   readonly prepItems: readonly PrepItem[];
   readonly tone: Tone;
+  readonly category?: ScheduleCategory;
   readonly cancelled: boolean;
   readonly updatedAt: ISODateTime;
 }
@@ -33,6 +34,7 @@ export interface CreateClassSessionInput {
   readonly grade?: string;
   readonly room?: string | null;
   readonly tone: Tone;
+  readonly category?: ScheduleCategory;
   readonly topic?: string;
   readonly prepItems?: readonly PrepItem[];
 }
@@ -48,4 +50,5 @@ export interface UpdateClassSessionInput {
   readonly grade?: string;
   readonly room?: string | null;
   readonly tone?: Tone;
+  readonly category?: ScheduleCategory;
 }

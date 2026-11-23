@@ -2,7 +2,10 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import { useServices, ApiError, toApiError } from '@/lib/api';
+import { clearPersistedQueryCache } from '@/lib/query';
+import { clearAllStoredServerTimes } from '@/lib/sync';
 import { useSessionStore } from '@/stores';
 import type { AuthSession } from '@/types';
 import type { TranslationKey } from '@/lib/i18n';
@@ -27,6 +30,7 @@ export interface ProcessAuthCallbackParams {
   readonly readRemember: () => boolean;
   readonly clearRemember: () => void;
   readonly navigate: (path: string) => void;
+  readonly clearClientCache?: () => Promise<void> | void;
 }
 
 /**
@@ -40,6 +44,7 @@ export async function processAuthCallback({
   readRemember,
   clearRemember,
   navigate,
+  clearClientCache,
 }: ProcessAuthCallbackParams): Promise<void> {
   // If provider returned an error on URL (e.g. ?error=google_failed)
   if (error) {
@@ -56,6 +61,9 @@ export async function processAuthCallback({
   try {
     const session = await exchange(code);
     const remember = readRemember();
+    await clearAllStoredServerTimes();
+    await clearPersistedQueryCache();
+    await clearClientCache?.();
     setSession(session, remember);
     clearRemember();
 
@@ -75,6 +83,7 @@ export async function processAuthCallback({
 export function useAuthCallback() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
   const { auth } = useServices();
   const setSession = useSessionStore((state) => state.setSession);
   const [isProcessing, setIsProcessing] = useState(true);
@@ -96,12 +105,15 @@ export function useAuthCallback() {
       setSession,
       readRemember: readOAuthRemember,
       clearRemember: clearOAuthRemember,
+      clearClientCache: () => {
+        queryClient.clear();
+      },
       navigate: (path) => {
         setIsProcessing(false);
         router.replace(path);
       },
     });
-  }, [auth, router, searchParams, setSession]);
+  }, [auth, queryClient, router, searchParams, setSession]);
 
   return { isProcessing };
 }

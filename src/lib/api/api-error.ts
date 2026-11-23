@@ -19,6 +19,9 @@ export type ApiErrorCode =
   | 'tag_name_taken'
   | 'timetable_conflict'
   | 'cannot_delete_generated_session'
+  | 'ai_draft_already_applied'
+  | 'ai_provider_not_configured'
+  | 'ai_provider_error'
   | 'conflict'
   | 'unknown';
 
@@ -40,6 +43,9 @@ const CODE_TO_KEY: Readonly<Record<ApiErrorCode, TranslationKey>> = {
   tag_name_taken: 'errors.tagNameTaken',
   timetable_conflict: 'errors.timetableConflict',
   cannot_delete_generated_session: 'classSession.cannotDeleteGenerated',
+  ai_draft_already_applied: 'errors.aiDraftAlreadyApplied',
+  ai_provider_not_configured: 'errors.aiProviderNotConfigured',
+  ai_provider_error: 'errors.aiProviderError',
   conflict: 'errors.generic',
   unknown: 'errors.generic',
 };
@@ -62,6 +68,9 @@ const KNOWN_CODES = new Set<ApiErrorCode>([
   'tag_name_taken',
   'timetable_conflict',
   'cannot_delete_generated_session',
+  'ai_draft_already_applied',
+  'ai_provider_not_configured',
+  'ai_provider_error',
   'conflict',
 ]);
 
