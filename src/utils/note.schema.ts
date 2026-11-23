@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { isValidISODate } from './date-parse';
+import { isValidISODate, isValidTime } from './date-parse';
 import { LIMITS } from './limits';
 
 export const checklistItemSchema = z.object({
@@ -23,6 +23,12 @@ export const noteSchema = z.object({
     .string()
     .optional()
     .refine((value) => !value || isValidISODate(value), 'validation.invalidDate')
+    .transform((value) => (value ? value : undefined)),
+  remindTime: z
+    .string()
+    .nullable()
+    .optional()
+    .refine((value) => !value || isValidTime(value), 'validation.invalidTime')
     .transform((value) => (value ? value : undefined)),
 });
 

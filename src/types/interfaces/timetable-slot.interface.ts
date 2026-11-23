@@ -1,6 +1,6 @@
-import type { ID, ISODate, ISODateTime, TimeOfDay, Tone } from './common.interface';
+import type { ID, ISODate, ISODateTime, ScheduleCategory, TimeOfDay, Tone } from './common.interface';
 
-/** A recurring weekly timetable slot (Thứ, giờ, môn, lớp, phòng, màu, hiệu lực). */
+/** A recurring weekly timetable slot (Thứ, giờ, môn, lớp, phòng, màu, loại lịch, hiệu lực). */
 export interface TimetableSlot {
   readonly id: ID;
   readonly weekday: number; // 1 = Thứ Hai … 7 = Chủ nhật
@@ -10,6 +10,7 @@ export interface TimetableSlot {
   readonly grade?: string;
   readonly room?: string | null;
   readonly tone: Tone;
+  readonly category?: ScheduleCategory;
   readonly effectiveFrom: ISODate;
   readonly effectiveTo?: ISODate | null;
   readonly updatedAt: ISODateTime;
@@ -24,6 +25,7 @@ export interface CreateTimetableSlotInput {
   readonly grade?: string;
   readonly room?: string | null;
   readonly tone: Tone;
+  readonly category?: ScheduleCategory;
   readonly effectiveFrom: ISODate;
   readonly effectiveTo?: ISODate | null;
 }
@@ -36,6 +38,7 @@ export interface UpdateTimetableSlotInput {
   readonly grade?: string;
   readonly room?: string | null;
   readonly tone?: Tone;
+  readonly category?: ScheduleCategory;
   readonly effectiveFrom?: ISODate;
   readonly effectiveTo?: ISODate | null;
 }

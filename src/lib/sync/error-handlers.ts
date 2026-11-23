@@ -22,8 +22,51 @@ export const isIdConflictError = (error: unknown): boolean => {
   return false;
 };
 
+const filterOutEntity = <T extends { id: string }>(old: unknown, entityId: string): unknown => {
+  if (!old) return old;
+
+  // Flat array of entities
+  if (Array.isArray(old)) {
+    return old.filter((item: T) => item?.id !== entityId);
+  }
+
+  // Object containing items array (e.g. envelope or paginated response)
+  if (typeof old === 'object' && old !== null) {
+    const record = old as Record<string, unknown>;
+
+    if (Array.isArray(record.items)) {
+      return {
+        ...record,
+        items: (record.items as T[]).filter((item) => item?.id !== entityId),
+      };
+    }
+
+    // Infinite query structure: { pages: [...], pageParams: [...] }
+    if (Array.isArray(record.pages)) {
+      return {
+        ...record,
+        pages: record.pages.map((page: unknown) => {
+          if (Array.isArray(page)) {
+            return page.filter((item: T) => item?.id !== entityId);
+          }
+          if (typeof page === 'object' && page !== null && Array.isArray((page as Record<string, unknown>).items)) {
+            const pageRecord = page as Record<string, unknown>;
+            return {
+              ...pageRecord,
+              items: (pageRecord.items as T[]).filter((item) => item?.id !== entityId),
+            };
+          }
+          return page;
+        }),
+      };
+    }
+  }
+
+  return old;
+};
+
 /**
- * Removes an entity by ID from the TanStack Query cache.
+ * Removes an entity by ID from the TanStack Query cache across all queries matching the prefix key.
  * Compatible with flat arrays, envelope objects (`{ items: [] }`), and infinite queries (`{ pages: [] }`).
  */
 export const removeEntityFromCache = <T extends { id: string }>(
@@ -33,48 +76,9 @@ export const removeEntityFromCache = <T extends { id: string }>(
 ): void => {
   const key = (Array.isArray(queryKey) ? queryKey : [queryKey]) as QueryKey;
 
-  queryClient.setQueryData(key, (old: unknown) => {
-    if (!old) return old;
-
-    // Flat array of entities
-    if (Array.isArray(old)) {
-      return old.filter((item: T) => item?.id !== entityId);
-    }
-
-    // Object containing items array (e.g. envelope or paginated response)
-    if (typeof old === 'object' && old !== null) {
-      const record = old as Record<string, unknown>;
-
-      if (Array.isArray(record.items)) {
-        return {
-          ...record,
-          items: (record.items as T[]).filter((item) => item?.id !== entityId),
-        };
-      }
-
-      // Infinite query structure: { pages: [...], pageParams: [...] }
-      if (Array.isArray(record.pages)) {
-        return {
-          ...record,
-          pages: record.pages.map((page: unknown) => {
-            if (Array.isArray(page)) {
-              return page.filter((item: T) => item?.id !== entityId);
-            }
-            if (typeof page === 'object' && page !== null && Array.isArray((page as Record<string, unknown>).items)) {
-              const pageRecord = page as Record<string, unknown>;
-              return {
-                ...pageRecord,
-                items: (pageRecord.items as T[]).filter((item) => item?.id !== entityId),
-              };
-            }
-            return page;
-          }),
-        };
-      }
-    }
-
-    return old;
-  });
+  queryClient.setQueriesData({ queryKey: key }, (old: unknown) =>
+    filterOutEntity<T>(old, entityId),
+  );
 };
 
 export interface GoneHandlerOptions {

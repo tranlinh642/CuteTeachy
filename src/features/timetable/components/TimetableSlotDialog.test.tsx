@@ -30,7 +30,7 @@ vi.mock('@/components/ui/Dialog', () => ({
     ) : null,
 }));
 
-describe('TimetableSlotDialog Component (S4-FE-02)', () => {
+describe('TimetableSlotDialog Component (S4-FE-02 & S7-FE-01)', () => {
   const pastSlot: TimetableSlot = {
     id: 'slot-past-1',
     weekday: 1,
@@ -40,6 +40,7 @@ describe('TimetableSlotDialog Component (S4-FE-02)', () => {
     grade: '10A',
     room: 'P302',
     tone: 'blue',
+    category: 'school_teaching',
     effectiveFrom: '2026-01-01',
     effectiveTo: null,
     updatedAt: '2026-09-01T00:00:00Z',
@@ -54,6 +55,7 @@ describe('TimetableSlotDialog Component (S4-FE-02)', () => {
     grade: '12B',
     room: 'Lab 1',
     tone: 'pink',
+    category: 'extra_teaching',
     effectiveFrom: '2099-01-01',
     effectiveTo: null,
     updatedAt: '2026-09-01T00:00:00Z',
@@ -80,10 +82,15 @@ describe('TimetableSlotDialog Component (S4-FE-02)', () => {
     );
   };
 
-  it('renders create dialog with title and default fields', () => {
+  it('renders create dialog with title, ScheduleCategory selector, and default fields', () => {
     const html = renderDialog(undefined, true, 'vi');
 
     expect(html).toContain('Thêm tiết dạy');
+    expect(html).toContain('Loại lịch');
+    expect(html).toContain('Lịch trên lớp');
+    expect(html).toContain('Lịch dạy thêm');
+    expect(html).toContain('Lịch học thêm');
+    expect(html).toContain('data-testid="schedule-category-selector"');
     expect(html).toContain('Thứ trong tuần');
     expect(html).toContain('Giờ bắt đầu');
     expect(html).toContain('Giờ kết thúc');
@@ -93,6 +100,12 @@ describe('TimetableSlotDialog Component (S4-FE-02)', () => {
     expect(html).toContain('Bảng màu pastel');
     expect(html).toContain('Hiệu lực từ ngày');
     expect(html).not.toContain('data-testid="split-warning-banner"');
+  });
+
+  it('pre-selects slot category when editing an existing slot', () => {
+    const html = renderDialog(futureSlot, true, 'vi');
+    expect(html).toContain('data-testid="category-option-extra_teaching"');
+    expect(html).toContain('aria-checked="true"');
   });
 
   it('renders split warning banner when editing a slot that has already started (effectiveFrom < today)', () => {
@@ -111,10 +124,14 @@ describe('TimetableSlotDialog Component (S4-FE-02)', () => {
     expect(html).not.toContain('data-testid="split-warning-banner"');
   });
 
-  it('renders correctly in English locale', () => {
+  it('renders correctly in English locale including category options', () => {
     const html = renderDialog(pastSlot, true, 'en');
 
     expect(html).toContain('Edit slot');
+    expect(html).toContain('Schedule category');
+    expect(html).toContain('School class');
+    expect(html).toContain('Extra tutoring');
+    expect(html).toContain('Self study');
     expect(html).toContain('Teaching history notice');
     expect(html).toContain('Save slot');
     expect(html).toContain('Cancel');

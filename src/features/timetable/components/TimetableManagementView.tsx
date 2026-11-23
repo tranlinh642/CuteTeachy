@@ -2,10 +2,11 @@
 
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useTranslation } from '@/lib/i18n';
+import { useTranslation, type TranslationKey } from '@/lib/i18n';
 import { Button, ConfirmDialog, EmptyState, IconButton } from '@/components/ui';
-import type { TimetableSlot } from '@/types';
+import { SCHEDULE_CATEGORIES, type ScheduleCategory, type TimetableSlot } from '@/types';
 import { timeToMinutes, toISODate } from '@/utils';
+import { AiAssistantFabDrawer } from '@/features/ai-assistant';
 import { useDeleteTimetableSlot, useTimetableSlots } from '../api';
 import { TimetableSlotCard } from './TimetableSlotCard';
 import { TimetableSlotDialog } from './TimetableSlotDialog';
@@ -21,20 +22,37 @@ const WEEKDAYS = [
   { value: 7, labelKey: 'timetable.weekdays.sun' },
 ] as const;
 
-export function TimetableManagementView() {
+const CATEGORY_FILTERS: readonly (ScheduleCategory | 'all')[] = ['all', ...SCHEDULE_CATEGORIES];
+
+export interface TimetableManagementViewProps {
+  readonly defaultCategoryFilter?: ScheduleCategory | 'all';
+}
+
+export function TimetableManagementView({
+  defaultCategoryFilter = 'all',
+}: TimetableManagementViewProps = {}) {
   const { t } = useTranslation();
   const router = useRouter();
 
   const { data: slots = [], isLoading } = useTimetableSlots();
   const deleteSlot = useDeleteTimetableSlot();
 
+  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<ScheduleCategory | 'all'>(
+    defaultCategoryFilter,
+  );
   const [selectedDayFilter, setSelectedDayFilter] = useState<number | 'all'>('all');
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [createWeekday, setCreateWeekday] = useState<number>(1);
   const [slotToEdit, setSlotToEdit] = useState<TimetableSlot | null>(null);
   const [slotToDelete, setSlotToDelete] = useState<TimetableSlot | null>(null);
+  const [deleteErrorKey, setDeleteErrorKey] = useState<TranslationKey | null>(null);
 
   const today = toISODate(new Date());
+
+  const filteredSlots = useMemo(() => {
+    if (selectedCategoryFilter === 'all') return slots;
+    return slots.filter((slot) => (slot.category ?? 'school_teaching') === selectedCategoryFilter);
+  }, [slots, selectedCategoryFilter]);
 
   // Group slots by weekday, sorted by start time
   const slotsByWeekday = useMemo(() => {
@@ -42,7 +60,7 @@ export function TimetableManagementView() {
     for (let day = 1; day <= 7; day++) {
       map.set(day, []);
     }
-    for (const slot of slots) {
+    for (const slot of filteredSlots) {
       const list = map.get(slot.weekday) ?? [];
       list.push(slot);
       map.set(slot.weekday, list);
@@ -52,7 +70,7 @@ export function TimetableManagementView() {
       list.sort((a, b) => timeToMinutes(a.startTime) - timeToMinutes(b.startTime));
     }
     return map;
-  }, [slots]);
+  }, [filteredSlots]);
 
   const openCreateForDay = (day: number) => {
     setCreateWeekday(day);
@@ -61,8 +79,17 @@ export function TimetableManagementView() {
 
   const handleConfirmDelete = async () => {
     if (!slotToDelete) return;
-    await deleteSlot.mutateAsync(slotToDelete.id);
-    setSlotToDelete(null);
+    setDeleteErrorKey(null);
+    try {
+      await deleteSlot.mutateAsync(slotToDelete.id);
+      setSlotToDelete(null);
+    } catch (err) {
+      const key =
+        err && typeof err === 'object' && 'messageKey' in err && typeof err.messageKey === 'string'
+          ? (err.messageKey as TranslationKey)
+          : ('errors.generic' as TranslationKey);
+      setDeleteErrorKey(key);
+    }
   };
 
   const isDeletingStartedSlot = Boolean(slotToDelete && slotToDelete.effectiveFrom < today);
@@ -81,7 +108,7 @@ export function TimetableManagementView() {
               {t('timetable.title')}
             </h1>
             <span className="rounded-full bg-surface-container px-3 py-1 text-label-sm font-bold text-on-surface-variant">
-              {t('timetable.totalSlots', { count: slots.length })}
+              {t('timetable.totalSlots', { count: filteredSlots.length })}
             </span>
           </div>
           <p className="text-body-md text-on-surface-variant mt-1">
@@ -108,6 +135,33 @@ export function TimetableManagementView() {
           </Button>
         </div>
       </header>
+
+      {/* Bộ lọc nhanh theo Loại lịch (ScheduleCategory) */}
+      <div
+        data-testid="timetable-category-filter"
+        className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar"
+      >
+        {CATEGORY_FILTERS.map((cat) => {
+          const selected = selectedCategoryFilter === cat;
+          return (
+            <button
+              key={cat}
+              type="button"
+              data-testid={`category-filter-${cat}`}
+              onClick={() => setSelectedCategoryFilter(cat)}
+              aria-pressed={selected}
+              className={cn(
+                'inline-flex min-h-11 items-center justify-center rounded-full px-4 text-body-sm font-medium transition-all whitespace-nowrap cursor-pointer',
+                selected
+                  ? 'bg-secondary-container text-on-secondary-container font-bold shadow-xs'
+                  : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high',
+              )}
+            >
+              {t(`timetable.categories.${cat}` as TranslationKey)}
+            </button>
+          );
+        })}
+      </div>
 
       {/* Bộ lọc theo thứ (Mobile cuộn ngang, vùng chạm ≥ 44px) */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
@@ -157,8 +211,17 @@ export function TimetableManagementView() {
         })}
       </div>
 
+      {deleteErrorKey && (
+        <div
+          role="alert"
+          className="rounded-xl bg-error-container px-4 py-2.5 text-body-sm font-medium text-on-error-container"
+        >
+          {t(deleteErrorKey)}
+        </div>
+      )}
+
       {/* Danh sách tiết theo từng thứ */}
-      {!isLoading && slots.length === 0 ? (
+      {!isLoading && filteredSlots.length === 0 ? (
         <EmptyState
           icon="school"
           title={t('timetable.emptyState.title')}
@@ -236,12 +299,16 @@ export function TimetableManagementView() {
         }}
         slot={slotToEdit ?? undefined}
         defaultWeekday={createWeekday}
+        defaultCategory={selectedCategoryFilter === 'all' ? 'school_teaching' : selectedCategoryFilter}
       />
 
       {/* Dialog xác nhận Ngừng / Xoá tiết dạy */}
       <ConfirmDialog
         open={Boolean(slotToDelete)}
-        onClose={() => setSlotToDelete(null)}
+        onClose={() => {
+          setSlotToDelete(null);
+          setDeleteErrorKey(null);
+        }}
         onConfirm={handleConfirmDelete}
         title={
           isDeletingStartedSlot
@@ -261,6 +328,9 @@ export function TimetableManagementView() {
         destructive={!isDeletingStartedSlot}
         loading={deleteSlot.isPending}
       />
+
+      {/* Nút mở nhanh Trợ lý AI */}
+      <AiAssistantFabDrawer />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   formatShortDate,
@@ -10,17 +10,24 @@ import {
   isToday,
   toISODate,
 } from '@/utils';
-import { useTranslation } from '@/lib/i18n';
-import type { ClassSession } from '@/types';
+import { useTranslation, type TranslationKey } from '@/lib/i18n';
+import { SCHEDULE_CATEGORIES, type ClassSession, type ScheduleCategory } from '@/types';
 import { Button, Card, EmptyState, IconButton, SectionHeader } from '@/components/ui';
 import { TaskDialog, TaskItem, useTaskDialog } from '@/features/tasks';
+import { AiAssistantFabDrawer } from '@/features/ai-assistant';
 import { ClassCard } from './ClassCard';
 import { SessionDetailDialog } from './SessionDetailDialog';
 import { AdHocSessionDialog } from './AdHocSessionDialog';
 import { cn } from '@/utils/cn';
 import { useCalendarView } from '../hooks/use-calendar-view';
 
-export function CalendarView() {
+const CATEGORY_FILTERS: readonly (ScheduleCategory | 'all')[] = ['all', ...SCHEDULE_CATEGORIES];
+
+export interface CalendarViewProps {
+  readonly defaultCategoryFilter?: ScheduleCategory | 'all';
+}
+
+export function CalendarView({ defaultCategoryFilter = 'all' }: CalendarViewProps = {}) {
   const { t, localeTag } = useTranslation();
   const router = useRouter();
   const {
@@ -30,6 +37,7 @@ export function CalendarView() {
     selectedDate,
     selectedDateLabel,
     selectDate,
+    selectCategory,
     goToToday,
     nextMonth,
     previousMonth,
@@ -40,9 +48,24 @@ export function CalendarView() {
     deleteTask,
   } = useCalendarView();
 
+  const [categoryFilter, setCategoryFilter] = useState<ScheduleCategory | 'all'>(defaultCategoryFilter);
   const taskDialog = useTaskDialog();
   const [selectedSession, setSelectedSession] = useState<ClassSession | null>(null);
   const [isAdHocDialogOpen, setIsAdHocDialogOpen] = useState(false);
+
+  const handleSelectCategory = (cat: ScheduleCategory | 'all') => {
+    setCategoryFilter(cat);
+    selectCategory?.(cat);
+  };
+
+  const filteredAgenda = useMemo(() => {
+    if (categoryFilter === 'all') return agenda;
+    return agenda.filter(
+      (entry) =>
+        entry.kind === 'task' ||
+        (entry.item.category ?? 'school_teaching') === categoryFilter,
+    );
+  }, [agenda, categoryFilter]);
 
   const weeks = getMonthGrid(year, monthIndex);
   const weekdays = getWeekDays(new Date(year, monthIndex, 1));
@@ -83,6 +106,33 @@ export function CalendarView() {
           />
         </div>
       </header>
+
+      {/* Bộ lọc nhanh theo Loại lịch (ScheduleCategory) */}
+      <div
+        data-testid="calendar-category-filter"
+        className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar"
+      >
+        {CATEGORY_FILTERS.map((cat) => {
+          const selected = categoryFilter === cat;
+          return (
+            <button
+              key={cat}
+              type="button"
+              data-testid={`calendar-category-filter-${cat}`}
+              onClick={() => handleSelectCategory(cat)}
+              aria-pressed={selected}
+              className={cn(
+                'inline-flex min-h-11 items-center justify-center rounded-full px-4 text-body-sm font-medium transition-all whitespace-nowrap cursor-pointer',
+                selected
+                  ? 'bg-primary text-on-primary font-bold shadow-xs'
+                  : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high',
+              )}
+            >
+              {t(`calendar.categories.${cat}` as TranslationKey)}
+            </button>
+          );
+        })}
+      </div>
 
       {/* Bố cục 2 phần: Lưới lịch tháng (trái) và Lịch trình ngày chọn (phải) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -175,14 +225,14 @@ export function CalendarView() {
             }
           />
 
-          {agenda.length === 0 ? (
+          {filteredAgenda.length === 0 ? (
             <EmptyState
               icon="calendar"
               title={t('calendar.noEvents')}
             />
           ) : (
             <div className="flex flex-col gap-3">
-              {agenda.map((entry) => {
+              {filteredAgenda.map((entry) => {
                 if (entry.kind === 'class') {
                   return (
                     <ClassCard
@@ -228,7 +278,11 @@ export function CalendarView() {
         open={isAdHocDialogOpen}
         onClose={() => setIsAdHocDialogOpen(false)}
         defaultDate={selectedDate}
+        defaultCategory={categoryFilter === 'all' ? 'school_teaching' : categoryFilter}
       />
+
+      {/* Nút mở nhanh Trợ lý AI */}
+      <AiAssistantFabDrawer />
     </div>
   );
 }

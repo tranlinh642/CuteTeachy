@@ -44,4 +44,18 @@ export const queryKeys = {
   inspirations: {
     today: ['inspirations', 'today'] as const,
   },
+  notifications: {
+    all: ['notifications'] as const,
+    list: (params?: { unreadOnly?: boolean; limit?: number }) =>
+      params?.unreadOnly !== undefined || params?.limit !== undefined
+        ? (['notifications', 'list', params] as const)
+        : (['notifications', 'list'] as const),
+  },
+  aiAssistant: {
+    all: ['ai-assistant'] as const,
+    messages: (params?: { limit?: number }) =>
+      params?.limit !== undefined
+        ? (['ai-assistant', 'messages', params] as const)
+        : (['ai-assistant', 'messages'] as const),
+  },
 } as const;

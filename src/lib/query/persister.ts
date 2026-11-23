@@ -27,7 +27,13 @@ const idbStorage: AsyncStorage<string> = {
   },
 };
 
-export const createIdbPersister = (idbKey = 'cute-teachy-query-cache') => {
+export const QUERY_CACHE_IDB_KEY = 'cute-teachy-query-cache';
+
+export const clearPersistedQueryCache = async (idbKey = QUERY_CACHE_IDB_KEY): Promise<void> => {
+  await idbStorage.removeItem(idbKey);
+};
+
+export const createIdbPersister = (idbKey = QUERY_CACHE_IDB_KEY) => {
   if (typeof window === 'undefined') return undefined;
   return createAsyncStoragePersister({
     storage: idbStorage,

@@ -1,12 +1,36 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { I18nProvider } from '@/lib/i18n';
 import { ServicesContext } from '@/lib/api/services-context';
+import { queryKeys } from '@/lib/query';
 import type { Note, Tag } from '@/types';
 import { NotesView } from './NotesView';
 import { NoteCard } from './NoteCard';
+import { NoteDialog } from './NoteDialog';
+import { readNoteIdFromSearch } from '../hooks/use-notes-view';
+
+vi.mock('@/components/ui/Dialog', () => ({
+  Dialog: ({
+    open,
+    title,
+    children,
+    footer,
+  }: {
+    open: boolean;
+    title: string;
+    children: React.ReactNode;
+    footer?: React.ReactNode;
+  }) =>
+    open ? (
+      <div data-testid="note-dialog" data-title={title}>
+        <h1>{title}</h1>
+        <div>{children}</div>
+        <div>{footer}</div>
+      </div>
+    ) : null,
+}));
 
 const mockNotes: Note[] = [
   {
@@ -23,14 +47,36 @@ const mockNotes: Note[] = [
 
 const mockTags: Tag[] = [{ id: 'tag-1', name: 'Giảng dạy', tone: 'blue', updatedAt: '2026-10-26T10:00:00Z' }];
 
-describe('NotesView Component (S3-FE-04)', () => {
-  const renderWithProviders = (element: React.ReactElement, servicesOverride: Record<string, unknown> = {}) => {
+describe('NotesView Component (S3-FE-04 & S6-FE-01)', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  const renderWithProviders = (
+    element: React.ReactElement,
+    servicesOverride: Record<string, unknown> = {},
+    seedCache = false,
+  ) => {
     const queryClient = new QueryClient({
       defaultOptions: {
         queries: { retry: false },
         mutations: { retry: false },
       },
     });
+
+    if (seedCache) {
+      queryClient.setQueryData(queryKeys.notes.infinite({ q: undefined, tagId: undefined }), {
+        pages: [
+          {
+            items: mockNotes,
+            deletedIds: [],
+            serverTime: '2026-10-26T10:00:00Z',
+            nextCursor: null,
+          },
+        ],
+        pageParams: [undefined],
+      });
+    }
 
     const defaultServices = {
       notes: {
@@ -90,5 +136,60 @@ describe('NotesView Component (S3-FE-04)', () => {
     const html = renderWithProviders(<NoteCard note={noteWithoutChecklist} />);
     expect(html).toContain('rounded-full');
     expect(html).toContain('type="checkbox"');
+  });
+
+  it('renders remindTime badge on NoteCard when note has dueDate and remindTime (S6-FE-01)', () => {
+    const noteWithRemind: Note = {
+      id: 'note-remind-1',
+      title: 'Họp tổ bộ môn',
+      checklist: [],
+      tagIds: [],
+      dueDate: '2026-10-30',
+      remindTime: '14:30',
+      completed: false,
+      createdAt: '2026-10-26T10:00:00Z',
+      updatedAt: '2026-10-26T10:00:00Z',
+    };
+
+    const html = renderWithProviders(<NoteCard note={noteWithRemind} />);
+    expect(html).toContain('14:30');
+  });
+
+  it('renders remindTime TimeField in NoteDialog when editing a note with dueDate (S6-FE-01)', () => {
+    const noteWithDueDate: Note = {
+      id: 'note-remind-2',
+      title: 'Nộp điểm giữa kỳ',
+      checklist: [],
+      tagIds: [],
+      dueDate: '2026-10-30',
+      remindTime: '09:15',
+      completed: false,
+      createdAt: '2026-10-26T10:00:00Z',
+      updatedAt: '2026-10-26T10:00:00Z',
+    };
+
+    const html = renderWithProviders(
+      <NoteDialog open={true} onClose={vi.fn()} note={noteWithDueDate} />,
+    );
+    expect(html).toContain('Giờ nhắc');
+    expect(html).toContain('09:15');
+  });
+
+  it('reads noteId from /notes?noteId=<id> deep-link, highlights the target NoteCard and opens NoteDialog (SPEC-006 lines 27, 49)', () => {
+    expect(readNoteIdFromSearch('?noteId=note-1')).toBe('note-1');
+    expect(readNoteIdFromSearch('')).toBeNull();
+
+    vi.stubGlobal('window', {
+      location: { search: '?noteId=note-1' },
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    });
+
+    const html = renderWithProviders(<NotesView />, {}, true);
+    expect(html).toContain('data-note-id="note-1"');
+    expect(html).toContain('data-highlighted="true"');
+    expect(html).toContain('ring-2 ring-primary');
+    expect(html).toContain('data-testid="note-dialog"');
+    expect(html).toContain('Chuẩn bị bài học');
   });
 });

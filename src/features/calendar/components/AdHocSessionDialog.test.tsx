@@ -47,10 +47,10 @@ vi.mock('@tanstack/react-query', () => ({
   }),
 }));
 
-describe('AdHocSessionDialog (S4-FE-03)', () => {
-  const renderDialog = (open = true, defaultDate = '2026-10-28') => {
+describe('AdHocSessionDialog (S4-FE-03 & S7-FE-01)', () => {
+  const renderDialog = (open = true, defaultDate = '2026-10-28', locale: 'vi' | 'en' = 'vi') => {
     return renderToStaticMarkup(
-      <I18nProvider defaultLocale="vi">
+      <I18nProvider locale={locale}>
         <AdHocSessionDialog open={open} onClose={vi.fn()} defaultDate={defaultDate} />
       </I18nProvider>,
     );
@@ -60,11 +60,18 @@ describe('AdHocSessionDialog (S4-FE-03)', () => {
     expect(renderDialog(false)).toBe('');
   });
 
-  it('renders form fields: subject, grade, room, date, startTime, endTime, tone, topic', () => {
-    const html = renderDialog(true, '2026-10-28');
+  it('renders form fields including ScheduleCategory selector: Lịch trên lớp, Lịch dạy thêm, Lịch học thêm', () => {
+    const html = renderDialog(true, '2026-10-28', 'vi');
 
     // Title
     expect(html).toContain('Thêm buổi lẻ');
+
+    // Category selector
+    expect(html).toContain('Loại lịch');
+    expect(html).toContain('Lịch trên lớp');
+    expect(html).toContain('Lịch dạy thêm');
+    expect(html).toContain('Lịch học thêm');
+    expect(html).toContain('data-testid="schedule-category-selector"');
 
     // Fields
     expect(html).toContain('Môn học');
@@ -80,5 +87,13 @@ describe('AdHocSessionDialog (S4-FE-03)', () => {
     // Default buttons
     expect(html).toContain('Thêm buổi');
     expect(html).toContain('Hủy');
+  });
+
+  it('renders ScheduleCategory options in English locale', () => {
+    const html = renderDialog(true, '2026-10-28', 'en');
+    expect(html).toContain('Schedule Category');
+    expect(html).toContain('School class');
+    expect(html).toContain('Extra tutoring');
+    expect(html).toContain('Self study');
   });
 });

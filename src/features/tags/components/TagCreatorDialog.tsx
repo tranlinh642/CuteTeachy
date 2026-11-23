@@ -17,8 +17,22 @@ export interface TagCreatorDialogProps {
 
 /** Hộp thoại "Tạo thẻ mới" (tên + màu). */
 export function TagCreatorDialog({ open, onClose, onCreated }: TagCreatorDialogProps) {
+  if (!open) return null;
+
+  return <TagCreatorDialogContent open={open} onClose={onClose} onCreated={onCreated} />;
+}
+
+function TagCreatorDialogContent({ open, onClose, onCreated }: TagCreatorDialogProps) {
   const { t } = useTranslation();
   const formId = useId();
+  const colorLabelId = useId();
+  const errorText = useFieldErrorText();
+  const form = useTagForm((tag) => {
+    onCreated?.(tag);
+    onClose();
+  });
+  const nameLabel = t('tags.editor.nameLabel');
+
   return (
     <Dialog
       open={open}
@@ -27,61 +41,41 @@ export function TagCreatorDialog({ open, onClose, onCreated }: TagCreatorDialogP
       size="sm"
       footer={
         <>
-          <Button variant="ghost" onClick={onClose}>
+          <Button variant="ghost" onClick={onClose} disabled={form.isSubmitting}>
             {t('common.actions.cancel')}
           </Button>
-          <Button type="submit" form={formId}>
+          <Button
+            type="submit"
+            form={formId}
+            loading={form.isSubmitting}
+            disabled={form.isSubmitting}
+          >
             {t('tags.editor.submit')}
           </Button>
         </>
       }
     >
-      {open ? (
-        <TagCreatorForm
-          formId={formId}
-          onCreated={(tag) => {
-            onCreated?.(tag);
-            onClose();
-          }}
+      <form id={formId} noValidate onSubmit={form.submit} className="flex flex-col gap-5">
+        <TextField
+          label={nameLabel}
+          placeholder={t('tags.editor.namePlaceholder')}
+          value={form.name}
+          maxLength={LIMITS.tagNameMax}
+          onChange={(event) => form.setName(event.target.value)}
+          error={errorText(form.errors.name, nameLabel)}
         />
-      ) : null}
+        <div className="flex flex-col gap-3">
+          <span id={colorLabelId} className="text-label-md text-on-surface-variant tracking-wider uppercase">
+            {t('tags.editor.colorLabel')}
+          </span>
+          <TonePicker value={form.tone} onChange={form.setTone} labelledBy={colorLabelId} />
+        </div>
+        {form.errorKey && form.errorKey !== 'errors.tagNameTaken' && (
+          <p role="alert" className="text-body-sm text-error">
+            {t(form.errorKey)}
+          </p>
+        )}
+      </form>
     </Dialog>
-  );
-}
-
-interface TagCreatorFormProps {
-  readonly formId: string;
-  readonly onCreated: (tag: Tag) => void;
-}
-
-function TagCreatorForm({ formId, onCreated }: TagCreatorFormProps) {
-  const { t } = useTranslation();
-  const errorText = useFieldErrorText();
-  const form = useTagForm(onCreated);
-  const colorLabelId = useId();
-  const nameLabel = t('tags.editor.nameLabel');
-
-  return (
-    <form id={formId} noValidate onSubmit={form.submit} className="flex flex-col gap-5">
-      <TextField
-        label={nameLabel}
-        placeholder={t('tags.editor.namePlaceholder')}
-        value={form.name}
-        maxLength={LIMITS.tagNameMax}
-        onChange={(event) => form.setName(event.target.value)}
-        error={errorText(form.errors.name, nameLabel)}
-      />
-      <div className="flex flex-col gap-3">
-        <span id={colorLabelId} className="text-label-md text-on-surface-variant tracking-wider uppercase">
-          {t('tags.editor.colorLabel')}
-        </span>
-        <TonePicker value={form.tone} onChange={form.setTone} labelledBy={colorLabelId} />
-      </div>
-      {form.errorKey && form.errorKey !== 'errors.tagNameTaken' && (
-        <p role="alert" className="text-body-sm text-error">
-          {t(form.errorKey)}
-        </p>
-      )}
-    </form>
   );
 }

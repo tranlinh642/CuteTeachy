@@ -18,7 +18,7 @@ describe('useSessionStore storage and remember behavior', () => {
   const mockSession: AuthSession = {
     user: {
       id: 'user-1',
-      email: 'linh@cuteteachy.vn',
+      email: 'teacher@example.com',
       emailVerified: true,
       loginProviders: ['password'],
       fullName: 'Nguyễn Thùy Linh',
@@ -78,3 +78,4 @@ describe('useSessionStore storage and remember behavior', () => {
     expect(sessionStorageProxy.getItem(SESSION_STORAGE_KEY)).toBeNull();
   });
 });
+

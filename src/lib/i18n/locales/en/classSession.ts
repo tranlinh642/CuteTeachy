@@ -4,6 +4,13 @@ export const classSession = {
   createAdHocTitle: 'Add Ad-hoc Class',
   slotGeneratedBadge: 'Timetable Session',
   adHocBadge: 'Make-up / Cover',
+  category: 'Schedule Category',
+  categories: {
+    all: 'All',
+    school_teaching: 'School class',
+    extra_teaching: 'Extra tutoring',
+    self_study: 'Self study',
+  },
   subject: 'Subject',
   grade: 'Grade / Class',
   room: 'Room',

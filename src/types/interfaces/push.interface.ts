@@ -24,3 +24,9 @@ export interface PushSubscriptionDto {
   readonly createdAt?: string;
   readonly updatedAt?: string;
 }
+
+export interface TestPushNotificationResponse {
+  readonly sent: number;
+  readonly failed: number;
+  readonly inAppCreated: boolean;
+}

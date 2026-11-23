@@ -11,16 +11,29 @@ import {
   daysInMonth,
   formatMonthYear,
   formatShortDate,
+  isValidISODate,
+  parseISODate,
   resolveTags,
   toISODate,
 } from '@/utils';
 import { useTranslation } from '@/lib/i18n';
-import type { ISODate } from '@/types';
+import type { ISODate, ScheduleCategory } from '@/types';
+
+function resolveInitialCalendarDate(): ISODate {
+  if (typeof window !== 'undefined' && window.location?.search) {
+    const rawDate = new URLSearchParams(window.location.search).get('date');
+    if (rawDate && isValidISODate(rawDate)) {
+      return rawDate;
+    }
+  }
+  return toISODate(new Date());
+}
 
 export function useCalendarView() {
   const { localeTag } = useTranslation();
-  const [currentDate, setCurrentDate] = useState<Date>(() => new Date());
-  const [selectedDate, setSelectedDate] = useState<ISODate>(() => toISODate(new Date()));
+  const [selectedDate, setSelectedDate] = useState<ISODate>(resolveInitialCalendarDate);
+  const [currentDate, setCurrentDate] = useState<Date>(() => parseISODate(selectedDate));
+  const [selectedCategory, setSelectedCategory] = useState<ScheduleCategory | 'all'>('all');
 
   const year = currentDate.getFullYear();
   const monthIndex = currentDate.getMonth();
@@ -43,8 +56,19 @@ export function useCalendarView() {
   const classes = useMemo(() => classesQuery.data ?? [], [classesQuery.data]);
   const tasks = useMemo(() => tasksQuery.data ?? [], [tasksQuery.data]);
 
-  const markers = useMemo(() => countEventsByDate(classes, tasks), [classes, tasks]);
-  const agenda = useMemo(() => buildAgenda(classes, tasks, selectedDate), [classes, tasks, selectedDate]);
+  const filteredClasses = useMemo(() => {
+    if (selectedCategory === 'all') return classes;
+    return classes.filter((session) => (session.category ?? 'school_teaching') === selectedCategory);
+  }, [classes, selectedCategory]);
+
+  const markers = useMemo(
+    () => countEventsByDate(filteredClasses, tasks),
+    [filteredClasses, tasks],
+  );
+  const agenda = useMemo(
+    () => buildAgenda(filteredClasses, tasks, selectedDate),
+    [filteredClasses, tasks, selectedDate],
+  );
 
   const nextMonth = () => setCurrentDate((d) => addMonths(d, 1));
   const previousMonth = () => setCurrentDate((d) => addMonths(d, -1));
@@ -56,7 +80,7 @@ export function useCalendarView() {
 
   const monthTitle = useMemo(() => formatMonthYear(currentDate, localeTag), [currentDate, localeTag]);
   const selectedDateLabel = useMemo(
-    () => formatShortDate(new Date(selectedDate), localeTag),
+    () => formatShortDate(parseISODate(selectedDate), localeTag),
     [selectedDate, localeTag],
   );
 
@@ -67,6 +91,8 @@ export function useCalendarView() {
     selectedDate,
     selectedDateLabel,
     selectDate: setSelectedDate,
+    selectedCategory,
+    selectCategory: setSelectedCategory,
     goToToday,
     nextMonth,
     previousMonth,

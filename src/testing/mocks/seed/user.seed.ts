@@ -2,7 +2,7 @@ import type { User } from '@/types';
 
 /** Demo login for the mock backend (shown as a hint on the login screen). */
 export const MOCK_DEMO_CREDENTIALS = {
-  email: 'linh@cuteteachy.vn',
+  email: 'teacher@example.com',
   password: 'password123',
 } as const;
 

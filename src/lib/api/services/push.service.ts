@@ -4,6 +4,7 @@ import type {
   CreatePushSubscriptionInput,
   DeletePushSubscriptionInput,
   PushSubscriptionDto,
+  TestPushNotificationResponse,
   VapidPublicKeyResponse,
 } from '@/types';
 
@@ -17,10 +18,17 @@ export const createPushService = (http: AxiosInstance) => {
   const deletePushSubscription = (payload: DeletePushSubscriptionInput) =>
     http.delete<void>(ENDPOINTS.push.subscriptions, { data: payload }).then(() => undefined);
 
+  const sendTestNotification = () =>
+    http
+      .post<TestPushNotificationResponse>(ENDPOINTS.push.testSubscription)
+      .then((res) => res.data);
+
   return {
     getVapidPublicKey,
     createPushSubscription,
     deletePushSubscription,
+    sendTestNotification,
+    testPushSubscription: sendTestNotification,
   };
 };
 

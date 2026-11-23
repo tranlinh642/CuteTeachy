@@ -1,20 +1,25 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from '@/lib/i18n';
-import type { Note } from '@/types';
+import type { ID, Note } from '@/types';
 import { Button, Chip, EmptyState, TagChip, TextField } from '@/components/ui';
 import { useNotesView } from '../hooks/use-notes-view';
 import { NoteCard } from './NoteCard';
 import { NoteDialog } from './NoteDialog';
 
-export function NotesView() {
+export interface NotesViewProps {
+  readonly initialNoteId?: ID | null;
+}
+
+export function NotesView({ initialNoteId }: NotesViewProps = {}) {
   const { t } = useTranslation();
   const {
     query,
     setQuery,
     selectedTagId,
     setSelectedTagId,
+    highlightedNoteId,
     tags,
     notes,
     tagsFor,
@@ -23,10 +28,22 @@ export function NotesView() {
     isFetchingNextPage,
     hasNextPage,
     fetchNextPage,
-  } = useNotesView();
+  } = useNotesView(initialNoteId);
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingNote, setEditingNote] = useState<Note | undefined>(undefined);
+  const [dismissedDeepLinkId, setDismissedDeepLinkId] = useState<ID | null>(null);
+
+  const deepLinkedNote = useMemo(() => {
+    if (!highlightedNoteId) return undefined;
+    return notes.find((n) => n.id === highlightedNoteId);
+  }, [highlightedNoteId, notes]);
+
+  const isDeepLinkDialogOpen = Boolean(
+    deepLinkedNote && dismissedDeepLinkId !== deepLinkedNote.id && !dialogOpen,
+  );
+  const effectiveDialogOpen = dialogOpen || isDeepLinkDialogOpen;
+  const effectiveEditingNote = dialogOpen ? editingNote : deepLinkedNote;
 
   const openCreate = () => {
     setEditingNote(undefined);
@@ -36,6 +53,13 @@ export function NotesView() {
   const openEdit = (note: Note) => {
     setEditingNote(note);
     setDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+    if (highlightedNoteId) {
+      setDismissedDeepLinkId(highlightedNoteId);
+    }
   };
 
   return (
@@ -100,6 +124,7 @@ export function NotesView() {
                 key={note.id}
                 note={note}
                 tags={tagsFor(note.tagIds)}
+                highlighted={note.id === highlightedNoteId}
                 onToggleItem={toggleChecklistItem}
                 onEdit={openEdit}
                 onDelete={(n) => deleteNote(n.id)}
@@ -123,9 +148,9 @@ export function NotesView() {
 
       {/* Hộp thoại tạo / sửa ghi chú */}
       <NoteDialog
-        open={dialogOpen}
-        onClose={() => setDialogOpen(false)}
-        note={editingNote}
+        open={effectiveDialogOpen}
+        onClose={handleCloseDialog}
+        note={effectiveEditingNote}
       />
     </div>
   );

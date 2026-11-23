@@ -37,9 +37,18 @@ describe('push-helpers', () => {
       expect(isIosDevice(ua)).toBe(true);
     });
 
-    it('returns false for Chrome on iOS (crios) or Firefox on iOS (fxios)', () => {
+    it('returns true for Chrome on iOS (CriOS), Firefox on iOS (FxiOS), and Edge on iOS (EdgiOS) (S6-FE-01)', () => {
       const crios = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 CriOS/120.0.0.0 Mobile/15E148 Safari/604.1';
-      expect(isIosDevice(crios)).toBe(false);
+      const fxios = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 FxiOS/120.0 Mobile/15E148 Safari/605.1.15';
+      const edgios = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 EdgiOS/120.0.0.0 Mobile/15E148 Safari/604.1';
+      expect(isIosDevice(crios)).toBe(true);
+      expect(isIosDevice(fxios)).toBe(true);
+      expect(isIosDevice(edgios)).toBe(true);
+    });
+
+    it('detects iPadOS with MacIntel platform and maxTouchPoints > 1 (S6-FE-01)', () => {
+      const ipadDesktopUa = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15';
+      expect(isIosDevice(ipadDesktopUa, { platform: 'MacIntel', maxTouchPoints: 5 })).toBe(true);
     });
 
     it('returns false for Android and desktop browsers', () => {
@@ -49,7 +58,7 @@ describe('push-helpers', () => {
 
     it('returns false for desktop Mac', () => {
       const desktopMac = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/120.0 Safari/537.36';
-      expect(isIosDevice(desktopMac)).toBe(false);
+      expect(isIosDevice(desktopMac, { platform: 'MacIntel', maxTouchPoints: 0 })).toBe(false);
     });
   });
 
@@ -119,6 +128,16 @@ describe('push-helpers', () => {
     it('returns ios_needs_pwa when device is iOS and not in standalone mode', () => {
       const result = evaluatePushDecision({
         isSupported: true,
+        isIos: true,
+        isStandalone: false,
+        permission: 'default',
+      });
+      expect(result).toBe('ios_needs_pwa');
+    });
+
+    it('returns ios_needs_pwa on iOS non-standalone even if PushManager is not exposed in browser tab yet', () => {
+      const result = evaluatePushDecision({
+        isSupported: false,
         isIos: true,
         isStandalone: false,
         permission: 'default',

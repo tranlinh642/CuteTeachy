@@ -6,7 +6,14 @@ import { useFieldErrorText } from '@/hooks';
 import { Button, Dialog, FormField, Icon, TextField } from '@/components/ui';
 import { DateField, TimeField } from '@/components/pickers';
 import { TonePicker } from '@/features/tags';
-import type { ISODate, TimeOfDay, TimetableSlot, Tone } from '@/types';
+import {
+  SCHEDULE_CATEGORIES,
+  type ISODate,
+  type ScheduleCategory,
+  type TimeOfDay,
+  type TimetableSlot,
+  type Tone,
+} from '@/types';
 import {
   timetableSlotSchema,
   toISODate,
@@ -23,6 +30,7 @@ export interface TimetableSlotDialogProps {
   readonly onClose: () => void;
   readonly slot?: TimetableSlot;
   readonly defaultWeekday?: number;
+  readonly defaultCategory?: ScheduleCategory;
 }
 
 const WEEKDAYS = [1, 2, 3, 4, 5, 6, 7] as const;
@@ -32,16 +40,19 @@ export function TimetableSlotDialog({
   onClose,
   slot,
   defaultWeekday = 1,
+  defaultCategory = 'school_teaching',
 }: TimetableSlotDialogProps) {
   const { t } = useTranslation();
   const formatError = useFieldErrorText();
   const createSlot = useCreateTimetableSlot();
   const updateSlot = useUpdateTimetableSlot();
 
+  const categoryControlId = useId();
   const weekdayControlId = useId();
   const toneControlId = useId();
   const today = toISODate(new Date());
 
+  const [category, setCategory] = useState<ScheduleCategory>(slot?.category ?? defaultCategory);
   const [weekday, setWeekday] = useState<number>(defaultWeekday);
   const [startTime, setStartTime] = useState<TimeOfDay>('07:30');
   const [endTime, setEndTime] = useState<TimeOfDay>('08:15');
@@ -59,6 +70,7 @@ export function TimetableSlotDialog({
 
   useEffect(() => {
     if (slot) {
+      setCategory(slot.category ?? 'school_teaching');
       setWeekday(slot.weekday);
       setStartTime(slot.startTime);
       setEndTime(slot.endTime);
@@ -69,6 +81,7 @@ export function TimetableSlotDialog({
       setEffectiveFrom(slot.effectiveFrom);
       setEffectiveTo(slot.effectiveTo ?? undefined);
     } else {
+      setCategory(defaultCategory);
       setWeekday(defaultWeekday);
       setStartTime('07:30');
       setEndTime('08:15');
@@ -81,13 +94,14 @@ export function TimetableSlotDialog({
     }
     setErrors({});
     setApiError(null);
-  }, [slot, defaultWeekday, open, today]);
+  }, [slot, defaultWeekday, defaultCategory, open, today]);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setApiError(null);
 
     const validationResult = validate(timetableSlotSchema, {
+      category,
       weekday,
       startTime,
       endTime,
@@ -169,6 +183,43 @@ export function TimetableSlotDialog({
             <p className="text-body-sm font-semibold">{apiError}</p>
           </div>
         )}
+
+        {/* Chọn Loại lịch (ScheduleCategory) */}
+        <FormField
+          controlId={categoryControlId}
+          label={t('timetable.fields.category')}
+          error={formatError(errors.category, t('timetable.fields.category'))}
+        >
+          <div
+            id={categoryControlId}
+            role="radiogroup"
+            aria-label={t('timetable.fields.category')}
+            data-testid="schedule-category-selector"
+            className="grid grid-cols-1 sm:grid-cols-3 gap-2"
+          >
+            {SCHEDULE_CATEGORIES.map((cat) => {
+              const selected = category === cat;
+              return (
+                <button
+                  key={cat}
+                  type="button"
+                  role="radio"
+                  aria-checked={selected}
+                  data-testid={`category-option-${cat}`}
+                  onClick={() => setCategory(cat)}
+                  className={cn(
+                    'flex min-h-11 items-center justify-center rounded-xl px-3 py-2 text-body-sm transition-all cursor-pointer',
+                    selected
+                      ? 'bg-primary text-on-primary font-bold shadow-xs'
+                      : 'bg-surface-container text-on-surface hover:bg-surface-container-high',
+                  )}
+                >
+                  <span>{t(`timetable.categories.${cat}` as TranslationKey)}</span>
+                </button>
+              );
+            })}
+          </div>
+        </FormField>
 
         {/* Chọn Thứ trong tuần (Vùng chạm ≥ 44px) */}
         <FormField

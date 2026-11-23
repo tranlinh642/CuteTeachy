@@ -5,7 +5,7 @@ import { registerSchema } from './register.schema';
 describe('registerSchema', () => {
   it('validates a correct payload', () => {
     const valid = registerSchema.safeParse({
-      email: 'linh@cuteteachy.vn',
+      email: 'teacher@example.com',
       password: 'password123',
       confirmPassword: 'password123',
       remember: true,
@@ -18,7 +18,7 @@ describe('registerSchema', () => {
 
   it('defaults remember to true if omitted', () => {
     const valid = registerSchema.safeParse({
-      email: 'linh@cuteteachy.vn',
+      email: 'teacher@example.com',
       password: 'password123',
       confirmPassword: 'password123',
     });
@@ -54,7 +54,7 @@ describe('registerSchema', () => {
 
   it('rejects password shorter than 8 characters', () => {
     const result = validate(registerSchema, {
-      email: 'linh@cuteteachy.vn',
+      email: 'teacher@example.com',
       password: 'short',
       confirmPassword: 'short',
     });
@@ -67,14 +67,14 @@ describe('registerSchema', () => {
 
   it('accepts password of exactly 8 characters and exactly 72 characters', () => {
     const minLen = registerSchema.safeParse({
-      email: 'linh@cuteteachy.vn',
+      email: 'teacher@example.com',
       password: 'a'.repeat(8),
       confirmPassword: 'a'.repeat(8),
     });
     expect(minLen.success).toBe(true);
 
     const maxLen = registerSchema.safeParse({
-      email: 'linh@cuteteachy.vn',
+      email: 'teacher@example.com',
       password: 'a'.repeat(72),
       confirmPassword: 'a'.repeat(72),
     });
@@ -83,7 +83,7 @@ describe('registerSchema', () => {
 
   it('rejects password longer than 72 characters', () => {
     const result = validate(registerSchema, {
-      email: 'linh@cuteteachy.vn',
+      email: 'teacher@example.com',
       password: 'a'.repeat(73),
       confirmPassword: 'a'.repeat(73),
     });
@@ -96,7 +96,7 @@ describe('registerSchema', () => {
 
   it('rejects when confirmPassword does not match password', () => {
     const result = validate(registerSchema, {
-      email: 'linh@cuteteachy.vn',
+      email: 'teacher@example.com',
       password: 'password123',
       confirmPassword: 'differentpassword',
     });
@@ -108,7 +108,7 @@ describe('registerSchema', () => {
 
   it('rejects empty confirmPassword with validation.required', () => {
     const result = validate(registerSchema, {
-      email: 'linh@cuteteachy.vn',
+      email: 'teacher@example.com',
       password: 'password123',
       confirmPassword: '',
     });
@@ -118,3 +118,4 @@ describe('registerSchema', () => {
     }
   });
 });
+

@@ -48,4 +48,37 @@ describe('validate', () => {
     expect(noteResult.success).toBe(false);
     expect(noteResult.errors?.tagIds).toEqual({ key: 'validation.maxTags', params: { count: 10 } });
   });
+
+  it('validates and normalises remindTime in noteSchema (S6-FE-01)', () => {
+    const valid = validate(noteSchema, {
+      title: 'Chuẩn bị phiếu bài tập',
+      dueDate: '2026-10-30',
+      remindTime: '08:30',
+    });
+    expect(valid.success).toBe(true);
+    expect(valid.data).toMatchObject({
+      title: 'Chuẩn bị phiếu bài tập',
+      dueDate: '2026-10-30',
+      remindTime: '08:30',
+    });
+
+    const emptyTime = validate(noteSchema, {
+      title: 'Chuẩn bị phiếu bài tập',
+      dueDate: '2026-10-30',
+      remindTime: '',
+    });
+    expect(emptyTime.success).toBe(true);
+    expect(emptyTime.data?.remindTime).toBeUndefined();
+
+    const invalidTime = validate(noteSchema, {
+      title: 'Chuẩn bị phiếu bài tập',
+      dueDate: '2026-10-30',
+      remindTime: '25:99',
+    });
+    expect(invalidTime.success).toBe(false);
+    expect(invalidTime.errors?.remindTime).toEqual({
+      key: 'validation.invalidTime',
+      params: undefined,
+    });
+  });
 });

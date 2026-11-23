@@ -116,4 +116,60 @@ describe('timetableSlotSchema', () => {
       expect(result.errors.weekday?.key).toBe('validation.invalidWeekday');
     }
   });
+
+  it('defaults category to school_teaching when omitted and accepts extra_teaching / self_study', () => {
+    const defaultRes = validate(timetableSlotSchema, {
+      weekday: 1,
+      startTime: '08:00',
+      endTime: '09:30',
+      subject: 'Toán học',
+      tone: 'blue',
+      effectiveFrom: '2026-09-01',
+    });
+    expect(defaultRes.success).toBe(true);
+    if (defaultRes.success) {
+      expect(defaultRes.data.category).toBe('school_teaching');
+    }
+
+    const extraRes = validate(timetableSlotSchema, {
+      weekday: 2,
+      startTime: '18:00',
+      endTime: '19:30',
+      subject: 'Toán nâng cao 9A',
+      category: 'extra_teaching',
+      tone: 'mint',
+      effectiveFrom: '2026-09-01',
+    });
+    expect(extraRes.success).toBe(true);
+    if (extraRes.success) {
+      expect(extraRes.data.category).toBe('extra_teaching');
+    }
+
+    const selfStudyRes = validate(timetableSlotSchema, {
+      weekday: 6,
+      startTime: '19:00',
+      endTime: '21:00',
+      subject: 'Học IELTS',
+      category: 'self_study',
+      tone: 'lavender',
+      effectiveFrom: '2026-09-01',
+    });
+    expect(selfStudyRes.success).toBe(true);
+    if (selfStudyRes.success) {
+      expect(selfStudyRes.data.category).toBe('self_study');
+    }
+  });
+
+  it('rejects invalid ScheduleCategory value', () => {
+    const invalidRes = validate(timetableSlotSchema, {
+      weekday: 1,
+      startTime: '08:00',
+      endTime: '09:30',
+      subject: 'Toán học',
+      category: 'invalid_category',
+      tone: 'blue',
+      effectiveFrom: '2026-09-01',
+    });
+    expect(invalidRes.success).toBe(false);
+  });
 });

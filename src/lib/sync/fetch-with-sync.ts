@@ -15,7 +15,6 @@ export interface FetchWithSyncOptions<T extends { id: string }> {
   readonly queryKey: QueryKey | string;
   readonly fetchFn: (updatedSince?: string) => Promise<SyncEnvelope<T>>;
   readonly storage?: KeyValueStorage;
-  /** Force a full reload, bypassing any stored serverTime checkpoint */
   readonly forceFull?: boolean;
 }
 
@@ -35,13 +34,7 @@ const isUpdatedSinceRejected = (error: unknown): boolean => {
   return false;
 };
 
-/**
- * Fetches list data using delta sync (`updatedSince`).
- *
- * Automatically recovers when `updatedSince` is rejected by the server
- * (e.g. HTTP 400 validation when checkpoint is older than 30 days):
- * it removes the stale checkpoint and reloads the full dataset.
- */
+
 export const fetchWithSync = async <T extends { id: string }>({
   queryClient,
   queryKey,
@@ -86,9 +79,6 @@ export const fetchWithSync = async <T extends { id: string }>({
   }
 };
 
-/**
- * Convenience queryFn creator for TanStack Query `useQuery`.
- */
 export const createSyncQueryFn = <T extends { id: string }>(
   queryClient: QueryClient,
   queryKey: QueryKey | string,

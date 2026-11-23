@@ -3,11 +3,15 @@
 import { useTranslation } from '@/lib/i18n';
 import type { ReactNode } from 'react';
 import { OfflineIndicator } from '@/components/feedback';
+import { LocalReminderTicker, NotificationBell } from '@/features/notifications';
 import { MobileBottomNav } from './MobileBottomNav';
+import { NAV_ITEMS } from './nav-items';
 import { Sidebar } from './Sidebar';
 import { Topbar } from './Topbar';
 
 export const MAIN_CONTENT_ID = 'main-content';
+export const ASSISTANT_NAV_HREF =
+  NAV_ITEMS.find((item) => item.href === '/assistant')?.href ?? '/assistant';
 
 export interface AppShellProps {
   readonly sidebarAction?: ReactNode;
@@ -37,8 +41,17 @@ export function AppShell({ sidebarAction, sidebarFooter, topbarTitle, topbarEnd,
       </a>
       <Sidebar action={sidebarAction} footer={sidebarFooter} />
       <div className="flex min-h-dvh flex-col md:pl-sidebar">
-        <Topbar title={topbarTitle} end={topbarEnd} />
+        <Topbar
+          title={topbarTitle}
+          end={
+            <>
+              <NotificationBell />
+              {topbarEnd}
+            </>
+          }
+        />
         <OfflineIndicator />
+        <LocalReminderTicker />
         <main
           id={MAIN_CONTENT_ID}
           tabIndex={-1}

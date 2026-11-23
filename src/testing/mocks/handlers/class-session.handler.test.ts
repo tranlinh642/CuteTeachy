@@ -1,9 +1,10 @@
 import { beforeEach, describe, expect, it } from 'vitest';
+import type { ClassSession } from '@/types';
 import { createMockDb, type MockDb } from '../mock-db';
 import { matchRoute } from '../mock-router';
 import { mockRoutes } from './index';
 
-describe('class-session mock routes (SPEC-004)', () => {
+describe('class-session mock routes (SPEC-004 & SPEC-007)', () => {
   let db: MockDb;
 
   beforeEach(() => {
@@ -77,8 +78,9 @@ describe('class-session mock routes (SPEC-004)', () => {
     });
 
     it('handles updatedSince delta sync: returns full list if a slot changed', () => {
-      // Modify a slot updatedAt to now
-      const nowIso = new Date('2026-10-27T12:00:00.000Z').toISOString();
+      const nowMs = Date.now();
+      const checkpoint = new Date(nowMs - 2 * 24 * 60 * 60 * 1000).toISOString();
+      const nowIso = new Date(nowMs - 1 * 24 * 60 * 60 * 1000).toISOString();
       db.timetableSlots[0] = {
         ...db.timetableSlots[0]!,
         updatedAt: nowIso,
@@ -87,19 +89,17 @@ describe('class-session mock routes (SPEC-004)', () => {
       const res = callRoute('GET', '/class-sessions', undefined, {
         from: '2026-10-26',
         to: '2026-11-01',
-        updatedSince: '2026-10-27T00:00:00.000Z',
+        updatedSince: checkpoint,
       });
 
       expect(res.status).toBe(200);
       const data = res.data as { items: unknown[] };
-      // Because a slot changed after updatedSince, all sessions in range are returned
       expect(data.items.length).toBeGreaterThan(5);
     });
   });
 
   describe('PATCH & DELETE /class-sessions', () => {
-    it('updates override topic, prepItems, cancelled for a generated session', () => {
-      // Pick a generated session
+    it('updates override topic, prepItems, cancelled, and category for a generated session', () => {
       const getRes = callRoute('GET', '/class-sessions', undefined, {
         from: '2026-10-26',
         to: '2026-10-26',
@@ -109,19 +109,22 @@ describe('class-session mock routes (SPEC-004)', () => {
       const patchRes = callRoute('PATCH', `/class-sessions/${firstSession.id}`, {
         topic: 'Chủ đề mới được cập nhật',
         cancelled: true,
+        category: 'extra_teaching',
       });
 
       expect(patchRes.status).toBe(200);
-      const updated = patchRes.data as { topic: string; cancelled: boolean };
+      const updated = patchRes.data as ClassSession;
       expect(updated.topic).toBe('Chủ đề mới được cập nhật');
       expect(updated.cancelled).toBe(true);
+      expect(updated.category).toBe('extra_teaching');
 
       // Clearing topic sets it to undefined
       const clearRes = callRoute('PATCH', `/class-sessions/${firstSession.id}`, {
         topic: '   ',
       });
       expect(clearRes.status).toBe(200);
-      expect((clearRes.data as { topic?: string }).topic).toBeUndefined();
+      expect((clearRes.data as ClassSession).topic).toBeUndefined();
+      expect((clearRes.data as ClassSession).category).toBe('extra_teaching');
     });
 
     it('rejects DELETE for generated sessions with 400 cannot_delete_generated_session', () => {
@@ -138,8 +141,8 @@ describe('class-session mock routes (SPEC-004)', () => {
       expect((delRes.data as { code: string }).code).toBe('cannot_delete_generated_session');
     });
 
-    it('creates, patches, and deletes ad-hoc session', () => {
-      // POST
+    it('creates, patches, and deletes ad-hoc session with ScheduleCategory', () => {
+      // POST with default category
       const postRes = callRoute('POST', '/class-sessions', {
         date: '2026-10-28',
         startTime: '15:30',
@@ -148,20 +151,35 @@ describe('class-session mock routes (SPEC-004)', () => {
         tone: 'mint',
       });
       expect(postRes.status).toBe(201);
-      const createdSession = postRes.data as { id: string; timetableSlotId: null; subject: string };
+      const createdSession = postRes.data as ClassSession;
       expect(createdSession.timetableSlotId).toBeNull();
       expect(createdSession.subject).toBe('Dạy bù Tin học');
+      expect(createdSession.category).toBe('school_teaching');
 
-      // PATCH with topic and prepItems
+      // POST with self_study category
+      const studyRes = callRoute('POST', '/class-sessions', {
+        date: '2026-10-28',
+        startTime: '19:00',
+        endTime: '21:00',
+        subject: 'Học bồi dưỡng chuyên môn',
+        category: 'self_study',
+        tone: 'lavender',
+      });
+      expect(studyRes.status).toBe(201);
+      expect((studyRes.data as ClassSession).category).toBe('self_study');
+
+      // PATCH with topic, prepItems, and category
       const patchRes = callRoute('PATCH', `/class-sessions/${createdSession.id}`, {
         subject: 'Dạy bù Tin học - Lập trình Python',
         topic: 'Vòng lặp for và while',
+        category: 'extra_teaching',
         prepItems: [{ id: 'p1', label: 'Cài đặt Python 3.12', done: true }],
       });
       expect(patchRes.status).toBe(200);
-      const patched = patchRes.data as { subject: string; topic: string; prepItems: Array<{ done: boolean }> };
+      const patched = patchRes.data as ClassSession;
       expect(patched.subject).toBe('Dạy bù Tin học - Lập trình Python');
       expect(patched.topic).toBe('Vòng lặp for và while');
+      expect(patched.category).toBe('extra_teaching');
       expect(patched.prepItems[0]?.done).toBe(true);
 
       // DELETE

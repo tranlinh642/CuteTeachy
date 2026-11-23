@@ -24,6 +24,7 @@ const serwist = new Serwist({
   precacheEntries: [...(self.__SW_MANIFEST ?? []), ...APP_SHELL_ROUTES],
   precacheOptions: {
     navigateFallback: '/',
+    navigateFallbackDenylist: [/^\/api\//],
     cleanupOutdatedCaches: true,
   },
   skipWaiting: true,

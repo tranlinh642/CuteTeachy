@@ -53,4 +53,20 @@ describe('pushService', () => {
       expect(http.delete).toHaveBeenCalledWith('/push/subscriptions', { data: payload });
     });
   });
+
+  describe('sendTestNotification (S6-FE-01)', () => {
+    it('posts to /push/subscriptions/test and returns { sent, failed, inAppCreated }', async () => {
+      const http = createMockHttp();
+      const mockResponse = { sent: 2, failed: 0, inAppCreated: true };
+      vi.mocked(http.post).mockResolvedValueOnce({ data: mockResponse });
+
+      const service = createPushService(http) as ReturnType<typeof createPushService> & {
+        sendTestNotification: () => Promise<typeof mockResponse>;
+      };
+      const result = await service.sendTestNotification();
+
+      expect(http.post).toHaveBeenCalledWith('/push/subscriptions/test');
+      expect(result).toEqual(mockResponse);
+    });
+  });
 });

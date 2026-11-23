@@ -7,7 +7,7 @@ import { createHttpClient } from '@/lib/api/create-http-client';
 import { createServices } from '@/lib/api/services/create-services';
 import { ServicesContext } from '@/lib/api/services-context';
 import { queryKeys } from '@/lib/query';
-import type { TimetableSlot } from '@/types';
+import type { ScheduleCategory, TimetableSlot } from '@/types';
 import { TimetableManagementView } from './TimetableManagementView';
 
 vi.mock('next/navigation', () => ({
@@ -55,7 +55,7 @@ vi.mock('@/components/ui/ConfirmDialog', () => ({
     ) : null,
 }));
 
-describe('TimetableManagementView Component (S4-FE-02)', () => {
+describe('TimetableManagementView Component (S4-FE-02 & S7-FE-01)', () => {
   const sampleSlots: TimetableSlot[] = [
     {
       id: 'slot-mon-1',
@@ -66,6 +66,7 @@ describe('TimetableManagementView Component (S4-FE-02)', () => {
       grade: '10A',
       room: 'P302',
       tone: 'blue',
+      category: 'school_teaching',
       effectiveFrom: '2026-01-01',
       effectiveTo: null,
       updatedAt: '2026-09-01T00:00:00Z',
@@ -73,12 +74,13 @@ describe('TimetableManagementView Component (S4-FE-02)', () => {
     {
       id: 'slot-mon-2',
       weekday: 1,
-      startTime: '10:00',
-      endTime: '11:30',
-      subject: 'Sinh học',
+      startTime: '18:00',
+      endTime: '19:30',
+      subject: 'Bồi dưỡng Sinh học',
       grade: '10B',
       room: 'Lab 2',
       tone: 'mint',
+      category: 'extra_teaching',
       effectiveFrom: '2026-01-01',
       effectiveTo: null,
       updatedAt: '2026-09-01T00:00:00Z',
@@ -86,19 +88,24 @@ describe('TimetableManagementView Component (S4-FE-02)', () => {
     {
       id: 'slot-tue-1',
       weekday: 2,
-      startTime: '13:30',
-      endTime: '15:00',
-      subject: 'Hóa học',
-      grade: '11A',
-      room: 'Lab 1',
+      startTime: '19:30',
+      endTime: '21:00',
+      subject: 'Luyện thi IELTS',
+      grade: 'C1',
+      room: 'Online',
       tone: 'pink',
+      category: 'self_study',
       effectiveFrom: '2026-01-01',
       effectiveTo: null,
       updatedAt: '2026-09-01T00:00:00Z',
     },
   ];
 
-  const renderView = (slots: TimetableSlot[] = sampleSlots, locale: 'vi' | 'en' = 'vi') => {
+  const renderView = (
+    slots: TimetableSlot[] = sampleSlots,
+    locale: 'vi' | 'en' = 'vi',
+    defaultCategoryFilter: ScheduleCategory | 'all' = 'all',
+  ) => {
     const queryClient = new QueryClient();
     queryClient.setQueryData(queryKeys.timetableSlots.list(), slots);
 
@@ -109,7 +116,7 @@ describe('TimetableManagementView Component (S4-FE-02)', () => {
       <I18nProvider locale={locale}>
         <ServicesContext.Provider value={services}>
           <QueryClientProvider client={queryClient}>
-            <TimetableManagementView />
+            <TimetableManagementView defaultCategoryFilter={defaultCategoryFilter} />
           </QueryClientProvider>
         </ServicesContext.Provider>
       </I18nProvider>,
@@ -128,16 +135,35 @@ describe('TimetableManagementView Component (S4-FE-02)', () => {
   it('groups slots by weekday and displays slots sorted by time', () => {
     const html = renderView(sampleSlots, 'vi');
 
-    // Weekdays are rendered
     expect(html).toContain('Thứ Hai');
     expect(html).toContain('Thứ Ba');
     expect(html).toContain('Thứ Tư');
 
-    // Monday slots
     expect(html).toContain('Toán học');
-    expect(html).toContain('Sinh học');
-    // Tuesday slot
-    expect(html).toContain('Hóa học');
+    expect(html).toContain('Bồi dưỡng Sinh học');
+    expect(html).toContain('Luyện thi IELTS');
+  });
+
+  it('renders quick category filter buttons (Tất cả, Lịch trên lớp, Lịch dạy thêm, Lịch học thêm) and filters slots by category', () => {
+    const allHtml = renderView(sampleSlots, 'vi', 'all');
+    expect(allHtml).toContain('data-testid="timetable-category-filter"');
+    expect(allHtml).toContain('data-testid="category-filter-all"');
+    expect(allHtml).toContain('data-testid="category-filter-school_teaching"');
+    expect(allHtml).toContain('data-testid="category-filter-extra_teaching"');
+    expect(allHtml).toContain('data-testid="category-filter-self_study"');
+    expect(allHtml).toContain('Lịch trên lớp');
+    expect(allHtml).toContain('Lịch dạy thêm');
+    expect(allHtml).toContain('Lịch học thêm');
+
+    const extraOnlyHtml = renderView(sampleSlots, 'vi', 'extra_teaching');
+    expect(extraOnlyHtml).toContain('Bồi dưỡng Sinh học');
+    expect(extraOnlyHtml).not.toContain('Toán học');
+    expect(extraOnlyHtml).not.toContain('Luyện thi IELTS');
+
+    const studyOnlyHtml = renderView(sampleSlots, 'vi', 'self_study');
+    expect(studyOnlyHtml).toContain('Luyện thi IELTS');
+    expect(studyOnlyHtml).not.toContain('Toán học');
+    expect(studyOnlyHtml).not.toContain('Bồi dưỡng Sinh học');
   });
 
   it('renders filter tabs with counts for each weekday', () => {
@@ -165,5 +191,8 @@ describe('TimetableManagementView Component (S4-FE-02)', () => {
     expect(html).toContain('Monday');
     expect(html).toContain('Tuesday');
     expect(html).toContain('View in calendar');
+    expect(html).toContain('School class');
+    expect(html).toContain('Extra tutoring');
+    expect(html).toContain('Self study');
   });
 });
