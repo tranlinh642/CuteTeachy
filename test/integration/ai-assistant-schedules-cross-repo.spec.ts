@@ -856,8 +856,8 @@ describe(
           .catch((e: unknown) => e);
 
         expect(hugeErr).toBeInstanceOf(ApiError);
-        expect((hugeErr as ApiError).status).toBe(400);
-        expect((hugeErr as ApiError).code).toBe('validation');
+        expect((hugeErr as ApiError).status).toBe(413);
+        expect((hugeErr as ApiError).code).toBe('file_too_large');
       });
 
       it('áp dụng bản nháp với chiến lược skip_conflicts: giữ nguyên TimetableSlot cũ bị trùng, chỉ tạo các mục không trùng (timetable_slot, class_session, task)', async () => {

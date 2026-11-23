@@ -1,10 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { spawn, type ChildProcess, execSync } from 'child_process';
+import { createRequire } from 'module';
 import fs from 'fs';
 import path from 'path';
-import https from 'https';
-import http from 'http';
-import net from 'net';
 import { createHttpClient } from '@/lib/api/create-http-client';
 import { createServices } from '@/lib/api/services';
 import { ApiError } from '@/lib/api/api-error';
@@ -24,140 +21,44 @@ import type { AuthSession } from '@/types';
 
 // =============================================================================
 // SPEC-006 Full E2E Cross-Repo Integration Test Suite (CuteTeachy-FE ↔ CuteTeachy-BE)
-// Validates User Stories 1–14 from SPEC-006 against live NestJS + PostgreSQL.
+// Validates User Stories 1–14 from SPEC-006 against live NestJS + PostgreSQL
+// using FakePushSender via NestJS overrideProvider (preserves SSRF protection).
 // Runs on a dedicated port (4006) to avoid collisions with other test runs.
 // =============================================================================
-
-const TLS_CERT = `-----BEGIN CERTIFICATE-----
-MIIDCTCCAfGgAwIBAgIURivGRQj09OhQZ05ppqxCpWsXWpMwDQYJKoZIhvcNAQEL
-BQAwFDESMBAGA1UEAwwJMTI3LjAuMC4xMB4XDTI2MTAyNzA5MTUzM1oXDTM2MTAy
-NDA5MTUzM1owFDESMBAGA1UEAwwJMTI3LjAuMC4xMIIBIjANBgkqhkiG9w0BAQEF
-AAOCAQ8AMIIBCgKCAQEA1zkQ2q+XjMtJi0wnK3KTJcQ+8qPhm5MMx1730sv1befW
-0hfSND2R3giFmS7BORE7SWN//8phw2DY68eAU8QTrTdadIqRvGCmBWoOqXs31n72
-NEEV/WGkO8pNI3fXSLM9/0sdMMdyz1gaDeuqnaFk0v1NFYk0xUB4DH8u1I1ftzHp
-E+HMVmjuTUsPVXj1ItxBr/MmZY12IB0Lcg3g58nVNBVWa76Mk5QutC6FxAULOtk+
-lxwxNP5Pkmtwdobi14jkP8ID/P+w/pW1nBFda1YwH5VRZl84W5YNmYvXXudY7NyP
-IU1CxfmgATzed3ujMOk30sfiQRzN1hC8O2vsI9woTwIDAQABo1MwUTAdBgNVHQ4E
-FgQU+WZKlJxsXKtwyMjOXWeaZpbU9G8wHwYDVR0jBBgwFoAU+WZKlJxsXKtwyMjO
-XWeaZpbU9G8wDwYDVR0TAQH/BAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAQEAkuDR
-6XpbP2g9ukMULUEvq1FTUD1IESwq8mXxrdTceWb9pYsA78pAyxGz/WiejNZRb2Kl
-/wkEQNBBtIiJ6n42lWF2ZmUGOOfSz1yl6uoW93c1+XZBJRQEJ/8GFtzrRk/Xi3zO
-hOh1BpSImSbkOWgAn79qIAo19IjdWPnjbSMvrlD2pgkDFyhY0j1UtgtBI8twBHQ3
-rEW2/Xvl4Q3ghuJPMO9NKpWSC1zc7Je1qnzI7ZnvYfkhWMNkm8UAGRgUiK4qK1MY
-sSBE45J/ld3UGHSUY9b+wMFP3apzgsjBYfJWfF7dLlbYpKkX1B/qWv9asq7KX9LX
-L/Ac0WPhF+GLGP+GLg==
------END CERTIFICATE-----`;
-
-const TLS_KEY = `-----BEGIN PRIVATE KEY-----
-MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDXORDar5eMy0mL
-TCcrcpMlxD7yo+GbkwzHXvfSy/Vt59bSF9I0PZHeCIWZLsE5ETtJY3//ymHDYNjr
-x4BTxBOtN1p0ipG8YKYFag6pezfWfvY0QRX9YaQ7yk0jd9dIsz3/Sx0wx3LPWBoN
-66qdoWTS/U0ViTTFQHgMfy7UjV+3MekT4cxWaO5NSw9VePUi3EGv8yZljXYgHQty
-DeDnydU0FVZrvoyTlC60LoXEBQs62T6XHDE0/k+Sa3B2huLXiOQ/wgP8/7D+lbWc
-EV1rVjAflVFmXzhblg2Zi9de51js3I8hTULF+aABPN53e6Mw6TfSx+JBHM3WELw7
-a+wj3ChPAgMBAAECggEAIUMMBEgr61IFoTYZPaE89ZLBSb2jIeiVioB2W4ky+pPg
-guK0lWdIkmCNyTFNInUzzPFIOG9+MXRXwgS4o/mDMvuBis5ZnJvxPJf6AR5ucEN5
-6HSAogLDn4vx5P/h8TXmaHyi28WPTFUo3ark2Oy3CNal4aStV6jRhNjpE2dv+f8/
-kA9PaqQ4vvMF9iDpEumyK/c095tH7zAdlV4O3zs7j4dM9z0KZfrvAVQJ6LSZg/ri
-FuwQm1RADKYalwrJgIuYvNR44r2YBFYzkPmndHV4MEKhQr/zq2qwH6hJ5fsruUQQ
-S5BMeyPg96qy0Jo7hvRCc+p2xAZWFK5hTQ8rnR8pfQKBgQD1AAV7lmoHFZyKU4XI
-c2OnunBSF6t+KZSQNkiq/zX6E6BzZT185uDh6w7/GgI2UlF46me8WX/xkWg+KVHa
-1T5TEj6ZQGbm2haK81tod6awEO53BVsiBKBxNFIkRV2mN3dC1hRL0NTh+xlbgcXy
-wZQJ+0EsL63tBxuL7kTbtDRoiwKBgQDg4sq/79aUVfRh6/nxdRqTUfiJpV3XZY2h
-czU8plDhxH8I8ysfPl2eCfC5FPz5kWjFNkLoJyiZTVo2iBBHrnNuEobZUrG3lGWx
-EXIYO7WMxwn+mfSladF92q54PVamTM/uvz76ov1vxVD09L+BXiNqHmzgFqMhymJK
-IlmI0IpzzQKBgATRmEoC/ljfUvHhjKsRoe8lmpnyvzu/A54Gg01hsaUWh7xdTGVN
-gTTQU74uu8ZnvhR7v8iTlhGhQ4SdeW+tbAlkPXj0LFH0Didze+PFHrEt1BLhNxan
-MqSnW8o81wey5ZSZ81I+bEF5l9kV51fL+OZtW63LzkbwMdmBuTb9B17bAoGAX1GB
-Ym1D5Eeyd7bPj/p0szCxSZZf+iY/K8lrLTPJYIgq2B5JjsqeX5gTAj/VIeryH3Tq
-UwAWAzR4Ilj1nYxhvKv5oC+eyBMML0sXsxHL18mdgN68hUge1VtVS/2jtoUkNSu2
-hAGFrlRSBiGe8jR2ikovF6RArNfdZVK95HGP3ZkCgYAzcht0I2t0NIiERACf4Qr6
-jRZf+a3zfVAODJJSphcv586NTRtTzVpx/cibXOR+ccH+CbHA7RggLcp6SybaIBdF
-57affGumLVcg/GaIYU2o7BifWZVFAu0hE2g8mpo0W8HMlEq/mDL9lRZhfZ+gXebO
-bIq+1SQ+6/5/7/2tOmtsKQ==
------END PRIVATE KEY-----`;
 
 const candidates = [
   path.resolve(__dirname, '../../../CuteTeachy-BE'),
   path.resolve(__dirname, '../../../../CuteTeachy-BE'),
 ];
 const BE_DIR = candidates.find((c) => fs.existsSync(c)) || candidates[0];
-const BE_PORT = process.env.BE_PORT_SPEC006 || '4006';
+const BE_PORT = Number(process.env.BE_PORT_SPEC006 || '4006');
 const BE_URL = `http://localhost:${BE_PORT}`;
 const CRON_SECRET = process.env.CRON_SECRET || 'dev-cron-secret-token';
+const PUSH_ENDPOINT_BASE = 'https://fcm.googleapis.com/fcm/send';
 
-let spawnedBe: ChildProcess | null = null;
+const beRequire = createRequire(path.join(BE_DIR, 'package.json'));
 
-async function isHttpHealthy(url: string): Promise<boolean> {
-  try {
-    const res = await fetch(`${url}/health`, { signal: AbortSignal.timeout(1500) });
-    return res.ok;
-  } catch {
-    return false;
-  }
-}
-
-async function waitForHttpHealthy(url: string, maxWaitMs = 15000): Promise<boolean> {
-  const start = Date.now();
-  while (Date.now() - start < maxWaitMs) {
-    if (await isHttpHealthy(url)) return true;
-    await new Promise((r) => setTimeout(r, 400));
-  }
-  return false;
-}
-
-function stopProcess(proc: ChildProcess | null): void {
-  if (!proc || proc.killed) return;
-  try {
-    if (process.platform === 'win32' && proc.pid) {
-      execSync(`taskkill /pid ${proc.pid} /T /F`, { stdio: 'ignore' });
-    } else {
-      proc.kill('SIGTERM');
-    }
-  } catch {
-    proc.kill();
-  }
+interface NestAppHandle {
+  listen(port: number | string): Promise<unknown>;
+  close(): Promise<void>;
 }
 
 interface ReceivedPush {
   endpoint: string;
   method: string;
-  headers: http.IncomingHttpHeaders;
+  headers: Record<string, string>;
   body: string;
 }
 
-let pushServer: https.Server | null = null;
-let pushPort = 0;
 const receivedPushes: ReceivedPush[] = [];
 let nextPushStatus = 201;
 
-function startLocalPushServer(): Promise<number> {
-  return new Promise((resolve, reject) => {
-    pushServer = https.createServer({ cert: TLS_CERT, key: TLS_KEY }, (req, res) => {
-      let body = '';
-      req.on('data', (chunk) => {
-        body += chunk;
-      });
-      req.on('end', () => {
-        receivedPushes.push({
-          endpoint: req.url || '',
-          method: req.method || 'POST',
-          headers: req.headers,
-          body,
-        });
-        res.writeHead(nextPushStatus, { 'Content-Type': 'text/plain' });
-        res.end(nextPushStatus === 201 ? 'ok' : 'expired');
-      });
-    });
-
-    pushServer.listen(0, '127.0.0.1', () => {
-      const addr = pushServer!.address() as net.AddressInfo;
-      pushPort = addr.port;
-      resolve(pushPort);
-    });
-
-    pushServer.on('error', reject);
-  });
+function extractPushPath(endpoint: string): string {
+  try {
+    return new URL(endpoint).pathname.replace(/^\/fcm\/send/, '');
+  } catch {
+    return endpoint;
+  }
 }
 
 function formatInTimeZone(
@@ -399,40 +300,61 @@ const DUMMY_KEYS_1 = {
   auth: 'tBHItJI5svbpez7KI4CCXg==',
 };
 
-describe('SPEC-006 Dual-Layer Notifications & Note Reminders Cross-Repo Integration Suite (FE ↔ BE live)', { timeout: 45000 }, () => {
+describe('SPEC-006 Dual-Layer Notifications & Note Reminders Cross-Repo Integration Suite (FE ↔ BE live)', { timeout: 60000 }, () => {
+  let app: NestAppHandle | null = null;
   let beAvailable = false;
 
   beforeAll(async () => {
-    await startLocalPushServer();
+    process.env.EMAIL_VERIFICATION_REQUIRED = 'false';
 
-    if (await isHttpHealthy(BE_URL)) {
+    try {
+      const { Test } = beRequire('@nestjs/testing');
+      const { AppModule } = beRequire(path.join(BE_DIR, 'dist/src/composition/app.module'));
+      const { setupApp } = beRequire(path.join(BE_DIR, 'dist/src/setup-app'));
+      const { PUSH_SENDER, PushSubscriptionExpiredError } = beRequire(
+        path.join(BE_DIR, 'dist/src/application/push-subscription/ports/push-sender.port'),
+      );
+
+      const fakePushSender = {
+        getVapidPublicKey: () =>
+          'BNcRdreALRFXTkOOUHK1EtK2wtaz5Ry4YfYCA_0QTpQtUbVlUls0VJXg7A8u-Ts1XbjhazAkj7I99e8QcYP7DkM',
+        send: async (
+          target: { endpoint: string; keys: { p256dh: string; auth: string } },
+          payload: Record<string, unknown>,
+        ) => {
+          receivedPushes.push({
+            endpoint: extractPushPath(target.endpoint),
+            method: 'POST',
+            headers: {},
+            body: JSON.stringify(payload),
+          });
+          if (nextPushStatus === 404 || nextPushStatus === 410) {
+            throw new PushSubscriptionExpiredError(target.endpoint, `HTTP ${nextPushStatus} expired`);
+          }
+        },
+      };
+
+      const moduleFixture = await Test.createTestingModule({
+        imports: [AppModule],
+      })
+        .overrideProvider(PUSH_SENDER)
+        .useValue(fakePushSender)
+        .compile();
+
+      app = moduleFixture.createNestApplication();
+      setupApp(app);
+      await app!.listen(BE_PORT);
       beAvailable = true;
-    } else {
-      try {
-        spawnedBe = spawn(process.execPath, [path.join(BE_DIR, 'dist', 'src', 'main.js')], {
-          cwd: BE_DIR,
-          env: {
-            ...process.env,
-            PORT: BE_PORT,
-            EMAIL_VERIFICATION_REQUIRED: 'false',
-            NODE_TLS_REJECT_UNAUTHORIZED: '0',
-          },
-          stdio: 'ignore',
-        });
-        spawnedBe.on('error', () => {
-          beAvailable = false;
-        });
-        beAvailable = await waitForHttpHealthy(BE_URL, 15000);
-      } catch {
-        beAvailable = false;
-      }
+    } catch {
+      beAvailable = false;
+      app = null;
     }
-  }, 45000);
+  }, 60000);
 
   afterAll(async () => {
-    stopProcess(spawnedBe);
-    if (pushServer) {
-      pushServer.close();
+    if (app) {
+      await app.close();
+      app = null;
     }
   });
 
@@ -526,7 +448,7 @@ describe('SPEC-006 Dual-Layer Notifications & Note Reminders Cross-Repo Integrat
     it('US 9 & 12: Note có dueDate + remindTime đến hạn -> tạo InAppNotification + gửi Web Push + idempotent; đổi remindTime -> nhắc lại ở mốc mới', async () => {
       if (!beAvailable) return;
       const { harness, userId } = await createOnboardedTeacher('NoteDispatchTimed');
-      const endpoint = `https://127.0.0.1:${pushPort}/sub/${userId}/note-timed-device`;
+      const endpoint = `${PUSH_ENDPOINT_BASE}/sub/${userId}/note-timed-device`;
 
       await harness.services.push.createPushSubscription({
         endpoint,
@@ -699,7 +621,7 @@ describe('SPEC-006 Dual-Layer Notifications & Note Reminders Cross-Repo Integrat
       // Trường hợp 2: Giáo viên có PushSubscription nhưng tắt pushEnabled = false
       const { harness: teacherPushOff, userId: userPushOffId } =
         await createOnboardedTeacher('TeacherPushOff');
-      const offEndpoint = `https://127.0.0.1:${pushPort}/sub/${userPushOffId}/off-device`;
+      const offEndpoint = `${PUSH_ENDPOINT_BASE}/sub/${userPushOffId}/off-device`;
       await teacherPushOff.services.push.createPushSubscription({
         endpoint: offEndpoint,
         keys: DUMMY_KEYS_1,
@@ -929,7 +851,7 @@ describe('SPEC-006 Dual-Layer Notifications & Note Reminders Cross-Repo Integrat
       expect(listAfterFirstTest.items[0].title).toContain('CuteTeachy');
 
       // 2. Đăng ký thiết bị Web Push và gọi lại sendTestNotification
-      const endpoint = `https://127.0.0.1:${pushPort}/sub/${userId}/test-push-device`;
+      const endpoint = `${PUSH_ENDPOINT_BASE}/sub/${userId}/test-push-device`;
       await harness.services.push.createPushSubscription({
         endpoint,
         keys: DUMMY_KEYS_1,
