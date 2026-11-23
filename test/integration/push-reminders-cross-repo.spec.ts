@@ -1,150 +1,51 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { spawn, type ChildProcess, execSync } from 'child_process';
+import { createRequire } from 'module';
 import fs from 'fs';
 import path from 'path';
-import https from 'https';
-import http from 'http';
-import net from 'net';
 import { createHttpClient } from '@/lib/api/create-http-client';
 import { createServices } from '@/lib/api/services';
 import type { AuthSession } from '@/types';
 
 // =============================================================================
 // SPEC-005 Full E2E Cross-Repo Integration Test Suite (CuteTeachy-FE ↔ CuteTeachy-BE)
-// Validates User Stories 1–17 against live NestJS + PostgreSQL.
+// Validates User Stories 1–17 against live NestJS + PostgreSQL using FakePushSender
+// via NestJS overrideProvider (preserves production SSRF protection on endpoints).
 // Runs on a dedicated port (4005) to avoid collisions with other test runs.
 // =============================================================================
-
-const TLS_CERT = `-----BEGIN CERTIFICATE-----
-MIIDCTCCAfGgAwIBAgIURivGRQj09OhQZ05ppqxCpWsXWpMwDQYJKoZIhvcNAQEL
-BQAwFDESMBAGA1UEAwwJMTI3LjAuMC4xMB4XDTI2MTAyNzA5MTUzM1oXDTM2MTAy
-NDA5MTUzM1owFDESMBAGA1UEAwwJMTI3LjAuMC4xMIIBIjANBgkqhkiG9w0BAQEF
-AAOCAQ8AMIIBCgKCAQEA1zkQ2q+XjMtJi0wnK3KTJcQ+8qPhm5MMx1730sv1befW
-0hfSND2R3giFmS7BORE7SWN//8phw2DY68eAU8QTrTdadIqRvGCmBWoOqXs31n72
-NEEV/WGkO8pNI3fXSLM9/0sdMMdyz1gaDeuqnaFk0v1NFYk0xUB4DH8u1I1ftzHp
-E+HMVmjuTUsPVXj1ItxBr/MmZY12IB0Lcg3g58nVNBVWa76Mk5QutC6FxAULOtk+
-lxwxNP5Pkmtwdobi14jkP8ID/P+w/pW1nBFda1YwH5VRZl84W5YNmYvXXudY7NyP
-IU1CxfmgATzed3ujMOk30sfiQRzN1hC8O2vsI9woTwIDAQABo1MwUTAdBgNVHQ4E
-FgQU+WZKlJxsXKtwyMjOXWeaZpbU9G8wHwYDVR0jBBgwFoAU+WZKlJxsXKtwyMjO
-XWeaZpbU9G8wDwYDVR0TAQH/BAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAQEAkuDR
-6XpbP2g9ukMULUEvq1FTUD1IESwq8mXxrdTceWb9pYsA78pAyxGz/WiejNZRb2Kl
-/wkEQNBBtIiJ6n42lWF2ZmUGOOfSz1yl6uoW93c1+XZBJRQEJ/8GFtzrRk/Xi3zO
-hOh1BpSImSbkOWgAn79qIAo19IjdWPnjbSMvrlD2pgkDFyhY0j1UtgtBI8twBHQ3
-rEW2/Xvl4Q3ghuJPMO9NKpWSC1zc7Je1qnzI7ZnvYfkhWMNkm8UAGRgUiK4qK1MY
-sSBE45J/ld3UGHSUY9b+wMFP3apzgsjBYfJWfF7dLlbYpKkX1B/qWv9asq7KX9LX
-L/Ac0WPhF+GLGP+GLg==
------END CERTIFICATE-----`;
-
-const TLS_KEY = `-----BEGIN PRIVATE KEY-----
-MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDXORDar5eMy0mL
-TCcrcpMlxD7yo+GbkwzHXvfSy/Vt59bSF9I0PZHeCIWZLsE5ETtJY3//ymHDYNjr
-x4BTxBOtN1p0ipG8YKYFag6pezfWfvY0QRX9YaQ7yk0jd9dIsz3/Sx0wx3LPWBoN
-66qdoWTS/U0ViTTFQHgMfy7UjV+3MekT4cxWaO5NSw9VePUi3EGv8yZljXYgHQty
-DeDnydU0FVZrvoyTlC60LoXEBQs62T6XHDE0/k+Sa3B2huLXiOQ/wgP8/7D+lbWc
-EV1rVjAflVFmXzhblg2Zi9de51js3I8hTULF+aABPN53e6Mw6TfSx+JBHM3WELw7
-a+wj3ChPAgMBAAECggEAIUMMBEgr61IFoTYZPaE89ZLBSb2jIeiVioB2W4ky+pPg
-guK0lWdIkmCNyTFNInUzzPFIOG9+MXRXwgS4o/mDMvuBis5ZnJvxPJf6AR5ucEN5
-6HSAogLDn4vx5P/h8TXmaHyi28WPTFUo3ark2Oy3CNal4aStV6jRhNjpE2dv+f8/
-kA9PaqQ4vvMF9iDpEumyK/c095tH7zAdlV4O3zs7j4dM9z0KZfrvAVQJ6LSZg/ri
-FuwQm1RADKYalwrJgIuYvNR44r2YBFYzkPmndHV4MEKhQr/zq2qwH6hJ5fsruUQQ
-S5BMeyPg96qy0Jo7hvRCc+p2xAZWFK5hTQ8rnR8pfQKBgQD1AAV7lmoHFZyKU4XI
-c2OnunBSF6t+KZSQNkiq/zX6E6BzZT185uDh6w7/GgI2UlF46me8WX/xkWg+KVHa
-1T5TEj6ZQGbm2haK81tod6awEO53BVsiBKBxNFIkRV2mN3dC1hRL0NTh+xlbgcXy
-wZQJ+0EsL63tBxuL7kTbtDRoiwKBgQDg4sq/79aUVfRh6/nxdRqTUfiJpV3XZY2h
-czU8plDhxH8I8ysfPl2eCfC5FPz5kWjFNkLoJyiZTVo2iBBHrnNuEobZUrG3lGWx
-EXIYO7WMxwn+mfSladF92q54PVamTM/uvz76ov1vxVD09L+BXiNqHmzgFqMhymJK
-IlmI0IpzzQKBgATRmEoC/ljfUvHhjKsRoe8lmpnyvzu/A54Gg01hsaUWh7xdTGVN
-gTTQU74uu8ZnvhR7v8iTlhGhQ4SdeW+tbAlkPXj0LFH0Didze+PFHrEt1BLhNxan
-MqSnW8o81wey5ZSZ81I+bEF5l9kV51fL+OZtW63LzkbwMdmBuTb9B17bAoGAX1GB
-Ym1D5Eeyd7bPj/p0szCxSZZf+iY/K8lrLTPJYIgq2B5JjsqeX5gTAj/VIeryH3Tq
-UwAWAzR4Ilj1nYxhvKv5oC+eyBMML0sXsxHL18mdgN68hUge1VtVS/2jtoUkNSu2
-hAGFrlRSBiGe8jR2ikovF6RArNfdZVK95HGP3ZkCgYAzcht0I2t0NIiERACf4Qr6
-jRZf+a3zfVAODJJSphcv586NTRtTzVpx/cibXOR+ccH+CbHA7RggLcp6SybaIBdF
-57affGumLVcg/GaIYU2o7BifWZVFAu0hE2g8mpo0W8HMlEq/mDL9lRZhfZ+gXebO
-bIq+1SQ+6/5/7/2tOmtsKQ==
------END PRIVATE KEY-----`;
 
 const candidates = [
   path.resolve(__dirname, '../../../CuteTeachy-BE'),
   path.resolve(__dirname, '../../../../CuteTeachy-BE'),
 ];
 const BE_DIR = candidates.find((c) => fs.existsSync(c)) || candidates[0];
-const BE_PORT = process.env.BE_PORT_SPEC005 || '4005';
+const BE_PORT = Number(process.env.BE_PORT_SPEC005 || '4005');
 const BE_URL = `http://localhost:${BE_PORT}`;
 const CRON_SECRET = process.env.CRON_SECRET || 'dev-cron-secret-token';
+const PUSH_ENDPOINT_BASE = 'https://fcm.googleapis.com/fcm/send';
 
-let spawnedBe: ChildProcess | null = null;
+const beRequire = createRequire(path.join(BE_DIR, 'package.json'));
 
-async function isHttpHealthy(url: string): Promise<boolean> {
-  try {
-    const res = await fetch(`${url}/health`, { signal: AbortSignal.timeout(1500) });
-    return res.ok;
-  } catch {
-    return false;
-  }
-}
-
-async function waitForHttpHealthy(url: string, maxWaitMs = 15000): Promise<boolean> {
-  const start = Date.now();
-  while (Date.now() - start < maxWaitMs) {
-    if (await isHttpHealthy(url)) return true;
-    await new Promise((r) => setTimeout(r, 400));
-  }
-  return false;
-}
-
-function stopProcess(proc: ChildProcess | null): void {
-  if (!proc || proc.killed) return;
-  try {
-    if (process.platform === 'win32' && proc.pid) {
-      execSync(`taskkill /pid ${proc.pid} /T /F`, { stdio: 'ignore' });
-    } else {
-      proc.kill('SIGTERM');
-    }
-  } catch {
-    proc.kill();
-  }
+interface NestAppHandle {
+  listen(port: number | string): Promise<unknown>;
+  close(): Promise<void>;
 }
 
 interface ReceivedPush {
   endpoint: string;
   method: string;
-  headers: http.IncomingHttpHeaders;
+  headers: Record<string, string>;
   body: string;
 }
 
-let pushServer: https.Server | null = null;
-let pushPort = 0;
 const receivedPushes: ReceivedPush[] = [];
 let nextPushStatus = 201;
 
-function startLocalPushServer(): Promise<number> {
-  return new Promise((resolve, reject) => {
-    pushServer = https.createServer({ cert: TLS_CERT, key: TLS_KEY }, (req, res) => {
-      let body = '';
-      req.on('data', (chunk) => {
-        body += chunk;
-      });
-      req.on('end', () => {
-        receivedPushes.push({
-          endpoint: req.url || '',
-          method: req.method || 'POST',
-          headers: req.headers,
-          body,
-        });
-        res.writeHead(nextPushStatus, { 'Content-Type': 'text/plain' });
-        res.end(nextPushStatus === 201 ? 'ok' : 'expired');
-      });
-    });
-
-    pushServer.listen(0, '127.0.0.1', () => {
-      const addr = pushServer!.address() as net.AddressInfo;
-      pushPort = addr.port;
-      resolve(pushPort);
-    });
-
-    pushServer.on('error', reject);
-  });
+function extractPushPath(endpoint: string): string {
+  try {
+    return new URL(endpoint).pathname.replace(/^\/fcm\/send/, '');
+  } catch {
+    return endpoint;
+  }
 }
 
 function formatInTimeZone(
@@ -289,41 +190,61 @@ const DUMMY_KEYS_2 = {
   auth: 'io7HrEhc256RDSYiu7XsYA',
 };
 
-describe('SPEC-005 Push & Reminders E2E Cross-Repo Integration Suite (FE ↔ BE live)', { timeout: 35000 }, () => {
+describe('SPEC-005 Push & Reminders E2E Cross-Repo Integration Suite (FE ↔ BE live)', { timeout: 60000 }, () => {
+  let app: NestAppHandle | null = null;
   let beAvailable = false;
 
   beforeAll(async () => {
-    // Start local HTTPS mock push receiver so live BE WebPushSender can deliver
-    await startLocalPushServer();
+    process.env.EMAIL_VERIFICATION_REQUIRED = 'false';
 
-    if (await isHttpHealthy(BE_URL)) {
+    try {
+      const { Test } = beRequire('@nestjs/testing');
+      const { AppModule } = beRequire(path.join(BE_DIR, 'dist/src/composition/app.module'));
+      const { setupApp } = beRequire(path.join(BE_DIR, 'dist/src/setup-app'));
+      const { PUSH_SENDER, PushSubscriptionExpiredError } = beRequire(
+        path.join(BE_DIR, 'dist/src/application/push-subscription/ports/push-sender.port'),
+      );
+
+      const fakePushSender = {
+        getVapidPublicKey: () =>
+          'BNcRdreALRFXTkOOUHK1EtK2wtaz5Ry4YfYCA_0QTpQtUbVlUls0VJXg7A8u-Ts1XbjhazAkj7I99e8QcYP7DkM',
+        send: async (
+          target: { endpoint: string; keys: { p256dh: string; auth: string } },
+          payload: Record<string, unknown>,
+        ) => {
+          receivedPushes.push({
+            endpoint: extractPushPath(target.endpoint),
+            method: 'POST',
+            headers: {},
+            body: JSON.stringify(payload),
+          });
+          if (nextPushStatus === 404 || nextPushStatus === 410) {
+            throw new PushSubscriptionExpiredError(target.endpoint, `HTTP ${nextPushStatus} expired`);
+          }
+        },
+      };
+
+      const moduleFixture = await Test.createTestingModule({
+        imports: [AppModule],
+      })
+        .overrideProvider(PUSH_SENDER)
+        .useValue(fakePushSender)
+        .compile();
+
+      app = moduleFixture.createNestApplication();
+      setupApp(app);
+      await app!.listen(BE_PORT);
       beAvailable = true;
-    } else {
-      try {
-        spawnedBe = spawn(process.execPath, [path.join(BE_DIR, 'dist', 'src', 'main.js')], {
-          cwd: BE_DIR,
-          env: {
-            ...process.env,
-            PORT: BE_PORT,
-            EMAIL_VERIFICATION_REQUIRED: 'false',
-            NODE_TLS_REJECT_UNAUTHORIZED: '0',
-          },
-          stdio: 'ignore',
-        });
-        spawnedBe.on('error', () => {
-          beAvailable = false;
-        });
-        beAvailable = await waitForHttpHealthy(BE_URL, 15000);
-      } catch {
-        beAvailable = false;
-      }
+    } catch {
+      beAvailable = false;
+      app = null;
     }
-  }, 35000);
+  }, 60000);
 
   afterAll(async () => {
-    stopProcess(spawnedBe);
-    if (pushServer) {
-      pushServer.close();
+    if (app) {
+      await app.close();
+      app = null;
     }
   });
 
@@ -374,7 +295,7 @@ describe('SPEC-005 Push & Reminders E2E Cross-Repo Integration Suite (FE ↔ BE 
     it('US 13: Đăng ký thiết bị 1 trả về 201 Created; đăng ký lại cùng endpoint trả về 200 OK (upsert)', async () => {
       if (!beAvailable) return;
       const { harness, userId } = await createOnboardedTeacher('UpsertTeacher');
-      const endpoint = `https://127.0.0.1:${pushPort}/sub/${userId}/device-primary`;
+      const endpoint = `${PUSH_ENDPOINT_BASE}/sub/${userId}/device-primary`;
 
       // Lần 1: Tạo mới subscription -> 201 Created
       const sub1 = await harness.services.push.createPushSubscription({
@@ -397,7 +318,7 @@ describe('SPEC-005 Push & Reminders E2E Cross-Repo Integration Suite (FE ↔ BE 
       if (!beAvailable) return;
       const teacherA = await createOnboardedTeacher('TeacherA');
       const teacherB = await createOnboardedTeacher('TeacherB');
-      const sharedEndpoint = `https://127.0.0.1:${pushPort}/sub/shared-phone`;
+      const sharedEndpoint = `${PUSH_ENDPOINT_BASE}/sub/shared-phone`;
 
       // Teacher A đăng ký thiết bị
       const subA = await teacherA.harness.services.push.createPushSubscription({
@@ -418,8 +339,8 @@ describe('SPEC-005 Push & Reminders E2E Cross-Repo Integration Suite (FE ↔ BE 
     it('US 13: Giáo viên có nhiều thiết bị (điện thoại và laptop) đều nhận được thông báo', async () => {
       if (!beAvailable) return;
       const { harness, userId } = await createOnboardedTeacher('MultiDeviceTeacher');
-      const phoneEndpoint = `https://127.0.0.1:${pushPort}/sub/${userId}/phone`;
-      const laptopEndpoint = `https://127.0.0.1:${pushPort}/sub/${userId}/laptop`;
+      const phoneEndpoint = `${PUSH_ENDPOINT_BASE}/sub/${userId}/phone`;
+      const laptopEndpoint = `${PUSH_ENDPOINT_BASE}/sub/${userId}/laptop`;
 
       await harness.services.push.createPushSubscription({
         endpoint: phoneEndpoint,
@@ -458,7 +379,7 @@ describe('SPEC-005 Push & Reminders E2E Cross-Repo Integration Suite (FE ↔ BE 
     it('US 3, 9, 11, 12: Gửi Reminder cho Task có giờ đến hạn; gọi dispatch lần 2 chỉ gửi đúng 1 lần (idempotent)', async () => {
       if (!beAvailable) return;
       const { harness, userId } = await createOnboardedTeacher('TaskRemindTeacher');
-      const endpoint = `https://127.0.0.1:${pushPort}/sub/${userId}/task-device`;
+      const endpoint = `${PUSH_ENDPOINT_BASE}/sub/${userId}/task-device`;
 
       await harness.services.push.createPushSubscription({
         endpoint,
@@ -496,7 +417,7 @@ describe('SPEC-005 Push & Reminders E2E Cross-Repo Integration Suite (FE ↔ BE 
     it('US 8: Đổi giờ Task hoặc đổi số phút nhắc (reminderLeadMinutes) -> dispatch phát hiện mốc nhắc mới', async () => {
       if (!beAvailable) return;
       const { harness, userId } = await createOnboardedTeacher('LeadMinutesChangeTeacher');
-      const endpoint = `https://127.0.0.1:${pushPort}/sub/${userId}/lead-change-device`;
+      const endpoint = `${PUSH_ENDPOINT_BASE}/sub/${userId}/lead-change-device`;
 
       await harness.services.push.createPushSubscription({
         endpoint,
@@ -534,7 +455,7 @@ describe('SPEC-005 Push & Reminders E2E Cross-Repo Integration Suite (FE ↔ BE 
     it('US 7: Không gửi Reminder cho Task đã hoàn thành hoặc Task đã xoá mềm', async () => {
       if (!beAvailable) return;
       const { harness, userId } = await createOnboardedTeacher('SkipCompletedDeletedTeacher');
-      const endpoint = `https://127.0.0.1:${pushPort}/sub/${userId}/skip-device`;
+      const endpoint = `${PUSH_ENDPOINT_BASE}/sub/${userId}/skip-device`;
 
       await harness.services.push.createPushSubscription({
         endpoint,
@@ -573,7 +494,7 @@ describe('SPEC-005 Push & Reminders E2E Cross-Repo Integration Suite (FE ↔ BE 
     it('US 10: Bỏ qua Task quá muộn (trễ hơn 10 phút)', async () => {
       if (!beAvailable) return;
       const { harness, userId } = await createOnboardedTeacher('TooLateTeacher');
-      const endpoint = `https://127.0.0.1:${pushPort}/sub/${userId}/late-device`;
+      const endpoint = `${PUSH_ENDPOINT_BASE}/sub/${userId}/late-device`;
 
       await harness.services.push.createPushSubscription({
         endpoint,
@@ -606,7 +527,7 @@ describe('SPEC-005 Push & Reminders E2E Cross-Repo Integration Suite (FE ↔ BE 
     it('US 4 & 9: Gửi Reminder cho tiết dạy sinh từ Thời khoá biểu (TimetableSlot) đến hạn', async () => {
       if (!beAvailable) return;
       const { harness, userId } = await createOnboardedTeacher('SlotRemindTeacher');
-      const endpoint = `https://127.0.0.1:${pushPort}/sub/${userId}/slot-device`;
+      const endpoint = `${PUSH_ENDPOINT_BASE}/sub/${userId}/slot-device`;
 
       await harness.services.push.createPushSubscription({
         endpoint,
@@ -648,7 +569,7 @@ describe('SPEC-005 Push & Reminders E2E Cross-Repo Integration Suite (FE ↔ BE 
     it('US 4 & 7: Tiết dạy bị huỷ (cancelled = true) không gửi nhắc nhở', async () => {
       if (!beAvailable) return;
       const { harness, userId } = await createOnboardedTeacher('CancelledSessionTeacher');
-      const endpoint = `https://127.0.0.1:${pushPort}/sub/${userId}/cancelled-session-device`;
+      const endpoint = `${PUSH_ENDPOINT_BASE}/sub/${userId}/cancelled-session-device`;
 
       await harness.services.push.createPushSubscription({
         endpoint,
@@ -685,7 +606,7 @@ describe('SPEC-005 Push & Reminders E2E Cross-Repo Integration Suite (FE ↔ BE 
     it('US 4: Gửi Reminder cho buổi lẻ (ad-hoc class session) chưa huỷ đến hạn', async () => {
       if (!beAvailable) return;
       const { harness, userId } = await createOnboardedTeacher('AdHocRemindTeacher');
-      const endpoint = `https://127.0.0.1:${pushPort}/sub/${userId}/adhoc-device`;
+      const endpoint = `${PUSH_ENDPOINT_BASE}/sub/${userId}/adhoc-device`;
 
       await harness.services.push.createPushSubscription({
         endpoint,
@@ -721,7 +642,7 @@ describe('SPEC-005 Push & Reminders E2E Cross-Repo Integration Suite (FE ↔ BE 
     it('US 16: Đổi múi giờ (timeZone) -> dispatch tính lại giờ nhắc theo múi giờ mới', async () => {
       if (!beAvailable) return;
       const { harness, userId } = await createOnboardedTeacher('TimeZoneTeacher');
-      const endpoint = `https://127.0.0.1:${pushPort}/sub/${userId}/tz-device`;
+      const endpoint = `${PUSH_ENDPOINT_BASE}/sub/${userId}/tz-device`;
 
       await harness.services.push.createPushSubscription({
         endpoint,
@@ -759,7 +680,7 @@ describe('SPEC-005 Push & Reminders E2E Cross-Repo Integration Suite (FE ↔ BE 
     it('khi tắt pushEnabled, mọi reminder đến hạn đều bị bỏ qua', async () => {
       if (!beAvailable) return;
       const { harness, userId } = await createOnboardedTeacher('PushDisabledTeacher');
-      const endpoint = `https://127.0.0.1:${pushPort}/sub/${userId}/disabled-device`;
+      const endpoint = `${PUSH_ENDPOINT_BASE}/sub/${userId}/disabled-device`;
 
       await harness.services.push.createPushSubscription({
         endpoint,
@@ -795,7 +716,7 @@ describe('SPEC-005 Push & Reminders E2E Cross-Repo Integration Suite (FE ↔ BE 
     it('US 14: Đăng xuất gọi DELETE /push/subscriptions trả về 204 No Content, thiết bị không còn nhận push', async () => {
       if (!beAvailable) return;
       const { harness, userId } = await createOnboardedTeacher('LogoutTeacher');
-      const endpoint = `https://127.0.0.1:${pushPort}/sub/${userId}/logout-device`;
+      const endpoint = `${PUSH_ENDPOINT_BASE}/sub/${userId}/logout-device`;
 
       await harness.services.push.createPushSubscription({
         endpoint,
@@ -826,7 +747,7 @@ describe('SPEC-005 Push & Reminders E2E Cross-Repo Integration Suite (FE ↔ BE 
     it('US 15: Subscription trả về 410 Gone (hết hạn) tự động bị xoá khỏi cơ sở dữ liệu', async () => {
       if (!beAvailable) return;
       const { harness, userId } = await createOnboardedTeacher('ExpiredSubTeacher');
-      const expiredEndpoint = `https://127.0.0.1:${pushPort}/sub/${userId}/expired-device`;
+      const expiredEndpoint = `${PUSH_ENDPOINT_BASE}/sub/${userId}/expired-device`;
 
       await harness.services.push.createPushSubscription({
         endpoint: expiredEndpoint,
